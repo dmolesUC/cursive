@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/cursive.iml" filepath="$PROJECT_DIR$/cursive.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cursive-inv-api/cursive-inv-api.iml" filepath="$PROJECT_DIR$/.idea/modules/cursive-inv-api/cursive-inv-api.iml" group="cursive-inv-api" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cursive-inv-api/cursive-inv-api_main.iml" filepath="$PROJECT_DIR$/.idea/modules/cursive-inv-api/cursive-inv-api_main.iml" group="cursive-inv-api" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cursive-inv-api/cursive-inv-api_test.iml" filepath="$PROJECT_DIR$/.idea/modules/cursive-inv-api/cursive-inv-api_test.iml" group="cursive-inv-api" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cursive-inv-store/cursive-inv-store.iml" filepath="$PROJECT_DIR$/.idea/modules/cursive-inv-store/cursive-inv-store.iml" group="cursive-inv-store" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cursive-inv-store/cursive-inv-store_main.iml" filepath="$PROJECT_DIR$/.idea/modules/cursive-inv-store/cursive-inv-store_main.iml" group="cursive-inv-store" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cursive-inv-store/cursive-inv-store_test.iml" filepath="$PROJECT_DIR$/.idea/modules/cursive-inv-store/cursive-inv-store_test.iml" group="cursive-inv-store" />
+    </modules>
+  </component>
+</project>

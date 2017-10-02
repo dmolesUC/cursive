@@ -1,0 +1,6 @@
+include 'cursive-inv-store', 'cursive-inv-api'
+
+rootProject.children.each { project ->
+      print project
+      project.buildFileName = "${project.name}.gradle"
+}

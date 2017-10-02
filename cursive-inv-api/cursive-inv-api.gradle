@@ -1,0 +1,10 @@
+ext {
+  vertxVersion = '3.4.2'
+}
+
+dependencies {
+  compile project(':cursive-inv-store')
+
+  compile "io.vertx:vertx-core:${vertxVersion}"
+  testCompile "io.vertx:vertx-unit:${vertxVersion}"
+}

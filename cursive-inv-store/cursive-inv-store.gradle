@@ -1,0 +1,7 @@
+ext {
+  tinkerpopVersion = '3.3.0'
+}
+
+dependencies {
+  compile "org.apache.tinkerpop:tinkergraph-gremlin:${tinkerpopVersion}"
+}
