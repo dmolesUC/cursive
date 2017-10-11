@@ -21,7 +21,7 @@ hs_err_pid*
 #####=== Gradle ===#####
 
 .gradle
-/build/
+build/
 
 # Ignore Gradle GUI config
 gradle-app.setting
@@ -100,7 +100,6 @@ flycheck_*.el
 .idea/uiDesigner.xml
 
 # Gradle:
-.idea/gradle.xml
 .idea/libraries
 
 # Mongo Explorer plugin:
@@ -125,4 +124,3 @@ com_crashlytics_export_strings.xml
 crashlytics.properties
 crashlytics-build.properties
 fabric.properties
-
