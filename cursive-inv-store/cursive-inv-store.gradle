@@ -3,5 +3,7 @@ ext {
 }
 
 dependencies {
+  compile project(':cursive-inv-core')
+
   compile "org.apache.tinkerpop:tinkergraph-gremlin:${tinkerpopVersion}"
 }

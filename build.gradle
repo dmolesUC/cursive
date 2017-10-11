@@ -22,7 +22,9 @@ subprojects {
     vavrArtifact = 'io.vavr:vavr'
     vavrVersion = '0.9.1'
 
-    junitJupiterVersion = '5.0.0-RC2'
+    junitJupiterVersion = '5.0.0'
+    junitVintageVersion = '4.12.0'
+
     mockitoVersion = '2.7.22'
     assertJVersion = '3.8.0'
   }
@@ -33,17 +35,17 @@ subprojects {
     // Vavr
 
     compile "${vavrArtifact}:${vavrVersion}"
-    
+
     // ------------------------------------------------------------
     // Testing
 
     testCompile "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
     testCompile "org.junit.jupiter:junit-jupiter-params:${junitJupiterVersion}"
     testRuntime "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
+    testCompile "org.junit.vintage:junit-vintage-engine:${junitVintageVersion}"
 
     testCompile "org.mockito:mockito-core:${mockitoVersion}"
     testCompile "org.assertj:assertj-core:${assertJVersion}"
 
-    testCompile 'org.junit.vintage:junit-vintage-engine:4.12.0-RC2'
   }
 }

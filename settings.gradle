@@ -1,4 +1,4 @@
-include 'cursive-inv-store', 'cursive-inv-api'
+include 'cursive-inv-core', 'cursive-inv-store', 'cursive-inv-api'
 
 rootProject.children.each { project ->
       print project
