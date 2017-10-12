@@ -8,7 +8,11 @@ import org.cdlib.cursive.core.CObject;
 
 public interface Store {
   Traversable<CWorkspace> workspaces();
+  CWorkspace createWorkspace();
+
   Traversable<CCollection> collections();
+  CCollection createCollection();
+
   Traversable<CObject> objects();
   Traversable<CFile> files();
 }

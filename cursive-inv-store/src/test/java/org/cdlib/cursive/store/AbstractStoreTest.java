@@ -9,7 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static org.cdlib.cursive.util.ValueAssert.assertThat;
+import static org.cdlib.cursive.util.VavrAssertions.assertThat;
 
 public abstract class AbstractStoreTest<S extends Store> {
 
@@ -36,6 +36,28 @@ public abstract class AbstractStoreTest<S extends Store> {
       Traversable<CWorkspace> workspaces = store.workspaces();
       assertThat(workspaces).isEmpty();
     }
+
+    @Test
+    void createWorkspaceCreatesAWorkspace() {
+      CWorkspace workspace = store.createWorkspace();
+      assertThat(workspace).isNotNull();
+      assertThat(store.workspaces()).contains(workspace);
+    }
+
+    @Test
+    void newWorkspaceIsEmpty() {
+      CWorkspace workspace = store.createWorkspace();
+      assertThat(workspace.memberCollections()).isEmpty();
+    }
+
+    @Test
+    void createCollectionCreatesACollection() {
+      CWorkspace workspace = store.createWorkspace();
+      CCollection collection = workspace.createCollection();
+      assertThat(workspace.memberCollections()).contains(collection);
+      assertThat(collection.parentWorkspace()).contains(workspace);
+      assertThat(store.collections()).contains(collection);
+    }
   }
 
   @Nested
@@ -45,6 +67,13 @@ public abstract class AbstractStoreTest<S extends Store> {
     void collectionsEmptyByDefault() {
       Traversable<CCollection> collections = store.collections();
       assertThat(collections).isEmpty();
+    }
+
+    @Test
+    void createCollectionCreatesACollection() {
+      CCollection collection = store.createCollection();
+      assertThat(collection).isNotNull();
+      assertThat(store.collections()).contains(collection);
     }
   }
 
