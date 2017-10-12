@@ -17,6 +17,7 @@ class MObject implements CObject {
   private final Option<CObject> parentObject;
 
   private final AtomicReference<Vector<CObject>> memberObjects = new AtomicReference<>(Vector.empty());
+  private final AtomicReference<Vector<CFile>> memberFiles = new AtomicReference<>(Vector.empty());
 
   MObject(MemoryStore store) {
     this(store, null, null);
@@ -51,7 +52,14 @@ class MObject implements CObject {
 
   @Override
   public Traversable<CFile> memberFiles() {
-    return null;
+    return memberFiles.get();
+  }
+
+  @Override
+  public CFile createFile() {
+    Lazy<CFile> newFile = Lazy.of(() -> store.createFile(this));
+    memberFiles.updateAndGet(v -> v.append(newFile.get()));
+    return newFile.get();
   }
 
   @Override

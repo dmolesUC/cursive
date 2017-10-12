@@ -101,6 +101,12 @@ public class MemoryStore implements Store {
     return files.get();
   }
 
+  CFile createFile(MObject parent) {
+    Lazy<CFile> newFile = Lazy.of(() -> new MFile(parent));
+    files.updateAndGet(v -> v.append(newFile.get()));
+    return newFile.get();
+  }
+
 
   // ------------------------------------------------------------
   // Relationships

@@ -8,6 +8,7 @@ public interface CObject {
   Option<CCollection> parentCollection();
 
   Traversable<CFile> memberFiles();
+  CFile createFile();
 
   Traversable<CObject> memberObjects();
   CObject createObject();

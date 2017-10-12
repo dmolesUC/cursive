@@ -122,6 +122,16 @@ public abstract class AbstractStoreTest<S extends Store> {
       assertThat(child.parentObject()).contains(parent);
       assertThat(store.objects()).contains(child);
     }
+
+    @Test
+    void createChildFileCreatesAFile() {
+      CObject parent = store.createObject();
+      CFile child = parent.createFile();
+      assertThat(child).isNotNull();
+      assertThat(parent.memberFiles()).contains(child);
+      assertThat(child.parentObject()).isEqualTo(parent);
+      assertThat(store.files()).contains(child);
+    }
   }
 
   @Nested
