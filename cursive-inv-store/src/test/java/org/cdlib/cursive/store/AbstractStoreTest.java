@@ -51,7 +51,7 @@ public abstract class AbstractStoreTest<S extends Store> {
     }
 
     @Test
-    void createCollectionCreatesACollection() {
+    void createChildCollectionCreatesACollection() {
       CWorkspace workspace = store.createWorkspace();
       CCollection collection = workspace.createCollection();
       assertThat(workspace.memberCollections()).contains(collection);
@@ -74,6 +74,16 @@ public abstract class AbstractStoreTest<S extends Store> {
       CCollection collection = store.createCollection();
       assertThat(collection).isNotNull();
       assertThat(store.collections()).contains(collection);
+    }
+
+    @Test
+    void createChildCollectionCreatesACollection() {
+      CCollection parent = store.createCollection();
+      CCollection child = parent.createCollection();
+      assertThat(child).isNotNull();
+      assertThat(parent.memberCollections()).contains(child);
+      assertThat(child.parentCollection()).contains(parent);
+      assertThat(store.collections()).contains(child);
     }
   }
 

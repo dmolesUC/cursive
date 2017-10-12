@@ -8,5 +8,7 @@ public interface CCollection {
   Option<CCollection> parentCollection();
 
   Traversable<CObject> memberObjects();
+
   Traversable<CCollection> memberCollections();
+  CCollection createCollection();
 }

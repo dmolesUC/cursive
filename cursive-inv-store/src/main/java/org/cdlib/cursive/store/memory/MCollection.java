@@ -1,16 +1,23 @@
 package org.cdlib.cursive.store.memory;
 
+import io.vavr.Lazy;
 import io.vavr.collection.Traversable;
+import io.vavr.collection.Vector;
 import io.vavr.control.Option;
 import org.cdlib.cursive.core.CCollection;
 import org.cdlib.cursive.core.CObject;
 import org.cdlib.cursive.core.CWorkspace;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 class MCollection implements CCollection {
+
+  private MemoryStore store;
 
   private Option<CWorkspace> parentWorkspace;
   private Option<CCollection> parentCollection;
-  private MemoryStore store;
+
+  private final AtomicReference<Vector<CCollection>> memberCollections = new AtomicReference<>(Vector.empty());
 
   MCollection(MemoryStore store) {
     this(store, null, null);
@@ -18,6 +25,10 @@ class MCollection implements CCollection {
 
   MCollection(MemoryStore store, MWorkspace parentWorkspace) {
     this(store, parentWorkspace, null);
+  }
+
+  MCollection(MemoryStore store, MCollection parentCollection) {
+    this(store, null, parentCollection);
   }
 
   MCollection(MemoryStore store, MWorkspace parentWorkspace, MCollection parentCollection) {
@@ -43,6 +54,13 @@ class MCollection implements CCollection {
 
   @Override
   public Traversable<CCollection> memberCollections() {
-    return null;
+    return memberCollections.get();
+  }
+
+  @Override
+  public CCollection createCollection() {
+    Lazy<CCollection> newCollection = Lazy.of(() -> store.createCollection(this));
+    memberCollections.updateAndGet(v -> v.append(newCollection.get()));
+    return newCollection.get();
   }
 }

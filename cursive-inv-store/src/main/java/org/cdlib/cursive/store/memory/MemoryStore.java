@@ -54,8 +54,14 @@ public class MemoryStore implements Store {
     return newCollection.get();
   }
 
-  CCollection createCollection(MWorkspace mWorkspace) {
-    Lazy<CCollection> newCollection = Lazy.of(() -> new MCollection(this, mWorkspace));
+  CCollection createCollection(MWorkspace parent) {
+    Lazy<CCollection> newCollection = Lazy.of(() -> new MCollection(this, parent));
+    collections.updateAndGet(v -> v.append(newCollection.get()));
+    return newCollection.get();
+  }
+
+  CCollection createCollection(MCollection parent) {
+    Lazy<CCollection> newCollection = Lazy.of(() -> new MCollection(this, parent));
     collections.updateAndGet(v -> v.append(newCollection.get()));
     return newCollection.get();
   }

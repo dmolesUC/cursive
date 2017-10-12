@@ -13,7 +13,9 @@ public class ValueAssert<T> extends AbstractAssert<ValueAssert<T>, Value<T>> {
   }
 
   public ValueAssert<T> isEmpty() {
-    isNotNull();
+    if (actual == null) {
+      failWithMessage("Exected empty value, but found null instead");
+    }
     if (!actual.isEmpty()) {
       failWithMessage("Expected value to be empty, but contained <%s>", actual.get());
     }
@@ -21,7 +23,9 @@ public class ValueAssert<T> extends AbstractAssert<ValueAssert<T>, Value<T>> {
   }
 
   public ValueAssert<T> contains(T value) {
-    isNotNull();
+    if (actual == null) {
+      failWithMessage("Exected value to contain <%s>, but value was null", value);
+    }
     if (!actual.contains(value)) {
       if (actual.isEmpty()) {
         failWithMessage("Expected value to contain <%s>, but was empty", value);

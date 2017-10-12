@@ -12,7 +12,7 @@ class MWorkspace implements CWorkspace {
 
   private final MemoryStore store;
 
-  private final AtomicReference<Vector<CCollection>> collections = new AtomicReference<>(Vector.empty());
+  private final AtomicReference<Vector<CCollection>> memberCollections = new AtomicReference<>(Vector.empty());
 
   MWorkspace(MemoryStore store) {
     this.store = store;
@@ -20,13 +20,13 @@ class MWorkspace implements CWorkspace {
 
   @Override
   public Traversable<CCollection> memberCollections() {
-    return collections.get();
+    return memberCollections.get();
   }
 
   @Override
   public CCollection createCollection() {
     Lazy<CCollection> newCollection = Lazy.of(() -> store.createCollection(this));
-    collections.updateAndGet(v -> v.append(newCollection.get()));
+    memberCollections.updateAndGet(v -> v.append(newCollection.get()));
     return newCollection.get();
   }
 }
