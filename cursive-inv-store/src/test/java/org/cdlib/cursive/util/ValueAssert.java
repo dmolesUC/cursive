@@ -4,7 +4,7 @@ import io.vavr.Value;
 import org.assertj.core.api.AbstractAssert;
 
 public class ValueAssert<T> extends AbstractAssert<ValueAssert<T>, Value<T>> {
-  public ValueAssert(Value<T> ts) {
+  private ValueAssert(Value<T> ts) {
     super(ts, ValueAssert.class);
   }
 
@@ -12,21 +12,23 @@ public class ValueAssert<T> extends AbstractAssert<ValueAssert<T>, Value<T>> {
     return new ValueAssert<>(actual);
   }
 
+  @SuppressWarnings("UnusedReturnValue")
   public ValueAssert<T> isEmpty() {
     if (actual == null) {
       failWithMessage("Exected empty value, but found null instead");
     }
-    if (!actual.isEmpty()) {
+    else if (!actual.isEmpty()) {
       failWithMessage("Expected value to be empty, but contained <%s>", actual.get());
     }
     return this;
   }
 
+  @SuppressWarnings("UnusedReturnValue")
   public ValueAssert<T> contains(T value) {
     if (actual == null) {
       failWithMessage("Exected value to contain <%s>, but value was null", value);
     }
-    if (!actual.contains(value)) {
+    else if (!actual.contains(value)) {
       if (actual.isEmpty()) {
         failWithMessage("Expected value to contain <%s>, but was empty", value);
       } else {

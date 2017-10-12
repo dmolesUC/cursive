@@ -1,10 +1,7 @@
 package org.cdlib.cursive.store;
 
 import io.vavr.collection.Traversable;
-import org.cdlib.cursive.core.CCollection;
-import org.cdlib.cursive.core.CFile;
-import org.cdlib.cursive.core.CWorkspace;
-import org.cdlib.cursive.core.CObject;
+import org.cdlib.cursive.core.*;
 
 public interface Store {
   Traversable<CWorkspace> workspaces();

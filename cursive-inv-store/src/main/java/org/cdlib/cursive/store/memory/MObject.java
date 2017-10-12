@@ -74,8 +74,4 @@ class MObject implements CObject {
     return newObject.get();
   }
 
-  @Override
-  public Traversable<CObject> relatedObjects() {
-    return null;
-  }
 }

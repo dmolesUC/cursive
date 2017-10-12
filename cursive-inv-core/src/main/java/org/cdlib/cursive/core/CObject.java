@@ -13,5 +13,4 @@ public interface CObject {
   Traversable<CObject> memberObjects();
   CObject createObject();
 
-  Traversable<CObject> relatedObjects();
 }
