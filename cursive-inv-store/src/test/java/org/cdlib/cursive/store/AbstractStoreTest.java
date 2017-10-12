@@ -85,6 +85,16 @@ public abstract class AbstractStoreTest<S extends Store> {
       assertThat(child.parentCollection()).contains(parent);
       assertThat(store.collections()).contains(child);
     }
+
+    @Test
+    void createChildObjectCreatesAnObject() {
+      CCollection parent = store.createCollection();
+      CObject child = parent.createObject();
+      assertThat(child).isNotNull();
+      assertThat(parent.memberObjects()).contains(child);
+      assertThat(child.parentCollection()).contains(parent);
+      assertThat(store.objects()).contains(child);
+    }
   }
 
   @Nested
@@ -94,6 +104,23 @@ public abstract class AbstractStoreTest<S extends Store> {
     void objectsEmptyByDefault() {
       Traversable<CObject> objects = store.objects();
       assertThat(objects).isEmpty();
+    }
+
+    @Test
+    void createObjectCreatesAnObject() {
+      CObject object = store.createObject();
+      assertThat(object).isNotNull();
+      assertThat(store.objects()).contains(object);
+    }
+
+    @Test
+    void createChildObjectCreatesAnObject() {
+      CObject parent = store.createObject();
+      CObject child = parent.createObject();
+      assertThat(child).isNotNull();
+      assertThat(parent.memberObjects()).contains(child);
+      assertThat(child.parentObject()).contains(parent);
+      assertThat(store.objects()).contains(child);
     }
   }
 

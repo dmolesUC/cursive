@@ -18,6 +18,7 @@ class MCollection implements CCollection {
   private Option<CCollection> parentCollection;
 
   private final AtomicReference<Vector<CCollection>> memberCollections = new AtomicReference<>(Vector.empty());
+  private final AtomicReference<Vector<CObject>> memberObjects = new AtomicReference<>(Vector.empty());
 
   MCollection(MemoryStore store) {
     this(store, null, null);
@@ -31,7 +32,10 @@ class MCollection implements CCollection {
     this(store, null, parentCollection);
   }
 
-  MCollection(MemoryStore store, MWorkspace parentWorkspace, MCollection parentCollection) {
+  private MCollection(MemoryStore store, MWorkspace parentWorkspace, MCollection parentCollection) {
+    assert store != null : "Collection must have a Store";
+    assert parentWorkspace == null || parentCollection == null : String.format("Collection can have at most one parent: %s, %s", parentWorkspace, parentCollection);
+
     this.store = store;
     this.parentWorkspace = Option.of(parentWorkspace);
     this.parentCollection = Option.of(parentCollection);
@@ -49,7 +53,7 @@ class MCollection implements CCollection {
 
   @Override
   public Traversable<CObject> memberObjects() {
-    return null;
+    return memberObjects.get();
   }
 
   @Override
@@ -62,5 +66,12 @@ class MCollection implements CCollection {
     Lazy<CCollection> newCollection = Lazy.of(() -> store.createCollection(this));
     memberCollections.updateAndGet(v -> v.append(newCollection.get()));
     return newCollection.get();
+  }
+
+  @Override
+  public CObject createObject() {
+    Lazy<CObject> newObject = Lazy.of(() -> store.createObject(this));
+    memberObjects.updateAndGet(v -> v.append(newObject.get()));
+    return newObject.get();
   }
 }

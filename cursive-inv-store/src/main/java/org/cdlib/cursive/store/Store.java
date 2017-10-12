@@ -14,5 +14,7 @@ public interface Store {
   CCollection createCollection();
 
   Traversable<CObject> objects();
+  CObject createObject();
+
   Traversable<CFile> files();
 }

@@ -74,6 +74,25 @@ public class MemoryStore implements Store {
     return objects.get();
   }
 
+  @Override
+  public CObject createObject() {
+    Lazy<CObject> newObject = Lazy.of(() -> new MObject(this));
+    objects.updateAndGet(v -> v.append(newObject.get()));
+    return newObject.get();
+  }
+
+  CObject createObject(MObject parent) {
+    Lazy<CObject> newObject = Lazy.of(() -> new MObject(this, parent));
+    objects.updateAndGet(v -> v.append(newObject.get()));
+    return newObject.get();
+  }
+
+  CObject createObject(MCollection parent) {
+    Lazy<CObject> newObject = Lazy.of(() -> new MObject(this, parent));
+    objects.updateAndGet(v -> v.append(newObject.get()));
+    return newObject.get();
+  }
+
   // --------------------
   // Files
 
