@@ -99,9 +99,6 @@ flycheck_*.el
 .idea/dynamic.xml
 .idea/uiDesigner.xml
 
-# Gradle:
-.idea/libraries
-
 # Mongo Explorer plugin:
 .idea/mongoSettings.xml
 
