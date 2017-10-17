@@ -106,7 +106,7 @@ public class MemoryStore implements Store {
     return newFile.get();
   }
 
-  // ------------------------------------------------------------
+  // --------------------
   // Relationships
 
   @Override

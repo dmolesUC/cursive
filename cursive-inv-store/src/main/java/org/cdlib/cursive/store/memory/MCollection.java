@@ -12,6 +12,9 @@ import java.util.concurrent.atomic.AtomicReference;
 
 class MCollection implements CCollection {
 
+  // --------------------
+  // Fields
+
   private MemoryStore store;
 
   private Option<CWorkspace> parentWorkspace;
@@ -19,6 +22,9 @@ class MCollection implements CCollection {
 
   private final AtomicReference<Vector<CCollection>> memberCollections = new AtomicReference<>(Vector.empty());
   private final AtomicReference<Vector<CObject>> memberObjects = new AtomicReference<>(Vector.empty());
+
+  // --------------------
+  // Constructors
 
   MCollection(MemoryStore store) {
     this(store, null, null);
@@ -41,6 +47,9 @@ class MCollection implements CCollection {
     this.parentCollection = Option.of(parentCollection);
   }
 
+  // --------------------
+  // Parents
+
   @Override
   public Option<CWorkspace> parentWorkspace() {
     return parentWorkspace;
@@ -51,10 +60,23 @@ class MCollection implements CCollection {
     return parentCollection;
   }
 
+  // --------------------
+  // Member objects
+
   @Override
   public Traversable<CObject> memberObjects() {
     return memberObjects.get();
   }
+
+  @Override
+  public CObject createObject() {
+    Lazy<CObject> newObject = Lazy.of(() -> store.createObject(this));
+    memberObjects.updateAndGet(v -> v.append(newObject.get()));
+    return newObject.get();
+  }
+
+  // --------------------
+  // Member collections
 
   @Override
   public Traversable<CCollection> memberCollections() {
@@ -66,12 +88,5 @@ class MCollection implements CCollection {
     Lazy<CCollection> newCollection = Lazy.of(() -> store.createCollection(this));
     memberCollections.updateAndGet(v -> v.append(newCollection.get()));
     return newCollection.get();
-  }
-
-  @Override
-  public CObject createObject() {
-    Lazy<CObject> newObject = Lazy.of(() -> store.createObject(this));
-    memberObjects.updateAndGet(v -> v.append(newObject.get()));
-    return newObject.get();
   }
 }

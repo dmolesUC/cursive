@@ -10,13 +10,21 @@ import java.util.concurrent.atomic.AtomicReference;
 
 class MWorkspace implements CWorkspace {
 
-  private final MemoryStore store;
+  // --------------------
+  // Fields
 
+  private final MemoryStore store;
   private final AtomicReference<Vector<CCollection>> memberCollections = new AtomicReference<>(Vector.empty());
+
+  // --------------------
+  // Constructors
 
   MWorkspace(MemoryStore store) {
     this.store = store;
   }
+
+  // --------------------
+  // Member collections
 
   @Override
   public Traversable<CCollection> memberCollections() {

@@ -5,13 +5,22 @@ import org.cdlib.cursive.core.CRelation;
 
 public class MRelation implements CRelation {
 
+  // --------------------
+  // Fields
+
   private final CObject fromObject;
   private final CObject toObject;
+
+  // --------------------
+  // Constructors
 
   MRelation(CObject fromObject, CObject toObject) {
     this.fromObject = fromObject;
     this.toObject = toObject;
   }
+
+  // --------------------
+  // Related objects
 
   @Override
   public CObject fromObject() {

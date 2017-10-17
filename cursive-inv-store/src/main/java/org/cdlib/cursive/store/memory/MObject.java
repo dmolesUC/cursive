@@ -12,6 +12,10 @@ import org.cdlib.cursive.core.CRelation;
 import java.util.concurrent.atomic.AtomicReference;
 
 class MObject implements CObject {
+
+  // --------------------
+  // Fields
+
   private final MemoryStore store;
 
   private final Option<CCollection> parentCollection;
@@ -22,6 +26,9 @@ class MObject implements CObject {
 
   private final AtomicReference<Vector<CRelation>> incomingRelations = new AtomicReference<>(Vector.empty());
   private final AtomicReference<Vector<CRelation>> outgoingRelations = new AtomicReference<>(Vector.empty());
+
+  // --------------------
+  // Constructors
 
   MObject(MemoryStore store) {
     this(store, null, null);
@@ -44,6 +51,9 @@ class MObject implements CObject {
     this.parentObject = Option.of(parentObject);
   }
 
+  // --------------------
+  // Parents
+
   @Override
   public Option<CObject> parentObject() {
     return parentObject;
@@ -53,6 +63,9 @@ class MObject implements CObject {
   public Option<CCollection> parentCollection() {
     return parentCollection;
   }
+
+  // --------------------
+  // Member files
 
   @Override
   public Traversable<CFile> memberFiles() {
@@ -66,6 +79,9 @@ class MObject implements CObject {
     return newFile.get();
   }
 
+  // --------------------
+  // Member objects
+
   @Override
   public Traversable<CObject> memberObjects() {
     return memberObjects.get();
@@ -77,6 +93,9 @@ class MObject implements CObject {
     memberObjects.updateAndGet(v -> v.append(newObject.get()));
     return newObject.get();
   }
+
+  // --------------------
+  // Relationships
 
   @Override
   public Traversable<CObject> relatedObjects() {
