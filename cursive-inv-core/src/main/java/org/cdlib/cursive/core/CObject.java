@@ -13,4 +13,9 @@ public interface CObject {
   Traversable<CObject> memberObjects();
   CObject createObject();
 
+  Traversable<CObject> relatedObjects();
+  CRelation relateTo(CObject toObject);
+
+  Traversable<CRelation> outgoingRelations();
+  Traversable<CRelation> incomingRelations();
 }

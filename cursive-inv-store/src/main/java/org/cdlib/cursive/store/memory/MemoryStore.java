@@ -3,10 +3,7 @@ package org.cdlib.cursive.store.memory;
 import io.vavr.Lazy;
 import io.vavr.collection.Traversable;
 import io.vavr.collection.Vector;
-import org.cdlib.cursive.core.CCollection;
-import org.cdlib.cursive.core.CFile;
-import org.cdlib.cursive.core.CObject;
-import org.cdlib.cursive.core.CWorkspace;
+import org.cdlib.cursive.core.*;
 import org.cdlib.cursive.store.Store;
 
 import java.util.concurrent.atomic.AtomicReference;
@@ -20,6 +17,7 @@ public class MemoryStore implements Store {
   private final AtomicReference<Vector<CCollection>> collections = new AtomicReference<>(Vector.empty());
   private final AtomicReference<Vector<CObject>> objects = new AtomicReference<>(Vector.empty());
   private final AtomicReference<Vector<CFile>> files = new AtomicReference<>(Vector.empty());
+  private final AtomicReference<Vector<CRelation>> relations = new AtomicReference<>(Vector.empty());
 
   // ------------------------------------------------------------
   // Store
@@ -101,15 +99,23 @@ public class MemoryStore implements Store {
     return files.get();
   }
 
+  // TODO: create files in objects, replace this with recordFile() or similar
   CFile createFile(MObject parent) {
     Lazy<CFile> newFile = Lazy.of(() -> new MFile(parent));
     files.updateAndGet(v -> v.append(newFile.get()));
     return newFile.get();
   }
 
-
   // ------------------------------------------------------------
   // Relationships
 
+  @Override
+  public Traversable<CRelation> relations() {
+    return relations.get();
+  }
+
+  void recordRelation(MRelation relation) {
+    relations.updateAndGet(v -> v.append(relation));
+  }
 
 }

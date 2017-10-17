@@ -1,10 +1,7 @@
 package org.cdlib.cursive.store;
 
 import io.vavr.collection.Traversable;
-import org.cdlib.cursive.core.CFile;
-import org.cdlib.cursive.core.CObject;
-import org.cdlib.cursive.core.CCollection;
-import org.cdlib.cursive.core.CWorkspace;
+import org.cdlib.cursive.core.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -141,6 +138,30 @@ public abstract class AbstractStoreTest<S extends Store> {
     void filesEmptyByDefault() {
       Traversable<CFile> files = store.files();
       assertThat(files).isEmpty();
+    }
+  }
+
+  @Nested
+  @SuppressWarnings("unused")
+  class Relations {
+    @Test
+    void relationsEmptyByDefault() {
+      Traversable<CRelation> relations = store.relations();
+      assertThat(relations.isEmpty());
+    }
+
+    @Test
+    void createRelationCreatesARelation() {
+      CObject fromObject = store.createObject();
+      CObject toObject = store.createObject();
+
+      CRelation relation = fromObject.relateTo(toObject);
+      assertThat(relation.fromObject()).isSameAs(fromObject);
+      assertThat(relation.toObject()).isSameAs(toObject);
+
+      assertThat(fromObject.relatedObjects()).contains(toObject);
+      assertThat(fromObject.outgoingRelations()).contains(relation);
+      assertThat(toObject.incomingRelations()).contains(relation);
     }
   }
 }

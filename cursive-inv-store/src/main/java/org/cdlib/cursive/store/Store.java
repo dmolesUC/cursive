@@ -14,4 +14,5 @@ public interface Store {
   CObject createObject();
 
   Traversable<CFile> files();
+  Traversable<CRelation> relations();
 }

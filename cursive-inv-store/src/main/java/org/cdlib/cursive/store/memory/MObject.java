@@ -7,6 +7,7 @@ import io.vavr.control.Option;
 import org.cdlib.cursive.core.CCollection;
 import org.cdlib.cursive.core.CFile;
 import org.cdlib.cursive.core.CObject;
+import org.cdlib.cursive.core.CRelation;
 
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -18,6 +19,9 @@ class MObject implements CObject {
 
   private final AtomicReference<Vector<CObject>> memberObjects = new AtomicReference<>(Vector.empty());
   private final AtomicReference<Vector<CFile>> memberFiles = new AtomicReference<>(Vector.empty());
+
+  private final AtomicReference<Vector<CRelation>> incomingRelations = new AtomicReference<>(Vector.empty());
+  private final AtomicReference<Vector<CRelation>> outgoingRelations = new AtomicReference<>(Vector.empty());
 
   MObject(MemoryStore store) {
     this(store, null, null);
@@ -72,6 +76,38 @@ class MObject implements CObject {
     Lazy<CObject> newObject = Lazy.of(() -> store.createObject(this));
     memberObjects.updateAndGet(v -> v.append(newObject.get()));
     return newObject.get();
+  }
+
+  @Override
+  public Traversable<CObject> relatedObjects() {
+    return outgoingRelations.get().map(CRelation::toObject);
+  }
+
+  @Override
+  public Traversable<CRelation> outgoingRelations() {
+    return outgoingRelations.get();
+  }
+
+  @Override
+  public Traversable<CRelation> incomingRelations() {
+    return incomingRelations.get();
+  }
+
+  @Override
+  public CRelation relateTo(CObject toObject) {
+    Lazy<MRelation> newRelation = Lazy.of(() -> new MRelation(this, toObject));
+    outgoingRelations.updateAndGet(v -> v.append(newRelation.get()));
+    MRelation relation = newRelation.get();
+    if (toObject instanceof MObject) {
+      ((MObject) toObject).addIncomingRelation(relation);
+    }
+    store.recordRelation(relation);
+    return relation;
+  }
+
+  private void addIncomingRelation(MRelation relation) {
+    assert this.equals(relation.toObject()): String.format("Incoming relation points to wrong object: expected %s, was %s", this, relation.toObject());
+    incomingRelations.updateAndGet(v -> v.append(relation));
   }
 
 }
