@@ -1,3 +1,7 @@
+apply plugin: 'application'
+
+mainClassName = 'io.vertx.core.Launcher'
+
 ext {
   vertxVersion = '3.4.2'
 }

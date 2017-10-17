@@ -1,0 +1,9 @@
+apply plugin: 'java-library'
+
+ext {
+  vavrVersion = '0.9.1'
+}
+
+dependencies {
+  api "io.vavr:vavr:${vavrVersion}"
+}

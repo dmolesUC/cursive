@@ -12,7 +12,6 @@ task wrapper(type: Wrapper) {
 }
 
 subprojects {
-  apply plugin: 'java'
   apply plugin: 'org.junit.platform.gradle.plugin'
 
   sourceCompatibility = 1.8
@@ -23,9 +22,6 @@ subprojects {
   }
 
   ext {
-    vavrArtifact = 'io.vavr:vavr'
-    vavrVersion = '0.9.1'
-
     junitJupiterVersion = '5.0.0'
     junitVintageVersion = '4.12.0'
 
@@ -34,11 +30,6 @@ subprojects {
   }
 
   dependencies {
-
-    // ------------------------------------------------------------
-    // Vavr
-
-    compile "${vavrArtifact}:${vavrVersion}"
 
     // ------------------------------------------------------------
     // Testing

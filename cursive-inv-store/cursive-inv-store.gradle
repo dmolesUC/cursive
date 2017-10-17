@@ -1,9 +1,11 @@
+apply plugin: 'java-library'
+
 ext {
   tinkerpopVersion = '3.3.0'
 }
 
 dependencies {
-  compile project(':cursive-inv-core')
+  api project(':cursive-inv-core')
 
-  compile "org.apache.tinkerpop:tinkergraph-gremlin:${tinkerpopVersion}"
+  implementation "org.apache.tinkerpop:tinkergraph-gremlin:${tinkerpopVersion}"
 }
