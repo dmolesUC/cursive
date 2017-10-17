@@ -12,3 +12,8 @@ dependencies {
   compile "io.vertx:vertx-core:${vertxVersion}"
   testCompile "io.vertx:vertx-unit:${vertxVersion}"
 }
+
+test {
+  // TODO: some sort of environment configuration
+  systemProperty 'cursive.port', 8180
+}
