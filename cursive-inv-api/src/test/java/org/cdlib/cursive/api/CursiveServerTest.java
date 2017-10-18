@@ -1,6 +1,8 @@
 package org.cdlib.cursive.api;
 
+import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
@@ -9,23 +11,24 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static org.cdlib.cursive.api.CursiveServer.DEFAULT_CURSIVE_PORT;
-
 @RunWith(VertxUnitRunner.class)
 public class CursiveServerTest {
   private Vertx vertx;
-  private int cursivePort;
+  private int httpPort;
 
   @Before
   public void setUp(TestContext tc) {
-    // TODO: figure out how to share IDEA/Gradle test configuration
-    cursivePort = Integer.getInteger("cursive.port", DEFAULT_CURSIVE_PORT);
-//    cursivePort = Integer.getInteger("cursive.port");
+    httpPort = 8180;
+    DeploymentOptions options = new DeploymentOptions()
+      .setConfig(new JsonObject().put("http.port", httpPort));
 
     vertx = Vertx.vertx();
 
     // TODO: is there a better way to do this than Class.getName()?
-    vertx.deployVerticle(CursiveServer.class.getName(), tc.asyncAssertSuccess());
+    vertx.deployVerticle(
+      CursiveServer.class.getName(),
+      options,
+      tc.asyncAssertSuccess());
   }
 
   @After
@@ -37,7 +40,7 @@ public class CursiveServerTest {
   public void serverStarts(TestContext tc) {
     Async async = tc.async();
     // TODO: fluent assertions
-    vertx.createHttpClient().getNow(cursivePort, "localhost", "/", response -> {
+    vertx.createHttpClient().getNow(httpPort, "localhost", "/", response -> {
       tc.assertEquals(response.statusCode(), 200);
       response.bodyHandler(body -> async.complete());
     });
