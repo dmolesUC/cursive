@@ -2,10 +2,13 @@ apply plugin: 'java-library'
 
 ext {
   tinkerpopVersion = '3.3.0'
+  rxJavaVersion = '2.1.5'
 }
 
 dependencies {
   api project(':cursive-inv-core')
+
+  api "io.reactivex.rxjava2:rxjava:${rxJavaVersion}"
 
   implementation "org.apache.tinkerpop:tinkergraph-gremlin:${tinkerpopVersion}"
 }
