@@ -44,6 +44,9 @@ public abstract class AbstractReactiveStoreTest<S extends ReactiveStore> {
       assertThat(allWorkspaces).containsExactly(workspace);
     }
 
+    // TODO: figure out sync/async naming convention
+    // TODO: figure out whether same object can implement sync/async interfaces
+
 //    @Test
 //    void createWorkspaceCreatesAWorkspace() {
 //      CWorkspace workspace = store.createWorkspace();
