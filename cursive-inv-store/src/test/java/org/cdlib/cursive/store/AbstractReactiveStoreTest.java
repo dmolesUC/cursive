@@ -1,12 +1,13 @@
 package org.cdlib.cursive.store;
 
-import io.reactivex.Observable;
+import io.reactivex.observers.TestObserver;
+import io.vavr.collection.List;
 import org.cdlib.cursive.core.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static org.cdlib.cursive.util.RxJavaAssertions.assertThat;
+import static org.cdlib.cursive.util.RxJavaAssertions.*;
 
 public abstract class AbstractReactiveStoreTest<S extends ReactiveStore> {
   // ------------------------------------------------------------
@@ -29,10 +30,18 @@ public abstract class AbstractReactiveStoreTest<S extends ReactiveStore> {
   class Workspaces {
     @Test
     void workspacesEmptyByDefault() {
-      Observable<CWorkspace> workspaces = store.workspaces();
-      assertThat(workspaces).isComplete();
-      assertThat(workspaces).isEmpty();
-      assertThat(workspaces).hasNoErrors();
+      TestObserver<CWorkspace> allWSObserver = store.workspaces().test();
+      assertThat(allWSObserver).isComplete();
+      assertThat(allWSObserver).observedNoValues();
+      assertThat(allWSObserver).observedNoErrors();
+    }
+
+    @Test
+    void createWorkspaceCreatesAWorkspace() {
+      CWorkspace workspace = valueEmittedBy(store.createWorkspace());
+
+      List<CWorkspace> allWorkspaces = valuesEmittedBy(store.workspaces());
+      assertThat(allWorkspaces).containsExactly(workspace);
     }
 
 //    @Test
@@ -41,13 +50,7 @@ public abstract class AbstractReactiveStoreTest<S extends ReactiveStore> {
 //      Assertions.assertThat(workspace).isNotNull();
 //      assertThat(store.workspaces()).contains(workspace);
 //    }
-//
-//    @Test
-//    void newWorkspaceIsEmpty() {
-//      CWorkspace workspace = store.createWorkspace();
-//      assertThat(workspace.memberCollections()).isEmpty();
-//    }
-//
+
 //    @Test
 //    void createChildCollectionCreatesACollection() {
 //      CWorkspace workspace = store.createWorkspace();

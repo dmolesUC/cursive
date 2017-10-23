@@ -1,0 +1,165 @@
+package org.cdlib.cursive.util;
+
+import io.reactivex.observers.TestObserver;
+import io.vavr.collection.Array;
+import io.vavr.collection.List;
+import io.vavr.collection.Traversable;
+import org.assertj.core.api.AbstractAssert;
+
+public class TestObserverAssert<T> extends AbstractAssert<TestObserverAssert<T>, TestObserver<T>> {
+
+  // ------------------------------
+  // Constructors
+
+  private TestObserverAssert(TestObserver<T> obs) {
+    super(obs, TestObserverAssert.class);
+  }
+
+  // ------------------------------
+  // Factory methods
+
+  static <T> TestObserverAssert<T> assertThat(TestObserver<T> actual) {
+    return new TestObserverAssert<>(actual);
+  }
+
+  // ------------------------------
+  // Accessors
+
+
+
+  // ------------------------------
+  // Assertions
+
+  @SuppressWarnings("UnusedReturnValue")
+  public TestObserverAssert<T> isComplete() {
+    if (actual == null) {
+      failWithMessage("Expected completed Observable, but found null instead");
+    } else {
+      long c = actual.completions();
+      if (c == 0) {
+        failWithMessage("Expected completed Observable, but was not completed");
+      } else if (c > 1) {
+        failWithMessage("Expected single completion, but found <%s> completions", c);
+      }
+    }
+    return this;
+  }
+
+  @SuppressWarnings("UnusedReturnValue")
+  public TestObserverAssert<T> observedNoValues() {
+    return observedValues(0);
+  }
+
+  @SuppressWarnings("UnusedReturnValue")
+  public TestObserverAssert<T> observedSingleValue() {
+    return observedValues(1);
+  }
+
+  @SuppressWarnings("UnusedReturnValue")
+  public TestObserverAssert<T> observedValues(int expectedCount) {
+    if (actual == null) {
+      failWithMessage("Expected TestObserver, but found null instead");
+    } else {
+      int actualCount = actual.valueCount();
+      if (actualCount != expectedCount) {
+        failWithMessage("Expected <%s> values, found <%s>", expectedCount, actualCount);
+      }
+    }
+    return this;
+  }
+
+  @SuppressWarnings("UnusedReturnValue")
+  public TestObserverAssert<T> observedValues() {
+    if (actual == null) {
+      failWithMessage("Expected TestObserver, but found null instead");
+    } else {
+      int valueCount = actual.valueCount();
+      if (valueCount == 0) {
+        failWithMessage("Expected values, found nothing");
+      }
+    }
+    return this;
+  }
+
+  @SuppressWarnings("UnusedReturnValue")
+  public TestObserverAssert<T> receivedValue(T expectedValue) {
+    if (actual == null) {
+      failWithMessage("Expected TestObserver, but found null instead");
+    } else {
+      List<T> values = List.ofAll(actual.values());
+      int valueCount = actual.valueCount();
+      if (valueCount == 0) {
+        failWithMessage("Expected <%s>, found nothing", expectedValue);
+      } else {
+        if (!values.contains(expectedValue)) {
+          failWithMessage("Expected value <%s> not found; values: <%s>", expectedValue, format(values));
+        }
+      }
+    }
+    return this;
+  }
+
+  @SuppressWarnings("UnusedReturnValue")
+  public TestObserverAssert<T> observedValues(T... expectedValues) {
+    if (actual == null) {
+      failWithMessage("Expected TestObserver, but found null instead");
+    } else {
+      Array<T> expected = Array.of(expectedValues);
+      int valueCount = actual.valueCount();
+      if (valueCount == 0) {
+        failWithMessage("Expected <%s>, found nothing", format(expected));
+      } else {
+        List<T> values = List.ofAll(actual.values());
+        if (!values.containsAll(expected)) {
+          failWithMessage("Expected values <%s> not found; values: <%s>", expected, format(values));
+        }
+      }
+    }
+    return this;
+  }
+
+  @SuppressWarnings("UnusedReturnValue")
+  public TestObserverAssert<T> observedValuesExactly(T... expectedValues) {
+    if (actual == null) {
+      failWithMessage("Expected TestObserver, but found null instead");
+    } else {
+      Array<T> expected = Array.of(expectedValues);
+      int valueCount = actual.valueCount();
+      if (valueCount == 0) {
+        failWithMessage("Expected <%s>, found nothing", format(expected));
+      } else {
+        List<T> values = List.ofAll(actual.values());
+        if (!values.equals(expected)) {
+          failWithMessage("Expected values <%s>, but found <%s>", expected, format(values));
+        }
+      }
+    }
+    return this;
+  }
+
+  @SuppressWarnings("UnusedReturnValue")
+  public TestObserverAssert<T> observedNoErrors() {
+    if (actual == null) {
+      failWithMessage("Expected TestObserver, but found null instead");
+    } else {
+      int errorCount = actual.errorCount();
+      if (errorCount != 0) {
+        failWithMessage("Expected no errors, found <%s>",
+          format(
+            List.ofAll(actual.errors())
+            .map(this::formatException)
+          )
+        );
+      }
+    }
+    return this;
+  }
+
+  private <E> String format(Traversable<E> values) {
+    return values.mkString("<", ", ", ">");
+  }
+
+  private String formatException(Throwable t) {
+    return String.format("%s: %s", t.getClass().getSimpleName(), t.getMessage());
+  }
+}
