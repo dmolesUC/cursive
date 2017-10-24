@@ -3,7 +3,7 @@ package org.cdlib.cursive.store.memory;
 import org.cdlib.cursive.core.CObject;
 import org.cdlib.cursive.core.CRelation;
 
-public class MRelation implements CRelation {
+class MRelation implements CRelation {
 
   // --------------------
   // Fields

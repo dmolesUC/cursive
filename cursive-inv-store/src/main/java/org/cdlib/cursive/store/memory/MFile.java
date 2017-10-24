@@ -3,7 +3,7 @@ package org.cdlib.cursive.store.memory;
 import org.cdlib.cursive.core.CFile;
 import org.cdlib.cursive.core.CObject;
 
-public class MFile implements CFile {
+class MFile implements CFile {
 
   // --------------------
   // Fields
