@@ -3,6 +3,7 @@ package org.cdlib.cursive.store;
 import io.reactivex.observers.TestObserver;
 import io.vavr.collection.List;
 import org.cdlib.cursive.core.*;
+import org.cdlib.cursive.core.rx.RxCWorkspace;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -30,7 +31,7 @@ public abstract class AbstractRxStoreTest<S extends RxStore> {
   class Workspaces {
     @Test
     void workspacesEmptyByDefault() {
-      TestObserver<CWorkspace> allWSObserver = store.workspaces().test();
+      TestObserver<RxCWorkspace> allWSObserver = store.workspacesAsync().test();
       assertThat(allWSObserver).isComplete();
       assertThat(allWSObserver).observedNoValues();
       assertThat(allWSObserver).observedNoErrors();
@@ -38,9 +39,9 @@ public abstract class AbstractRxStoreTest<S extends RxStore> {
 
     @Test
     void createWorkspaceCreatesAWorkspace() {
-      CWorkspace workspace = valueEmittedBy(store.createWorkspace());
+      RxCWorkspace workspace = valueEmittedBy(store.createWorkspaceAsync());
 
-      List<CWorkspace> allWorkspaces = valuesEmittedBy(store.workspaces());
+      List<RxCWorkspace> allWorkspaces = valuesEmittedBy(store.workspacesAsync());
       assertThat(allWorkspaces).containsExactly(workspace);
     }
 
