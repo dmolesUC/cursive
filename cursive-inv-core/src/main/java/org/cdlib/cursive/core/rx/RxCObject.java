@@ -3,19 +3,20 @@ package org.cdlib.cursive.core.rx;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
-import io.vavr.control.Option;
-import org.cdlib.cursive.core.CObject;
 
-public interface RxCObject extends CObject {
-  Maybe<RxCObject> parentObjectAsync();
-  Maybe<RxCCollection> parentCollectionAsync();
+public interface RxCObject   {
+  Maybe<RxCObject> parentObject();
+  Maybe<RxCCollection> parentCollection();
 
-  Observable<RxCFile> memberFilesAsync();
-  Single<RxCFile> createFileAsync();
+  Observable<RxCFile> memberFiles();
+  Single<RxCFile> createFile();
 
-  Observable<RxCObject> memberObjectsAsync();
-  Single<RxCObject> createObjectAsync();
+  Observable<RxCObject> memberObjects();
+  Single<RxCObject> createObject();
 
-  Observable<RxCObject> relatedObjectsAsync();
+  Observable<RxCObject> relatedObjects();
   Single<RxCRelation> relateTo(RxCObject toObject);
+
+  Observable<RxCRelation> outgoingRelations();
+  Observable<RxCRelation> incomingRelations();
 }

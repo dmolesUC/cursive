@@ -23,11 +23,6 @@ public class TestObserverAssert<T> extends AbstractAssert<TestObserverAssert<T>,
   }
 
   // ------------------------------
-  // Accessors
-
-
-
-  // ------------------------------
   // Assertions
 
   @SuppressWarnings("UnusedReturnValue")
@@ -46,17 +41,14 @@ public class TestObserverAssert<T> extends AbstractAssert<TestObserverAssert<T>,
   }
 
   @SuppressWarnings("UnusedReturnValue")
-  public TestObserverAssert<T> observedNoValues() {
-    return observedValues(0);
+  public TestObserverAssert<T> observedNothing() {
+    return this
+      .observedNoValues()
+      .observedNoErrors()
+      ;
   }
 
-  @SuppressWarnings("UnusedReturnValue")
-  public TestObserverAssert<T> observedSingleValue() {
-    return observedValues(1);
-  }
-
-  @SuppressWarnings("UnusedReturnValue")
-  public TestObserverAssert<T> observedValues(int expectedCount) {
+  public TestObserverAssert<T> hasValueCount(int expectedCount) {
     if (actual == null) {
       failWithMessage("Expected TestObserver, but found null instead");
     } else {
@@ -69,20 +61,7 @@ public class TestObserverAssert<T> extends AbstractAssert<TestObserverAssert<T>,
   }
 
   @SuppressWarnings("UnusedReturnValue")
-  public TestObserverAssert<T> observedValues() {
-    if (actual == null) {
-      failWithMessage("Expected TestObserver, but found null instead");
-    } else {
-      int valueCount = actual.valueCount();
-      if (valueCount == 0) {
-        failWithMessage("Expected values, found nothing");
-      }
-    }
-    return this;
-  }
-
-  @SuppressWarnings("UnusedReturnValue")
-  public TestObserverAssert<T> receivedValue(T expectedValue) {
+  public TestObserverAssert<T> observed(T expectedValue) {
     if (actual == null) {
       failWithMessage("Expected TestObserver, but found null instead");
     } else {
@@ -100,7 +79,7 @@ public class TestObserverAssert<T> extends AbstractAssert<TestObserverAssert<T>,
   }
 
   @SuppressWarnings("UnusedReturnValue")
-  public TestObserverAssert<T> observedValues(T... expectedValues) {
+  public TestObserverAssert<T> observed(T... expectedValues) {
     if (actual == null) {
       failWithMessage("Expected TestObserver, but found null instead");
     } else {
@@ -119,7 +98,7 @@ public class TestObserverAssert<T> extends AbstractAssert<TestObserverAssert<T>,
   }
 
   @SuppressWarnings("UnusedReturnValue")
-  public TestObserverAssert<T> observedValuesExactly(T... expectedValues) {
+  public TestObserverAssert<T> observedExactly(T... expectedValues) {
     if (actual == null) {
       failWithMessage("Expected TestObserver, but found null instead");
     } else {
@@ -137,7 +116,6 @@ public class TestObserverAssert<T> extends AbstractAssert<TestObserverAssert<T>,
     return this;
   }
 
-  @SuppressWarnings("UnusedReturnValue")
   public TestObserverAssert<T> observedNoErrors() {
     if (actual == null) {
       failWithMessage("Expected TestObserver, but found null instead");
@@ -147,8 +125,22 @@ public class TestObserverAssert<T> extends AbstractAssert<TestObserverAssert<T>,
         failWithMessage("Expected no errors, found <%s>",
           format(
             List.ofAll(actual.errors())
-            .map(this::formatException)
+              .map(this::formatException)
           )
+        );
+      }
+    }
+    return this;
+  }
+
+  public TestObserverAssert<T> observedNoValues() {
+    if (actual == null) {
+      failWithMessage("Expected TestObserver, but found null instead");
+    } else {
+      int valueCount = actual.valueCount();
+      if (valueCount != 0) {
+        failWithMessage("Expected no values, found <%s>",
+          format(List.ofAll(actual.values()))
         );
       }
     }

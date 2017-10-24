@@ -2,8 +2,8 @@ package org.cdlib.cursive.store.rx;
 
 import io.reactivex.observers.TestObserver;
 import io.vavr.collection.List;
-import org.cdlib.cursive.core.rx.RxCWorkspace;
-import org.cdlib.cursive.store.rx.RxStore;
+import org.assertj.core.api.Assertions;
+import org.cdlib.cursive.core.rx.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -31,145 +31,161 @@ public abstract class AbstractRxStoreTest<S extends RxStore> {
   class Workspaces {
     @Test
     void workspacesEmptyByDefault() {
-      TestObserver<RxCWorkspace> allWSObserver = store.workspacesAsync().test();
-      assertThat(allWSObserver).isComplete();
-      assertThat(allWSObserver).observedNoValues();
-      assertThat(allWSObserver).observedNoErrors();
+      TestObserver<RxCWorkspace> workspacesObserver = store.workspaces().test();
+      assertThat(workspacesObserver).isComplete();
+      assertThat(workspacesObserver).observedNothing();
+      assertThat(workspacesObserver).observedNoErrors();
     }
 
     @Test
     void createWorkspaceCreatesAWorkspace() {
-      RxCWorkspace workspace = valueEmittedBy(store.createWorkspaceAsync());
-
-      List<RxCWorkspace> allWorkspaces = valuesEmittedBy(store.workspacesAsync());
-      assertThat(allWorkspaces).containsExactly(workspace);
+      RxCWorkspace workspace = valueEmittedBy(store.createWorkspace());
+      TestObserver<RxCWorkspace> allWorkspacesObserver = store.workspaces().test();
+      assertThat(allWorkspacesObserver).observedExactly(workspace);
     }
 
-    // TODO: figure out sync/async naming convention
-    // TODO: figure out whether same object can implement sync/async interfaces
+    @Test
+    void newWorkspaceIsEmpty() {
+      RxCWorkspace workspace = valueEmittedBy(store.createWorkspace());
+      TestObserver<RxCCollection> memberCollectionsObserver = workspace.memberCollections().test();
+      assertThat(memberCollectionsObserver).observedNothing();
+    }
 
-//    @Test
-//    void createWorkspaceCreatesAWorkspace() {
-//      CWorkspace workspace = store.createWorkspace();
-//      Assertions.assertThat(workspace).isNotNull();
-//      assertThat(store.workspaces()).contains(workspace);
-//    }
+    @Test
+    void createChildCollectionCreatesACollection() {
+      RxCWorkspace workspace = valueEmittedBy(store.createWorkspace());
+      RxCCollection collection = valueEmittedBy(workspace.createCollection());
 
-//    @Test
-//    void createChildCollectionCreatesACollection() {
-//      CWorkspace workspace = store.createWorkspace();
-//      CCollection collection = workspace.createCollection();
-//      assertThat(workspace.memberCollections()).contains(collection);
-//      assertThat(collection.parentWorkspace()).contains(workspace);
-//      assertThat(store.collections()).contains(collection);
-//    }
+      TestObserver<RxCCollection> memberCollectionsObserver = workspace.memberCollections().test();
+      assertThat(memberCollectionsObserver).observedExactly(collection);
+
+      TestObserver<RxCCollection> allCollectionsObserver = store.collections().test();
+      assertThat(allCollectionsObserver).observedExactly(collection);
+    }
   }
 
-//  @Nested
-//  @SuppressWarnings("unused")
-//  class Collections {
-//    @Test
-//    void collectionsEmptyByDefault() {
-//      Traversable<CCollection> collections = store.collections();
-//      assertThat(collections).isEmpty();
-//    }
-//
-//    @Test
-//    void createCollectionCreatesACollection() {
-//      CCollection collection = store.createCollection();
-//      Assertions.assertThat(collection).isNotNull();
-//      assertThat(store.collections()).contains(collection);
-//    }
-//
-//    @Test
-//    void createChildCollectionCreatesACollection() {
-//      CCollection parent = store.createCollection();
-//      CCollection child = parent.createCollection();
-//      Assertions.assertThat(child).isNotNull();
-//      assertThat(parent.memberCollections()).contains(child);
-//      assertThat(child.parentCollection()).contains(parent);
-//      assertThat(store.collections()).contains(child);
-//    }
-//
-//    @Test
-//    void createChildObjectCreatesAnObject() {
-//      CCollection parent = store.createCollection();
-//      CObject child = parent.createObject();
-//      Assertions.assertThat(child).isNotNull();
-//      assertThat(parent.memberObjects()).contains(child);
-//      assertThat(child.parentCollection()).contains(parent);
-//      assertThat(store.objects()).contains(child);
-//    }
-//  }
-//
-//  @Nested
-//  @SuppressWarnings("unused")
-//  class Objects {
-//    @Test
-//    void objectsEmptyByDefault() {
-//      Traversable<CObject> objects = store.objects();
-//      assertThat(objects).isEmpty();
-//    }
-//
-//    @Test
-//    void createObjectCreatesAnObject() {
-//      CObject object = store.createObject();
-//      Assertions.assertThat(object).isNotNull();
-//      assertThat(store.objects()).contains(object);
-//    }
-//
-//    @Test
-//    void createChildObjectCreatesAnObject() {
-//      CObject parent = store.createObject();
-//      CObject child = parent.createObject();
-//      Assertions.assertThat(child).isNotNull();
-//      assertThat(parent.memberObjects()).contains(child);
-//      assertThat(child.parentObject()).contains(parent);
-//      assertThat(store.objects()).contains(child);
-//    }
-//
-//    @Test
-//    void createChildFileCreatesAFile() {
-//      CObject parent = store.createObject();
-//      CFile child = parent.createFile();
-//      Assertions.assertThat(child).isNotNull();
-//      assertThat(parent.memberFiles()).contains(child);
-//      Assertions.assertThat(child.parentObject()).isEqualTo(parent);
-//      assertThat(store.files()).contains(child);
-//    }
-//  }
-//
-//  @Nested
-//  @SuppressWarnings("unused")
-//  class Files {
-//    @Test
-//    void filesEmptyByDefault() {
-//      Traversable<CFile> files = store.files();
-//      assertThat(files).isEmpty();
-//    }
-//  }
-//
-//  @Nested
-//  @SuppressWarnings("unused")
-//  class Relations {
-//    @Test
-//    void relationsEmptyByDefault() {
-//      Traversable<CRelation> relations = store.relations();
-//      Assertions.assertThat(relations.isEmpty());
-//    }
-//
-//    @Test
-//    void createRelationCreatesARelation() {
-//      CObject fromObject = store.createObject();
-//      CObject toObject = store.createObject();
-//
-//      CRelation relation = fromObject.relateTo(toObject);
-//      Assertions.assertThat(relation.fromObject()).isSameAs(fromObject);
-//      Assertions.assertThat(relation.toObject()).isSameAs(toObject);
-//
-//      assertThat(fromObject.relatedObjects()).contains(toObject);
-//      assertThat(fromObject.outgoingRelations()).contains(relation);
-//      assertThat(toObject.incomingRelations()).contains(relation);
-//    }
-//  }
+  @Nested
+  @SuppressWarnings("unused")
+  class Collections {
+    @Test
+    void collectionsEmptyByDefault() {
+      List<RxCCollection> collections = valuesEmittedBy(store.collections());
+      assertThat(collections).isEmpty();
+    }
+
+    @Test
+    void createCollectionCreatesACollection() {
+      RxCCollection collection = valueEmittedBy(store.createCollection());
+      TestObserver<RxCCollection> allCollectionsObserver = store.collections().test();
+      assertThat(allCollectionsObserver).observedExactly(collection);
+    }
+
+    @Test
+    void createChildCollectionCreatesACollection() {
+      RxCCollection parent = valueEmittedBy(store.createCollection());
+      RxCCollection child = valueEmittedBy(parent.createCollection());
+
+      TestObserver<RxCCollection> memberCollectionsObserver = parent.memberCollections().test();
+      assertThat(memberCollectionsObserver).observedExactly(child);
+
+      assertThat(valueEmittedBy(child.parentCollection())).isEqualTo(parent);
+
+      TestObserver<RxCCollection> allCollectionsObserver = store.collections().test();
+      assertThat(allCollectionsObserver).observed(parent, child);
+    }
+
+    @Test
+    void createChildObjectCreatesAnObject() {
+      RxCCollection parent = valueEmittedBy(store.createCollection());
+      RxCObject child = valueEmittedBy(parent.createObject());
+
+      TestObserver<RxCObject> memberObjectsObserver = parent.memberObjects().test();
+      assertThat(memberObjectsObserver).observedExactly(child);
+
+      assertThat(valueEmittedBy(child.parentCollection())).isEqualTo(parent);
+
+      TestObserver<RxCObject> allObjectsObserver = store.objects().test();
+      assertThat(allObjectsObserver).observed(child);
+    }
+  }
+
+  @Nested
+  @SuppressWarnings("unused")
+  class Objects {
+    @Test
+    void objectsEmptyByDefault() {
+      assertThat(valuesEmittedBy(store.objects())).isEmpty();
+    }
+
+    @Test
+    void createObjectCreatesAnObject() {
+      RxCObject object = valueEmittedBy(store.createObject());
+      TestObserver<RxCObject> allObjectsObserver = store.objects().test();
+      assertThat(allObjectsObserver).observed(object);
+    }
+
+    @Test
+    void createChildObjectCreatesAnObject() {
+      RxCObject parent = valueEmittedBy(store.createObject());
+      RxCObject child = valueEmittedBy(parent.createObject());
+
+      TestObserver<RxCObject> memberObjectsObserver = parent.memberObjects().test();
+      assertThat(memberObjectsObserver).observedExactly(child);
+
+      assertThat(valueEmittedBy(child.parentObject())).isEqualTo(parent);
+
+      TestObserver<RxCObject> allObjectsObserver = store.objects().test();
+      assertThat(allObjectsObserver).observed(parent, child);
+    }
+
+    @Test
+    void createChildFileCreatesAFile() {
+      RxCObject parent = valueEmittedBy(store.createObject());
+      RxCFile child = valueEmittedBy(parent.createFile());
+
+      TestObserver<RxCFile> memberFilesObserver = parent.memberFiles().test();
+      assertThat(memberFilesObserver).observedExactly(child);
+
+      assertThat(valueEmittedBy(child.parentObject())).isEqualTo(parent);
+
+      TestObserver<RxCFile> allFilesObserver = store.files().test();
+      assertThat(allFilesObserver).observedExactly(child);
+    }
+  }
+
+  @Nested
+  @SuppressWarnings("unused")
+  class Files {
+    @Test
+    void filesEmptyByDefault() {
+      TestObserver<RxCFile> allFilesObserver = store.files().test();
+      assertThat(allFilesObserver).observedNothing();
+    }
+  }
+
+  @Nested
+  @SuppressWarnings("unused")
+  class Relations {
+    @Test
+    void relationsEmptyByDefault() {
+      TestObserver<RxCRelation> allRelationsObserver = store.relations().test();
+      assertThat(allRelationsObserver).observedNothing();
+    }
+
+    @Test
+    void createRelationCreatesARelation() {
+      RxCObject fromObject = valueEmittedBy(store.createObject());
+      RxCObject toObject = valueEmittedBy(store.createObject());
+
+      RxCRelation relation = valueEmittedBy(fromObject.relateTo(toObject));
+      assertThat(valueEmittedBy(relation.fromObject())).isSameAs(fromObject);
+      assertThat(valueEmittedBy(relation.toObject())).isSameAs(toObject);
+
+      TestObserver<RxCObject> relatedObjectsObserver = fromObject.relatedObjects().test();
+      assertThat(relatedObjectsObserver).observedExactly(toObject);
+
+      assertThat(fromObject.outgoingRelations().test()).observedExactly(relation);
+      assertThat(toObject.incomingRelations().test()).observedExactly(relation);
+    }
+  }
 }

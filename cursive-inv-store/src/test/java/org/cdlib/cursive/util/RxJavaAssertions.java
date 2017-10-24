@@ -1,5 +1,6 @@
 package org.cdlib.cursive.util;
 
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
@@ -11,10 +12,17 @@ public class RxJavaAssertions extends Assertions {
     return TestObserverAssert.assertThat(actual);
   }
 
-  public static <T> T valueEmittedBy(Single<T> observable) {
-    TestObserver<T> observer = observable.test();
+  public static <T> T valueEmittedBy(Single<T> single) {
+    TestObserver<T> observer = single.test();
     assertThat(observer).observedNoErrors();
-    assertThat(observer).observedSingleValue();
+    assertThat(observer).hasValueCount(1);
+    return firstValueObservedBy(observer);
+  }
+
+  public static <T> T valueEmittedBy(Maybe<T> maybe) {
+    TestObserver<T> observer = maybe.test();
+    assertThat(observer).observedNoErrors();
+    assertThat(observer).hasValueCount(1);
     return firstValueObservedBy(observer);
   }
 

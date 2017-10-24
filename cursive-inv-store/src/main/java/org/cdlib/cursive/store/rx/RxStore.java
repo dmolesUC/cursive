@@ -4,17 +4,18 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import org.cdlib.cursive.core.*;
 import org.cdlib.cursive.core.rx.*;
+import org.cdlib.cursive.store.Store;
 
 public interface RxStore {
-  Observable<RxCWorkspace> workspacesAsync();
-  Single<RxCWorkspace> createWorkspaceAsync();
+  Observable<RxCWorkspace> workspaces();
+  Single<RxCWorkspace> createWorkspace();
 
-  Observable<RxCCollection> collectionsAsync();
-  Single<RxCCollection> createCollectionAsync();
+  Observable<RxCCollection> collections();
+  Single<RxCCollection> createCollection();
 
-  Observable<RxCObject> objectsAsync();
-  Single<RxCObject> createObjectAsync();
+  Observable<RxCObject> objects();
+  Single<RxCObject> createObject();
 
-  Observable<RxCFile> filesAsync();
-  Observable<RxCRelation> relationsAsync();
+  Observable<RxCFile> files();
+  Observable<RxCRelation> relations();
 }

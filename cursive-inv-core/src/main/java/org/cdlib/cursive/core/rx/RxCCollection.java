@@ -3,15 +3,14 @@ package org.cdlib.cursive.core.rx;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
-import org.cdlib.cursive.core.CCollection;
 
-public interface RxCCollection extends CCollection {
-  Maybe<RxCWorkspace> parentWorkspaceAsync();
-  Maybe<RxCCollection> parentCollectionAsync();
+public interface RxCCollection   {
+  Maybe<RxCWorkspace> parentWorkspace();
+  Maybe<RxCCollection> parentCollection();
 
-  Observable<RxCObject> memberObjectsAsync();
-  Single<RxCObject> createObjectAsync();
+  Observable<RxCObject> memberObjects();
+  Single<RxCObject> createObject();
 
-  Observable<RxCCollection> memberCollectionsAsync();
-  Single<RxCCollection> createCollectionAsync();
+  Observable<RxCCollection> memberCollections();
+  Single<RxCCollection> createCollection();
 }
