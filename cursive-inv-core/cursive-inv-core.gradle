@@ -2,8 +2,10 @@ apply plugin: 'java-library'
 
 ext {
   vavrVersion = '0.9.1'
+  rxJavaVersion = '2.1.5'
 }
 
 dependencies {
   api "io.vavr:vavr:${vavrVersion}"
+  api "io.reactivex.rxjava2:rxjava:${rxJavaVersion}"
 }

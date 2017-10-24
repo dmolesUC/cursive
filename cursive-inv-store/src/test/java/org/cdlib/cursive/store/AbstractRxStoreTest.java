@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.cdlib.cursive.util.RxJavaAssertions.*;
 
-public abstract class AbstractReactiveStoreTest<S extends ReactiveStore> {
+public abstract class AbstractRxStoreTest<S extends RxStore> {
   // ------------------------------------------------------------
   // Fixture
 

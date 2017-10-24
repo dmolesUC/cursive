@@ -4,7 +4,7 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import org.cdlib.cursive.core.*;
 
-public interface ReactiveStore {
+public interface RxStore {
   Observable<CWorkspace> workspaces();
   Single<CWorkspace> createWorkspace();
 

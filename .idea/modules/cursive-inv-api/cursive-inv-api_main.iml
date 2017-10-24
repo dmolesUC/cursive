@@ -10,7 +10,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Gradle: io.vertx:vertx-core:3.4.2" level="project" />
-    <orderEntry type="library" name="Gradle: io.reactivex.rxjava2:rxjava:2.1.5" level="project" />
     <orderEntry type="library" name="Gradle: io.netty:netty-codec-http2:4.1.8.Final" level="project" />
     <orderEntry type="library" name="Gradle: io.netty:netty-handler:4.1.8.Final" level="project" />
     <orderEntry type="library" name="Gradle: io.netty:netty-handler-proxy:4.1.8.Final" level="project" />
@@ -27,9 +26,10 @@
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-databind:2.7.4" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-core:2.7.4" level="project" />
     <orderEntry type="library" name="Gradle: io.vavr:vavr:0.9.1" level="project" />
-    <orderEntry type="library" name="Gradle: org.reactivestreams:reactive-streams:1.0.1" level="project" />
+    <orderEntry type="library" name="Gradle: io.reactivex.rxjava2:rxjava:2.1.5" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-annotations:2.7.0" level="project" />
     <orderEntry type="library" name="Gradle: io.vavr:vavr-match:0.9.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.reactivestreams:reactive-streams:1.0.1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.apache.tinkerpop:gremlin-test:3.3.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.apache.tinkerpop:gremlin-core:3.3.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.apache.commons:commons-lang3:3.3.1" level="project" />
