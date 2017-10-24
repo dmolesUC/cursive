@@ -2,7 +2,6 @@ package org.cdlib.cursive.store.rx;
 
 import io.reactivex.observers.TestObserver;
 import io.vavr.collection.List;
-import org.assertj.core.api.Assertions;
 import org.cdlib.cursive.core.rx.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;

@@ -2,9 +2,7 @@ package org.cdlib.cursive.store.rx;
 
 import io.reactivex.Observable;
 import io.reactivex.Single;
-import org.cdlib.cursive.core.*;
 import org.cdlib.cursive.core.rx.*;
-import org.cdlib.cursive.store.Store;
 
 public interface RxStore {
   Observable<RxCWorkspace> workspaces();
