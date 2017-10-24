@@ -1,9 +1,9 @@
-package org.cdlib.cursive.store;
+package org.cdlib.cursive.store.rx;
 
 import io.reactivex.observers.TestObserver;
 import io.vavr.collection.List;
-import org.cdlib.cursive.core.*;
 import org.cdlib.cursive.core.rx.RxCWorkspace;
+import org.cdlib.cursive.store.rx.RxStore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
