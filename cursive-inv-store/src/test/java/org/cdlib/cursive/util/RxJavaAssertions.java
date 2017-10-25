@@ -13,14 +13,17 @@ public class RxJavaAssertions extends Assertions {
   }
 
   public static <T> T valueEmittedBy(Single<T> single) {
-    TestObserver<T> observer = single.test();
-    assertThat(observer).observedNoErrors();
-    assertThat(observer).hasValueCount(1);
-    return firstValueObservedBy(observer);
+    assertThat(single).isNotNull();
+    return valueObservedBy(single.test());
   }
 
   public static <T> T valueEmittedBy(Maybe<T> maybe) {
-    TestObserver<T> observer = maybe.test();
+    assertThat(maybe).isNotNull();
+    return valueObservedBy(maybe.test());
+  }
+
+  public static <T> T valueObservedBy(TestObserver<T> observer) {
+    assertThat(observer).isNotNull();
     assertThat(observer).observedNoErrors();
     assertThat(observer).hasValueCount(1);
     return firstValueObservedBy(observer);

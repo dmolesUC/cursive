@@ -14,6 +14,12 @@ public interface CObject {
   CObject createObject();
 
   Traversable<CObject> relatedObjects();
+
+  /**
+   * @throws NullPointerException if {@code toObject} is null
+   * @throws IllegalArgumentException if {@code toObject} belongs to
+   *   a different {@link Store} than this object
+   */
   CRelation relateTo(CObject toObject);
 
   Traversable<CRelation> outgoingRelations();

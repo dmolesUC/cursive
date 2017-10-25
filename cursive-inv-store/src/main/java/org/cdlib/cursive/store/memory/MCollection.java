@@ -8,6 +8,7 @@ import org.cdlib.cursive.core.CCollection;
 import org.cdlib.cursive.core.CObject;
 import org.cdlib.cursive.core.CWorkspace;
 
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 class MCollection implements CCollection {
@@ -39,8 +40,10 @@ class MCollection implements CCollection {
   }
 
   private MCollection(MemoryStore store, MWorkspace parentWorkspace, MCollection parentCollection) {
-    assert store != null : "Collection must have a Store";
-    assert parentWorkspace == null || parentCollection == null : String.format("Collection can have at most one parent: %s, %s", parentWorkspace, parentCollection);
+    Objects.requireNonNull(store, "Collection must have a Store");
+    if (parentWorkspace != null && parentCollection != null) {
+      throw new IllegalArgumentException(String.format("Collection can have at most one parent: %s, %s", parentWorkspace, parentCollection));
+    }
 
     this.store = store;
     this.parentWorkspace = Option.of(parentWorkspace);

@@ -3,6 +3,8 @@ package org.cdlib.cursive.store.memory;
 import org.cdlib.cursive.core.CFile;
 import org.cdlib.cursive.core.CObject;
 
+import java.util.Objects;
+
 class MFile implements CFile {
 
   // --------------------
@@ -14,7 +16,7 @@ class MFile implements CFile {
   // Constructors
 
   MFile(CObject parentObject) {
-    assert parentObject != null: "File must have an Object";
+    Objects.requireNonNull(parentObject, "Object must have a Store");
     this.parentObject = parentObject;
   }
 

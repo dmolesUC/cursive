@@ -9,6 +9,7 @@ import org.cdlib.cursive.core.CFile;
 import org.cdlib.cursive.core.CObject;
 import org.cdlib.cursive.core.CRelation;
 
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 class MObject implements CObject {
@@ -43,8 +44,10 @@ class MObject implements CObject {
   }
 
   private MObject(MemoryStore store, MCollection parentCollection, MObject parentObject) {
-    assert store != null : "Object must have a Store";
-    assert parentCollection == null || parentObject == null : String.format("Collection can have at most one parent: %s, %s", parentCollection, parentObject);
+    Objects.requireNonNull(store, "Object must have a Store");
+    if (parentCollection != null && parentObject != null) {
+      throw new IllegalArgumentException(String.format("Object can have at most one parent: %s, %s", parentCollection, parentObject));
+    }
 
     this.store = store;
     this.parentCollection = Option.of(parentCollection);
@@ -114,18 +117,26 @@ class MObject implements CObject {
 
   @Override
   public CRelation relateTo(CObject toObject) {
-    Lazy<MRelation> newRelation = Lazy.of(() -> new MRelation(this, toObject));
+    if (!(toObject instanceof MObject)) {
+      throw new IllegalArgumentException(String.format("Related object <%s> must be from the same store as <%s>", toObject, this));
+    }
+    MObject toObj = (MObject) toObject;
+    if (!this.store.equals(toObj.store)) {
+      throw new IllegalArgumentException(String.format("Related object <%s> must be from the same store as <%s>", toObject, this));
+    }
+
+    Lazy<MRelation> newRelation = Lazy.of(() -> new MRelation(this, toObj));
     outgoingRelations.updateAndGet(v -> v.append(newRelation.get()));
     MRelation relation = newRelation.get();
-    if (toObject instanceof MObject) {
-      ((MObject) toObject).addIncomingRelation(relation);
-    }
+    toObj.addIncomingRelation(relation);
     store.recordRelation(relation);
     return relation;
   }
 
   private void addIncomingRelation(MRelation relation) {
-    assert this.equals(relation.toObject()): String.format("Incoming relation points to wrong object: expected %s, was %s", this, relation.toObject());
+    if (!this.equals(relation.toObject())) {
+      throw new IllegalArgumentException(String.format("Incoming relation points to wrong object: expected %s, was %s", this, relation.toObject()));
+    }
     incomingRelations.updateAndGet(v -> v.append(relation));
   }
 

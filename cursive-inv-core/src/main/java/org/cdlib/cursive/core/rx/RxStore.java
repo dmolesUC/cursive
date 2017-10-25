@@ -1,4 +1,4 @@
-package org.cdlib.cursive.store.rx;
+package org.cdlib.cursive.core.rx;
 
 import io.reactivex.Observable;
 import io.reactivex.Single;

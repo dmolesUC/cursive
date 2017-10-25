@@ -4,7 +4,7 @@ import io.vavr.Lazy;
 import io.vavr.collection.Traversable;
 import io.vavr.collection.Vector;
 import org.cdlib.cursive.core.*;
-import org.cdlib.cursive.store.Store;
+import org.cdlib.cursive.core.Store;
 
 import java.util.concurrent.atomic.AtomicReference;
 

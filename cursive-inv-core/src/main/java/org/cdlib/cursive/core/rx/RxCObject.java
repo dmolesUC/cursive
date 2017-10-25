@@ -15,6 +15,12 @@ public interface RxCObject   {
   Single<RxCObject> createObject();
 
   Observable<RxCObject> relatedObjects();
+
+  /**
+   * @throws NullPointerException if {@code toObject} is null
+   * @throws IllegalArgumentException if {@code toObject} belongs to
+   *   a different {@link RxStore} than this object
+   */
   Single<RxCRelation> relateTo(RxCObject toObject);
 
   Observable<RxCRelation> outgoingRelations();

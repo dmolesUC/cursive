@@ -58,6 +58,8 @@ public abstract class AbstractRxStoreTest<S extends RxStore> {
       TestObserver<RxCCollection> memberCollectionsObserver = workspace.memberCollections().test();
       assertThat(memberCollectionsObserver).observedExactly(collection);
 
+      assertThat(valueEmittedBy(collection.parentWorkspace())).isEqualTo(workspace);
+
       TestObserver<RxCCollection> allCollectionsObserver = store.collections().test();
       assertThat(allCollectionsObserver).observedExactly(collection);
     }
@@ -177,8 +179,8 @@ public abstract class AbstractRxStoreTest<S extends RxStore> {
       RxCObject toObject = valueEmittedBy(store.createObject());
 
       RxCRelation relation = valueEmittedBy(fromObject.relateTo(toObject));
-      assertThat(valueEmittedBy(relation.fromObject())).isSameAs(fromObject);
-      assertThat(valueEmittedBy(relation.toObject())).isSameAs(toObject);
+      assertThat(valueEmittedBy(relation.fromObject())).isEqualTo(fromObject);
+      assertThat(valueEmittedBy(relation.toObject())).isEqualTo(toObject);
 
       TestObserver<RxCObject> relatedObjectsObserver = fromObject.relatedObjects().test();
       assertThat(relatedObjectsObserver).observedExactly(toObject);

@@ -156,8 +156,8 @@ public abstract class AbstractStoreTest<S extends Store> {
       CObject toObject = store.createObject();
 
       CRelation relation = fromObject.relateTo(toObject);
-      assertThat(relation.fromObject()).isSameAs(fromObject);
-      assertThat(relation.toObject()).isSameAs(toObject);
+      assertThat(relation.fromObject()).isEqualTo(fromObject);
+      assertThat(relation.toObject()).isEqualTo(toObject);
 
       assertThat(fromObject.relatedObjects()).contains(toObject);
       assertThat(fromObject.outgoingRelations()).contains(relation);

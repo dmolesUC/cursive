@@ -1,4 +1,4 @@
-package org.cdlib.cursive.store;
+package org.cdlib.cursive.core;
 
 import io.vavr.collection.Traversable;
 import org.cdlib.cursive.core.*;
