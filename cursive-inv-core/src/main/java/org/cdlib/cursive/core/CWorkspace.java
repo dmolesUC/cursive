@@ -2,7 +2,7 @@ package org.cdlib.cursive.core;
 
 import io.vavr.collection.Traversable;
 
-public interface CWorkspace {
+public interface CWorkspace extends Identified {
   Traversable<CCollection> memberCollections();
   CCollection createCollection();
 }

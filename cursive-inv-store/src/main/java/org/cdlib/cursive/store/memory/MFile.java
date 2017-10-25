@@ -5,7 +5,7 @@ import org.cdlib.cursive.core.CObject;
 
 import java.util.Objects;
 
-class MFile implements CFile {
+class MFile extends IdentifiedImpl implements CFile {
 
   // --------------------
   // Fields
@@ -15,8 +15,9 @@ class MFile implements CFile {
   // --------------------
   // Constructors
 
-  MFile(CObject parentObject) {
-    Objects.requireNonNull(parentObject, "Object must have a Store");
+  MFile(CObject parentObject, String identifier) {
+    super(identifier);
+    Objects.requireNonNull(parentObject, () -> String.format("%s must have a parent", getClass().getSimpleName()));
     this.parentObject = parentObject;
   }
 

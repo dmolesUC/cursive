@@ -1,6 +1,8 @@
 package org.cdlib.cursive.store.memory;
 
 import io.vavr.Lazy;
+import io.vavr.collection.HashMap;
+import io.vavr.collection.Map;
 import io.vavr.collection.Traversable;
 import io.vavr.collection.Vector;
 import org.cdlib.cursive.core.*;
@@ -19,8 +21,21 @@ public class MemoryStore implements Store {
   private final AtomicReference<Vector<CFile>> files = new AtomicReference<>(Vector.empty());
   private final AtomicReference<Vector<CRelation>> relations = new AtomicReference<>(Vector.empty());
 
+  private final AtomicReference<Map<String, Identified>> identifiers = new AtomicReference<>(HashMap.empty());
+
   // ------------------------------------------------------------
   // Store
+
+  private String mintIdentifier() {
+    return Identifiers.mintIdentifier();
+  }
+
+  private <T extends Identified> void register(AtomicReference<Vector<T>> registry, Lazy<T> lazyValue) {
+    registry.updateAndGet(v -> v.append(lazyValue.get()));
+    T value = lazyValue.get();
+    String identifier = value.identifier();
+    identifiers.updateAndGet(m -> m.put(identifier, value));
+  }
 
   // --------------------
   // Workspaces
@@ -32,8 +47,8 @@ public class MemoryStore implements Store {
 
   @Override
   public CWorkspace createWorkspace() {
-    Lazy<CWorkspace> newWorkspace = Lazy.of(() -> new MWorkspace(this));
-    workspaces.updateAndGet(v -> v.append(newWorkspace.get()));
+    Lazy<CWorkspace> newWorkspace = Lazy.of(() -> new MWorkspace(this, mintIdentifier()));
+    register(workspaces, newWorkspace);
     return newWorkspace.get();
   }
 
@@ -47,20 +62,20 @@ public class MemoryStore implements Store {
 
   @Override
   public CCollection createCollection() {
-    Lazy<CCollection> newCollection = Lazy.of(() -> new MCollection(this));
-    collections.updateAndGet(v -> v.append(newCollection.get()));
+    Lazy<CCollection> newCollection = Lazy.of(() -> new MCollection(this, mintIdentifier()));
+    register(collections, newCollection);
     return newCollection.get();
   }
 
   CCollection createCollection(MWorkspace parent) {
-    Lazy<CCollection> newCollection = Lazy.of(() -> new MCollection(this, parent));
-    collections.updateAndGet(v -> v.append(newCollection.get()));
+    Lazy<CCollection> newCollection = Lazy.of(() -> new MCollection(this, mintIdentifier(), parent));
+    register(collections, newCollection);
     return newCollection.get();
   }
 
   CCollection createCollection(MCollection parent) {
-    Lazy<CCollection> newCollection = Lazy.of(() -> new MCollection(this, parent));
-    collections.updateAndGet(v -> v.append(newCollection.get()));
+    Lazy<CCollection> newCollection = Lazy.of(() -> new MCollection(this, mintIdentifier(), parent));
+    register(collections, newCollection);
     return newCollection.get();
   }
 
@@ -74,20 +89,20 @@ public class MemoryStore implements Store {
 
   @Override
   public CObject createObject() {
-    Lazy<CObject> newObject = Lazy.of(() -> new MObject(this));
-    objects.updateAndGet(v -> v.append(newObject.get()));
+    Lazy<CObject> newObject = Lazy.of(() -> new MObject(this, mintIdentifier()));
+    register(objects, newObject);
     return newObject.get();
   }
 
   CObject createObject(MObject parent) {
-    Lazy<CObject> newObject = Lazy.of(() -> new MObject(this, parent));
-    objects.updateAndGet(v -> v.append(newObject.get()));
+    Lazy<CObject> newObject = Lazy.of(() -> new MObject(this, mintIdentifier(), parent));
+    register(objects, newObject);
     return newObject.get();
   }
 
   CObject createObject(MCollection parent) {
-    Lazy<CObject> newObject = Lazy.of(() -> new MObject(this, parent));
-    objects.updateAndGet(v -> v.append(newObject.get()));
+    Lazy<CObject> newObject = Lazy.of(() -> new MObject(this, mintIdentifier(), parent));
+    register(objects, newObject);
     return newObject.get();
   }
 
@@ -101,8 +116,8 @@ public class MemoryStore implements Store {
 
   // TODO: create files in objects, replace this with recordFile() or similar
   CFile createFile(MObject parent) {
-    Lazy<CFile> newFile = Lazy.of(() -> new MFile(parent));
-    files.updateAndGet(v -> v.append(newFile.get()));
+    Lazy<CFile> newFile = Lazy.of(() -> new MFile(parent, mintIdentifier()));
+    register(files, newFile);
     return newFile.get();
   }
 

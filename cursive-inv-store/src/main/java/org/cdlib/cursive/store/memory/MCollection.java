@@ -11,7 +11,7 @@ import org.cdlib.cursive.core.CWorkspace;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
-class MCollection implements CCollection {
+class MCollection extends IdentifiedImpl implements CCollection {
 
   // --------------------
   // Fields
@@ -27,20 +27,21 @@ class MCollection implements CCollection {
   // --------------------
   // Constructors
 
-  MCollection(MemoryStore store) {
-    this(store, null, null);
+  MCollection(MemoryStore store, String identifier) {
+    this(store, identifier, null, null);
   }
 
-  MCollection(MemoryStore store, MWorkspace parentWorkspace) {
-    this(store, parentWorkspace, null);
+  MCollection(MemoryStore store, String identifier, MWorkspace parentWorkspace) {
+    this(store, identifier, parentWorkspace, null);
   }
 
-  MCollection(MemoryStore store, MCollection parentCollection) {
-    this(store, null, parentCollection);
+  MCollection(MemoryStore store, String identifier, MCollection parentCollection) {
+    this(store, identifier, null, parentCollection);
   }
 
-  private MCollection(MemoryStore store, MWorkspace parentWorkspace, MCollection parentCollection) {
-    Objects.requireNonNull(store, "Collection must have a Store");
+  private MCollection(MemoryStore store, String identifier, MWorkspace parentWorkspace, MCollection parentCollection) {
+    super(identifier);
+    Objects.requireNonNull(store, () -> String.format("%s must have a Store", getClass().getSimpleName()));
     if (parentWorkspace != null && parentCollection != null) {
       throw new IllegalArgumentException(String.format("Collection can have at most one parent: %s, %s", parentWorkspace, parentCollection));
     }

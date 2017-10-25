@@ -12,7 +12,7 @@ import org.cdlib.cursive.core.CRelation;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
-class MObject implements CObject {
+class MObject extends IdentifiedImpl implements CObject {
 
   // --------------------
   // Fields
@@ -31,20 +31,21 @@ class MObject implements CObject {
   // --------------------
   // Constructors
 
-  MObject(MemoryStore store) {
-    this(store, null, null);
+  MObject(MemoryStore store, String identifier) {
+    this(store, identifier, null, null);
   }
 
-  MObject(MemoryStore store, MCollection parentCollection) {
-    this(store, parentCollection, null);
+  MObject(MemoryStore store, String identifier, MCollection parentCollection) {
+    this(store, identifier, parentCollection, null);
   }
 
-  MObject(MemoryStore store, MObject parentObject) {
-    this(store, null, parentObject);
+  MObject(MemoryStore store, String identifier, MObject parentObject) {
+    this(store, identifier, null, parentObject);
   }
 
-  private MObject(MemoryStore store, MCollection parentCollection, MObject parentObject) {
-    Objects.requireNonNull(store, "Object must have a Store");
+  private MObject(MemoryStore store, String identifier, MCollection parentCollection, MObject parentObject) {
+    super(identifier);
+    Objects.requireNonNull(store, () -> String.format("%s must have a Store", getClass().getSimpleName()));
     if (parentCollection != null && parentObject != null) {
       throw new IllegalArgumentException(String.format("Object can have at most one parent: %s, %s", parentCollection, parentObject));
     }
