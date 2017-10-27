@@ -8,6 +8,8 @@
       <module name="cursive-inv-core_test" target="1.9" />
       <module name="cursive-inv-store_main" target="1.9" />
       <module name="cursive-inv-store_test" target="1.9" />
+      <module name="cursive-inv-test_main" target="1.9" />
+      <module name="cursive-inv-test_test" target="1.9" />
     </bytecodeTargetLevel>
   </component>
 </project>

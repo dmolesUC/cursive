@@ -1,0 +1,12 @@
+apply plugin: 'java-library'
+
+dependencies {
+  api project(':cursive-inv-core')
+
+  api "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
+  api "org.junit.jupiter:junit-jupiter-params:${junitJupiterVersion}"
+  api "org.junit.vintage:junit-vintage-engine:${junitVintageVersion}"
+
+  api "org.mockito:mockito-core:${mockitoVersion}"
+  api "org.assertj:assertj-core:${assertJVersion}"
+}

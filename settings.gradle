@@ -1,6 +1,6 @@
-include 'cursive-inv-core', 'cursive-inv-store', 'cursive-inv-api'
+include 'cursive-inv-core', 'cursive-inv-api', 'cursive-inv-store', 'cursive-inv-test'
 
-rootProject.children.each { project ->
+    rootProject.children.each { project ->
       print project
       project.buildFileName = "${project.name}.gradle"
 }

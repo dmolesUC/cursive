@@ -12,6 +12,7 @@
             <option value="$PROJECT_DIR$/cursive-inv-api" />
             <option value="$PROJECT_DIR$/cursive-inv-core" />
             <option value="$PROJECT_DIR$/cursive-inv-store" />
+            <option value="$PROJECT_DIR$/cursive-inv-test" />
           </set>
         </option>
       </GradleProjectSettings>

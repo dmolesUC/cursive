@@ -12,6 +12,9 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/cursive-inv-store/cursive-inv-store.iml" filepath="$PROJECT_DIR$/.idea/modules/cursive-inv-store/cursive-inv-store.iml" group="cursive-inv-store" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/cursive-inv-store/cursive-inv-store_main.iml" filepath="$PROJECT_DIR$/.idea/modules/cursive-inv-store/cursive-inv-store_main.iml" group="cursive-inv-store" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/cursive-inv-store/cursive-inv-store_test.iml" filepath="$PROJECT_DIR$/.idea/modules/cursive-inv-store/cursive-inv-store_test.iml" group="cursive-inv-store" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cursive-inv-test/cursive-inv-test.iml" filepath="$PROJECT_DIR$/.idea/modules/cursive-inv-test/cursive-inv-test.iml" group="cursive-inv-test" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cursive-inv-test/cursive-inv-test_main.iml" filepath="$PROJECT_DIR$/.idea/modules/cursive-inv-test/cursive-inv-test_main.iml" group="cursive-inv-test" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cursive-inv-test/cursive-inv-test_test.iml" filepath="$PROJECT_DIR$/.idea/modules/cursive-inv-test/cursive-inv-test_test.iml" group="cursive-inv-test" />
     </modules>
   </component>
 </project>

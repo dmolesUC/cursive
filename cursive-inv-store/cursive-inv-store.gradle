@@ -9,4 +9,6 @@ dependencies {
 
   implementation 'com.fasterxml.uuid:java-uuid-generator:3.1.4'
   implementation "org.apache.tinkerpop:tinkergraph-gremlin:${tinkerpopVersion}"
+
+  testCompile project(':cursive-inv-test')
 }
