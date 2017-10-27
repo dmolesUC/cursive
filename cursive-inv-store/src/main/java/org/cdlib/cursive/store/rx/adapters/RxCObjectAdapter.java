@@ -12,64 +12,45 @@ import org.cdlib.cursive.store.util.RxUtils;
 
 import java.util.Objects;
 
-class RxCObjectAdapter implements RxCObject {
-  private final CObject object;
+class RxCObjectAdapter extends RxResourceImpl<CObject> implements RxCObject {
 
   RxCObjectAdapter(CObject object) {
-    Objects.requireNonNull(object);
-    this.object = object;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    RxCObjectAdapter that = (RxCObjectAdapter) o;
-    return object.equals(that.object);
-  }
-
-  @Override
-  public int hashCode() {
-    return object.hashCode();
+    super(object);
   }
 
   @Override
   public Maybe<RxCObject> parentObject() {
-    return RxUtils.toMaybe(object.parentObject()).map(RxCObjectAdapter::new);
+    return RxUtils.toMaybe(delegate.parentObject()).map(RxCObjectAdapter::new);
   }
 
   @Override
   public Maybe<RxCCollection> parentCollection() {
-    return RxUtils.toMaybe(object.parentCollection()).map(RxCCollectionAdapter::new);
+    return RxUtils.toMaybe(delegate.parentCollection()).map(RxCCollectionAdapter::new);
   }
 
   @Override
   public Observable<RxCFile> memberFiles() {
-    return Observable.fromIterable(object.memberFiles()).map(RxCFileAdapter::new);
+    return Observable.fromIterable(delegate.memberFiles()).map(RxCFileAdapter::new);
   }
 
   @Override
   public Single<RxCFile> createFile() {
-    return Single.just(object.createFile()).map(RxCFileAdapter::new);
+    return Single.just(delegate.createFile()).map(RxCFileAdapter::new);
   }
 
   @Override
   public Observable<RxCObject> memberObjects() {
-    return Observable.fromIterable(object.memberObjects()).map(RxCObjectAdapter::new);
+    return Observable.fromIterable(delegate.memberObjects()).map(RxCObjectAdapter::new);
   }
 
   @Override
   public Single<RxCObject> createObject() {
-    return Single.just(object.createObject()).map(RxCObjectAdapter::new);
+    return Single.just(delegate.createObject()).map(RxCObjectAdapter::new);
   }
 
   @Override
   public Observable<RxCObject> relatedObjects() {
-    return Observable.fromIterable(object.relatedObjects()).map(RxCObjectAdapter::new);
+    return Observable.fromIterable(delegate.relatedObjects()).map(RxCObjectAdapter::new);
   }
 
   @Override
@@ -78,16 +59,16 @@ class RxCObjectAdapter implements RxCObject {
     if (!(toObject instanceof RxCObjectAdapter)) {
       throw new IllegalArgumentException(String.format("Related object <%s> must be from the same store as <%s>", toObject, this));
     }
-    return Single.just(object.relateTo(((RxCObjectAdapter) toObject).object)).map(RxCRelationAdapter::new);
+    return Single.just(delegate.relateTo(((RxCObjectAdapter) toObject).delegate)).map(RxCRelationAdapter::new);
   }
 
   @Override
   public Observable<RxCRelation> outgoingRelations() {
-    return Observable.fromIterable(object.outgoingRelations()).map(RxCRelationAdapter::new);
+    return Observable.fromIterable(delegate.outgoingRelations()).map(RxCRelationAdapter::new);
   }
 
   @Override
   public Observable<RxCRelation> incomingRelations() {
-    return Observable.fromIterable(object.incomingRelations()).map(RxCRelationAdapter::new);
+    return Observable.fromIterable(delegate.incomingRelations()).map(RxCRelationAdapter::new);
   }
 }

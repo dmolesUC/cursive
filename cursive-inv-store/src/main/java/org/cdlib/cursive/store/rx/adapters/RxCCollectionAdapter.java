@@ -9,60 +9,38 @@ import org.cdlib.cursive.core.rx.RxCObject;
 import org.cdlib.cursive.core.rx.RxCWorkspace;
 import org.cdlib.cursive.store.util.RxUtils;
 
-import java.util.Objects;
-
-class RxCCollectionAdapter implements RxCCollection {
-  private final CCollection collection;
-
+class RxCCollectionAdapter extends RxResourceImpl<CCollection> implements RxCCollection {
   RxCCollectionAdapter(CCollection collection) {
-    Objects.requireNonNull(collection);
-    this.collection = collection;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    RxCCollectionAdapter that = (RxCCollectionAdapter) o;
-    return collection.equals(that.collection);
-  }
-
-  @Override
-  public int hashCode() {
-    return collection.hashCode();
+    super(collection);
   }
 
   @Override
   public Maybe<RxCWorkspace> parentWorkspace() {
-    return RxUtils.toMaybe(collection.parentWorkspace()).map(RxCWorkspaceAdapter::new);
+    return RxUtils.toMaybe(delegate.parentWorkspace()).map(RxCWorkspaceAdapter::new);
   }
 
   @Override
   public Maybe<RxCCollection> parentCollection() {
-    return RxUtils.toMaybe(collection.parentCollection()).map(RxCCollectionAdapter::new);
+    return RxUtils.toMaybe(delegate.parentCollection()).map(RxCCollectionAdapter::new);
   }
 
   @Override
   public Observable<RxCObject> memberObjects() {
-    return Observable.fromIterable(collection.memberObjects()).map(RxCObjectAdapter::new);
+    return Observable.fromIterable(delegate.memberObjects()).map(RxCObjectAdapter::new);
   }
 
   @Override
   public Single<RxCObject> createObject() {
-    return Single.just(collection.createObject()).map(RxCObjectAdapter::new);
+    return Single.just(delegate.createObject()).map(RxCObjectAdapter::new);
   }
 
   @Override
   public Observable<RxCCollection> memberCollections() {
-    return Observable.fromIterable(collection.memberCollections()).map(RxCCollectionAdapter::new);
+    return Observable.fromIterable(delegate.memberCollections()).map(RxCCollectionAdapter::new);
   }
 
   @Override
   public Single<RxCCollection> createCollection() {
-    return Single.just(collection.createCollection()).map(RxCCollectionAdapter::new);
+    return Single.just(delegate.createCollection()).map(RxCCollectionAdapter::new);
   }
 }

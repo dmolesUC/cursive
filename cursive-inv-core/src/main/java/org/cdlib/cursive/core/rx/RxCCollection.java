@@ -4,7 +4,7 @@ import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 
-public interface RxCCollection   {
+public interface RxCCollection extends RxResource {
   Maybe<RxCWorkspace> parentWorkspace();
   Maybe<RxCCollection> parentCollection();
 

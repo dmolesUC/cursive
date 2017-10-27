@@ -11,7 +11,7 @@ import org.cdlib.cursive.core.CWorkspace;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
-class MCollection extends IdentifiedImpl implements CCollection {
+class MCollection extends ResourceImpl implements CCollection {
 
   // --------------------
   // Fields

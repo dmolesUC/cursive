@@ -9,7 +9,7 @@ import org.cdlib.cursive.core.CWorkspace;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
-class MWorkspace extends IdentifiedImpl implements CWorkspace {
+class MWorkspace extends ResourceImpl implements CWorkspace {
 
   // --------------------
   // Fields

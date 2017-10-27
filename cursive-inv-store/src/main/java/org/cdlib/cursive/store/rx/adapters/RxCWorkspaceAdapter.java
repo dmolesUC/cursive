@@ -6,40 +6,19 @@ import org.cdlib.cursive.core.CWorkspace;
 import org.cdlib.cursive.core.rx.RxCCollection;
 import org.cdlib.cursive.core.rx.RxCWorkspace;
 
-import java.util.Objects;
-
-class RxCWorkspaceAdapter implements RxCWorkspace {
-  private final CWorkspace workspace;
+class RxCWorkspaceAdapter extends RxResourceImpl<CWorkspace> implements RxCWorkspace {
 
   RxCWorkspaceAdapter(CWorkspace workspace) {
-    Objects.requireNonNull(workspace);
-    this.workspace = workspace;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    RxCWorkspaceAdapter that = (RxCWorkspaceAdapter) o;
-    return workspace.equals(that.workspace);
-  }
-
-  @Override
-  public int hashCode() {
-    return workspace.hashCode();
+    super(workspace);
   }
 
   @Override
   public Observable<RxCCollection> memberCollections() {
-    return Observable.fromIterable(workspace.memberCollections()).map(RxCCollectionAdapter::new);
+    return Observable.fromIterable(delegate.memberCollections()).map(RxCCollectionAdapter::new);
   }
 
   @Override
   public Single<RxCCollection> createCollection() {
-    return Single.just(workspace.createCollection()).map(RxCCollectionAdapter::new);
+    return Single.just(delegate.createCollection()).map(RxCCollectionAdapter::new);
   }
 }

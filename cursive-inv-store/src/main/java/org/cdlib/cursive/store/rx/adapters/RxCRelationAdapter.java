@@ -8,11 +8,11 @@ import org.cdlib.cursive.core.rx.RxCRelation;
 import java.util.Objects;
 
 class RxCRelationAdapter implements RxCRelation {
-  private final CRelation relation;
+  private final CRelation delegate;
 
-  RxCRelationAdapter(CRelation relation) {
-    Objects.requireNonNull(relation);
-    this.relation = relation;
+  RxCRelationAdapter(CRelation delegate) {
+    Objects.requireNonNull(delegate);
+    this.delegate = delegate;
   }
 
   @Override
@@ -24,21 +24,21 @@ class RxCRelationAdapter implements RxCRelation {
       return false;
     }
     RxCRelationAdapter that = (RxCRelationAdapter) o;
-    return relation.equals(that.relation);
+    return delegate.equals(that.delegate);
   }
 
   @Override
   public int hashCode() {
-    return relation.hashCode();
+    return delegate.hashCode();
   }
 
   @Override
   public Single<RxCObject> fromObject() {
-    return Single.just(relation.fromObject()).map(RxCObjectAdapter::new);
+    return Single.just(delegate.fromObject()).map(RxCObjectAdapter::new);
   }
 
   @Override
   public Single<RxCObject> toObject() {
-    return Single.just(relation.toObject()).map(RxCObjectAdapter::new);
+    return Single.just(delegate.toObject()).map(RxCObjectAdapter::new);
   }
 }

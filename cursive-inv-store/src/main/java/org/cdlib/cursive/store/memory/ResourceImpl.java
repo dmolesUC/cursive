@@ -1,15 +1,16 @@
 package org.cdlib.cursive.store.memory;
 
 import io.vavr.Lazy;
+import org.cdlib.cursive.core.Resource;
 
 import java.util.Objects;
 
-class IdentifiedImpl {
+class ResourceImpl implements Resource {
   private final String identifier;
   private final Lazy<String> stringVal = Lazy.of(() -> getClass().getName() + "<" + identifier() + ">");
 
-  IdentifiedImpl(String identifier) {
-    Objects.requireNonNull(identifier, () -> String.format("%s must have a Store", getClass().getSimpleName()));
+  ResourceImpl(String identifier) {
+    Objects.requireNonNull(identifier, () -> String.format("%s must have an identifier", getClass().getSimpleName()));
     this.identifier = identifier;
   }
 
@@ -26,7 +27,7 @@ class IdentifiedImpl {
       return false;
     }
 
-    IdentifiedImpl that = (IdentifiedImpl) o;
+    ResourceImpl that = (ResourceImpl) o;
     return identifier.equals(that.identifier);
   }
 

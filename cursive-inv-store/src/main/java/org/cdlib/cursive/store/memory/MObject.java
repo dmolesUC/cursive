@@ -12,7 +12,7 @@ import org.cdlib.cursive.core.CRelation;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
-class MObject extends IdentifiedImpl implements CObject {
+class MObject extends ResourceImpl implements CObject {
 
   // --------------------
   // Fields

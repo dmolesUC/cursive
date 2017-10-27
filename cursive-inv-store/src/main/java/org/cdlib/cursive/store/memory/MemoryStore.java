@@ -21,7 +21,7 @@ public class MemoryStore implements Store {
   private final AtomicReference<Vector<CFile>> files = new AtomicReference<>(Vector.empty());
   private final AtomicReference<Vector<CRelation>> relations = new AtomicReference<>(Vector.empty());
 
-  private final AtomicReference<Map<String, Identified>> identifiers = new AtomicReference<>(HashMap.empty());
+  private final AtomicReference<Map<String, Resource>> identifiers = new AtomicReference<>(HashMap.empty());
 
   // ------------------------------------------------------------
   // Store
@@ -30,7 +30,7 @@ public class MemoryStore implements Store {
     return Identifiers.mintIdentifier();
   }
 
-  private <T extends Identified> void register(AtomicReference<Vector<T>> registry, Lazy<T> lazyValue) {
+  private <T extends Resource> void register(AtomicReference<Vector<T>> registry, Lazy<T> lazyValue) {
     registry.updateAndGet(v -> v.append(lazyValue.get()));
     T value = lazyValue.get();
     String identifier = value.identifier();

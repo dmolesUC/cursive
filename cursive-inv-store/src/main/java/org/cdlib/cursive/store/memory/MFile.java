@@ -5,7 +5,7 @@ import org.cdlib.cursive.core.CObject;
 
 import java.util.Objects;
 
-class MFile extends IdentifiedImpl implements CFile {
+class MFile extends ResourceImpl implements CFile {
 
   // --------------------
   // Fields
