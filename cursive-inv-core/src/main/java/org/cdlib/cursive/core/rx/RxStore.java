@@ -1,5 +1,6 @@
 package org.cdlib.cursive.core.rx;
 
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import org.cdlib.cursive.core.rx.*;
@@ -16,4 +17,6 @@ public interface RxStore {
 
   Observable<RxCFile> files();
   Observable<RxCRelation> relations();
+
+  Maybe<RxResource> find(String identifier);
 }

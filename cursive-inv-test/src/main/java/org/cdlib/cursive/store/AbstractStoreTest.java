@@ -164,4 +164,37 @@ public abstract class AbstractStoreTest<S extends Store> {
       assertThat(toObject.incomingRelations()).contains(relation);
     }
   }
+
+  @Nested
+  @SuppressWarnings("unused")
+  class Find {
+    @Test
+    void findFindsAWorkspace() {
+      CWorkspace workspace = store.createWorkspace();
+      assertThat(store.find(workspace.identifier())).contains(workspace);
+    }
+
+    @Test
+    void findFindsACollection() {
+      CCollection collection = store.createCollection();
+      assertThat(store.find(collection.identifier())).contains(collection);
+    }
+
+    @Test
+    void findFindsAnObject() {
+      CObject object = store.createObject();
+      assertThat(store.find(object.identifier())).contains(object);
+    }
+
+    @Test
+    void findFindsAFile() {
+      CFile file = store.createObject().createFile();
+      assertThat(store.find(file.identifier())).contains(file);
+    }
+
+    @Test
+    void findFindsNothing() {
+      assertThat(store.find("I am not a valid identifier")).isEmpty();
+    }
+  }
 }

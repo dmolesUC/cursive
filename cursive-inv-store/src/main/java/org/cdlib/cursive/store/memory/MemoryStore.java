@@ -5,6 +5,7 @@ import io.vavr.collection.HashMap;
 import io.vavr.collection.Map;
 import io.vavr.collection.Traversable;
 import io.vavr.collection.Vector;
+import io.vavr.control.Option;
 import org.cdlib.cursive.core.*;
 import org.cdlib.cursive.core.Store;
 
@@ -35,6 +36,11 @@ public class MemoryStore implements Store {
     T value = lazyValue.get();
     String identifier = value.identifier();
     identifiers.updateAndGet(m -> m.put(identifier, value));
+  }
+
+  @Override
+  public Option<Resource> find(String identifier) {
+    return identifiers.get().get(identifier);
   }
 
   // --------------------

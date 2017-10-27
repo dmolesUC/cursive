@@ -1,10 +1,12 @@
 package org.cdlib.cursive.store.rx.adapters;
 
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import org.cdlib.cursive.core.rx.*;
 import org.cdlib.cursive.core.Store;
 import org.cdlib.cursive.core.rx.RxStore;
+import org.cdlib.cursive.store.util.RxUtils;
 
 import java.util.Objects;
 
@@ -64,5 +66,10 @@ public class RxStoreAdapter<S extends Store> implements RxStore {
   @Override
   public Observable<RxCRelation> relations() {
     return Observable.fromIterable(store.relations()).map(RxCRelationAdapter::new);
+  }
+
+  @Override
+  public Maybe<RxResource> find(String identifier) {
+    return RxUtils.toMaybe(store.find(identifier)).map(RxResourceImpl::from);
   }
 }

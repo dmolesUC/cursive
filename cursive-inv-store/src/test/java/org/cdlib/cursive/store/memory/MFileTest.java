@@ -12,19 +12,19 @@ class MFileTest {
   private MemoryStore store;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     store = new MemoryStore();
   }
 
   @Test
-  public void fileMustHaveAParent() {
+  void fileMustHaveAParent() {
     assertThatThrownBy(() -> new MFile(null, "Elvis"))
       .isInstanceOf(NullPointerException.class)
       .withFailMessage("%s must have a parent", MFile.class.getSimpleName());
   }
 
   @Test
-  public void fileMustHaveAnIdentifier() {
+  void fileMustHaveAnIdentifier() {
     CObject parent = store.createObject();
     assertThatThrownBy(() -> new MFile(parent, null))
       .isInstanceOf(NullPointerException.class)
@@ -32,7 +32,7 @@ class MFileTest {
   }
 
   @Test
-  public void constructorSetsIdentifier() {
+  void constructorSetsIdentifier() {
     String identifier = "Elvis";
     CObject parent = store.createObject();
     MFile file = new MFile(parent, identifier);
@@ -40,7 +40,7 @@ class MFileTest {
   }
 
   @Test
-  public void filesWithSameIdentifierAreEqual() {
+  void filesWithSameIdentifierAreEqual() {
     String identifier = "Elvis";
     CObject parent = store.createObject();
     MFile file1 = new MFile(parent, identifier);
@@ -52,7 +52,7 @@ class MFileTest {
   }
 
   @Test
-  public void toStringIncludesTypeAndIdentifier() {
+  void toStringIncludesTypeAndIdentifier() {
     String identifier = "Elvis";
     CObject parent = store.createObject();
     MFile file = new MFile(parent, identifier);

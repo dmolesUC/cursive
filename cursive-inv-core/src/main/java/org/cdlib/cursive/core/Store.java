@@ -1,6 +1,7 @@
 package org.cdlib.cursive.core;
 
 import io.vavr.collection.Traversable;
+import io.vavr.control.Option;
 import org.cdlib.cursive.core.*;
 
 public interface Store {
@@ -15,4 +16,6 @@ public interface Store {
 
   Traversable<CFile> files();
   Traversable<CRelation> relations();
+
+  Option<Resource> find(String identifier);
 }

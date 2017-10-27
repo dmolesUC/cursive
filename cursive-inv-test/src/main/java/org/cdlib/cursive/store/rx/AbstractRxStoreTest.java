@@ -7,7 +7,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static org.cdlib.cursive.util.RxJavaAssertions.*;
+import static org.cdlib.cursive.util.RxJavaAssertions.valueEmittedBy;
+import static org.cdlib.cursive.util.RxJavaAssertions.valuesEmittedBy;
+import static org.cdlib.cursive.util.RxJavaAssertions.assertThat;
 
 public abstract class AbstractRxStoreTest<S extends RxStore> {
   // ------------------------------------------------------------
@@ -189,4 +191,37 @@ public abstract class AbstractRxStoreTest<S extends RxStore> {
       assertThat(toObject.incomingRelations().test()).observedExactly(relation);
     }
   }
-}
+
+  @Nested
+  @SuppressWarnings("unused")
+  class Find {
+    @Test
+    void findFindsAWorkspace() {
+      RxCWorkspace workspace = valueEmittedBy(store.createWorkspace());
+      assertThat(store.find(workspace.identifier()).test()).observedExactly(workspace);
+    }
+
+    @Test
+    void findFindsACollection() {
+      RxCCollection collection = valueEmittedBy(store.createCollection());
+      assertThat(store.find(collection.identifier()).test()).observedExactly(collection);
+    }
+
+    @Test
+    void findFindsAnObject() {
+      RxCObject object = valueEmittedBy(store.createObject());
+      assertThat(store.find(object.identifier()).test()).observedExactly(object);
+    }
+
+    @Test
+    void findFindsAFile() {
+      RxCObject parent = valueEmittedBy(store.createObject());
+      RxCFile file = valueEmittedBy(parent.createFile());
+      assertThat(store.find(file.identifier()).test()).observedExactly(file);
+    }
+
+    @Test
+    void findFindsNothing() {
+      assertThat(store.find("I am not a valid identifier").test()).observedNothing();
+    }
+  }}
