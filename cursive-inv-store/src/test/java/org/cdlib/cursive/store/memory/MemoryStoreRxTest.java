@@ -1,11 +1,11 @@
 package org.cdlib.cursive.store.memory;
 
-import org.cdlib.cursive.store.rx.AbstractRxStoreTest;
-import org.cdlib.cursive.store.rx.adapters.RxStoreAdapter;
+import org.cdlib.cursive.store.rx.AbstractAsyncStoreTest;
+import org.cdlib.cursive.store.async.adapters.AsyncStoreAdapter;
 
-public class MemoryStoreRxTest extends AbstractRxStoreTest<RxStoreAdapter<MemoryStore>> {
+public class MemoryStoreRxTest extends AbstractAsyncStoreTest<AsyncStoreAdapter<MemoryStore>> {
   @Override
-  protected RxStoreAdapter<MemoryStore> newStore() {
-    return new RxStoreAdapter<>(new MemoryStore());
+  protected AsyncStoreAdapter<MemoryStore> newStore() {
+    return new AsyncStoreAdapter<>(new MemoryStore());
   }
 }

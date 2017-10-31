@@ -8,6 +8,7 @@ import io.vavr.collection.Vector;
 import io.vavr.control.Option;
 import org.cdlib.cursive.core.*;
 import org.cdlib.cursive.core.Store;
+import org.cdlib.cursive.pcdm.*;
 
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -16,13 +17,13 @@ public class MemoryStore implements Store {
   // ------------------------------------------------------------
   // Data
 
-  private final AtomicReference<Vector<CWorkspace>> workspaces = new AtomicReference<>(Vector.empty());
-  private final AtomicReference<Vector<CCollection>> collections = new AtomicReference<>(Vector.empty());
-  private final AtomicReference<Vector<CObject>> objects = new AtomicReference<>(Vector.empty());
-  private final AtomicReference<Vector<CFile>> files = new AtomicReference<>(Vector.empty());
-  private final AtomicReference<Vector<CRelation>> relations = new AtomicReference<>(Vector.empty());
+  private final AtomicReference<Vector<Workspace>> workspaces = new AtomicReference<>(Vector.empty());
+  private final AtomicReference<Vector<PcdmCollection>> collections = new AtomicReference<>(Vector.empty());
+  private final AtomicReference<Vector<PcdmObject>> objects = new AtomicReference<>(Vector.empty());
+  private final AtomicReference<Vector<PcdmFile>> files = new AtomicReference<>(Vector.empty());
+  private final AtomicReference<Vector<PcdmRelation>> relations = new AtomicReference<>(Vector.empty());
 
-  private final AtomicReference<Map<String, Resource>> identifiers = new AtomicReference<>(HashMap.empty());
+  private final AtomicReference<Map<String, PcdmResource>> identifiers = new AtomicReference<>(HashMap.empty());
 
   // ------------------------------------------------------------
   // Store
@@ -31,7 +32,7 @@ public class MemoryStore implements Store {
     return Identifiers.mintIdentifier();
   }
 
-  private <T extends Resource> void register(AtomicReference<Vector<T>> registry, Lazy<T> lazyValue) {
+  private <T extends PcdmResource> void register(AtomicReference<Vector<T>> registry, Lazy<T> lazyValue) {
     registry.updateAndGet(v -> v.append(lazyValue.get()));
     T value = lazyValue.get();
     String identifier = value.identifier();
@@ -39,7 +40,7 @@ public class MemoryStore implements Store {
   }
 
   @Override
-  public Option<Resource> find(String identifier) {
+  public Option<PcdmResource> find(String identifier) {
     return identifiers.get().get(identifier);
   }
 
@@ -47,13 +48,13 @@ public class MemoryStore implements Store {
   // Workspaces
 
   @Override
-  public Traversable<CWorkspace> workspaces() {
+  public Traversable<Workspace> workspaces() {
     return workspaces.get();
   }
 
   @Override
-  public CWorkspace createWorkspace() {
-    Lazy<CWorkspace> newWorkspace = Lazy.of(() -> new MWorkspace(this, mintIdentifier()));
+  public Workspace createWorkspace() {
+    Lazy<Workspace> newWorkspace = Lazy.of(() -> new MemoryWorkspace(this, mintIdentifier()));
     register(workspaces, newWorkspace);
     return newWorkspace.get();
   }
@@ -62,25 +63,25 @@ public class MemoryStore implements Store {
   // Collections
 
   @Override
-  public Traversable<CCollection> collections() {
+  public Traversable<PcdmCollection> collections() {
     return collections.get();
   }
 
   @Override
-  public CCollection createCollection() {
-    Lazy<CCollection> newCollection = Lazy.of(() -> new MCollection(this, mintIdentifier()));
+  public PcdmCollection createCollection() {
+    Lazy<PcdmCollection> newCollection = Lazy.of(() -> new MemoryCollection(this, mintIdentifier()));
     register(collections, newCollection);
     return newCollection.get();
   }
 
-  CCollection createCollection(MWorkspace parent) {
-    Lazy<CCollection> newCollection = Lazy.of(() -> new MCollection(this, mintIdentifier(), parent));
+  PcdmCollection createCollection(MemoryWorkspace parent) {
+    Lazy<PcdmCollection> newCollection = Lazy.of(() -> new MemoryCollection(this, mintIdentifier(), parent));
     register(collections, newCollection);
     return newCollection.get();
   }
 
-  CCollection createCollection(MCollection parent) {
-    Lazy<CCollection> newCollection = Lazy.of(() -> new MCollection(this, mintIdentifier(), parent));
+  PcdmCollection createCollection(MemoryCollection parent) {
+    Lazy<PcdmCollection> newCollection = Lazy.of(() -> new MemoryCollection(this, mintIdentifier(), parent));
     register(collections, newCollection);
     return newCollection.get();
   }
@@ -89,25 +90,25 @@ public class MemoryStore implements Store {
   // Objects
 
   @Override
-  public Traversable<CObject> objects() {
+  public Traversable<PcdmObject> objects() {
     return objects.get();
   }
 
   @Override
-  public CObject createObject() {
-    Lazy<CObject> newObject = Lazy.of(() -> new MObject(this, mintIdentifier()));
+  public PcdmObject createObject() {
+    Lazy<PcdmObject> newObject = Lazy.of(() -> new MemoryObject(this, mintIdentifier()));
     register(objects, newObject);
     return newObject.get();
   }
 
-  CObject createObject(MObject parent) {
-    Lazy<CObject> newObject = Lazy.of(() -> new MObject(this, mintIdentifier(), parent));
+  PcdmObject createObject(MemoryObject parent) {
+    Lazy<PcdmObject> newObject = Lazy.of(() -> new MemoryObject(this, mintIdentifier(), parent));
     register(objects, newObject);
     return newObject.get();
   }
 
-  CObject createObject(MCollection parent) {
-    Lazy<CObject> newObject = Lazy.of(() -> new MObject(this, mintIdentifier(), parent));
+  PcdmObject createObject(MemoryCollection parent) {
+    Lazy<PcdmObject> newObject = Lazy.of(() -> new MemoryObject(this, mintIdentifier(), parent));
     register(objects, newObject);
     return newObject.get();
   }
@@ -116,13 +117,13 @@ public class MemoryStore implements Store {
   // Files
 
   @Override
-  public Traversable<CFile> files() {
+  public Traversable<PcdmFile> files() {
     return files.get();
   }
 
   // TODO: create files in objects, replace this with recordFile() or similar
-  CFile createFile(MObject parent) {
-    Lazy<CFile> newFile = Lazy.of(() -> new MFile(parent, mintIdentifier()));
+  PcdmFile createFile(MemoryObject parent) {
+    Lazy<PcdmFile> newFile = Lazy.of(() -> new MemoryFile(parent, mintIdentifier()));
     register(files, newFile);
     return newFile.get();
   }
@@ -131,11 +132,11 @@ public class MemoryStore implements Store {
   // Relationships
 
   @Override
-  public Traversable<CRelation> relations() {
+  public Traversable<PcdmRelation> relations() {
     return relations.get();
   }
 
-  void recordRelation(MRelation relation) {
+  void recordRelation(MemoryRelation relation) {
     relations.updateAndGet(v -> v.append(relation));
   }
 

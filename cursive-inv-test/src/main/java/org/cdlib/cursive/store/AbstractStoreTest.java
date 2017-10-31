@@ -2,6 +2,10 @@ package org.cdlib.cursive.store;
 
 import io.vavr.collection.Traversable;
 import org.cdlib.cursive.core.*;
+import org.cdlib.cursive.pcdm.PcdmCollection;
+import org.cdlib.cursive.pcdm.PcdmFile;
+import org.cdlib.cursive.pcdm.PcdmObject;
+import org.cdlib.cursive.pcdm.PcdmRelation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -30,27 +34,27 @@ public abstract class AbstractStoreTest<S extends Store> {
   class Workspaces {
     @Test
     void workspacesEmptyByDefault() {
-      Traversable<CWorkspace> workspaces = store.workspaces();
+      Traversable<Workspace> workspaces = store.workspaces();
       assertThat(workspaces).isEmpty();
     }
 
     @Test
     void createWorkspaceCreatesAWorkspace() {
-      CWorkspace workspace = store.createWorkspace();
+      Workspace workspace = store.createWorkspace();
       assertThat(workspace).isNotNull();
       assertThat(store.workspaces()).contains(workspace);
     }
 
     @Test
     void newWorkspaceIsEmpty() {
-      CWorkspace workspace = store.createWorkspace();
+      Workspace workspace = store.createWorkspace();
       assertThat(workspace.memberCollections()).isEmpty();
     }
 
     @Test
     void createChildCollectionCreatesACollection() {
-      CWorkspace workspace = store.createWorkspace();
-      CCollection collection = workspace.createCollection();
+      Workspace workspace = store.createWorkspace();
+      PcdmCollection collection = workspace.createCollection();
       assertThat(workspace.memberCollections()).contains(collection);
       assertThat(collection.parentWorkspace()).contains(workspace);
       assertThat(store.collections()).contains(collection);
@@ -62,21 +66,21 @@ public abstract class AbstractStoreTest<S extends Store> {
   class Collections {
     @Test
     void collectionsEmptyByDefault() {
-      Traversable<CCollection> collections = store.collections();
+      Traversable<PcdmCollection> collections = store.collections();
       assertThat(collections).isEmpty();
     }
 
     @Test
     void createCollectionCreatesACollection() {
-      CCollection collection = store.createCollection();
+      PcdmCollection collection = store.createCollection();
       assertThat(collection).isNotNull();
       assertThat(store.collections()).contains(collection);
     }
 
     @Test
     void createChildCollectionCreatesACollection() {
-      CCollection parent = store.createCollection();
-      CCollection child = parent.createCollection();
+      PcdmCollection parent = store.createCollection();
+      PcdmCollection child = parent.createCollection();
       assertThat(child).isNotNull();
       assertThat(parent.memberCollections()).contains(child);
       assertThat(child.parentCollection()).contains(parent);
@@ -85,8 +89,8 @@ public abstract class AbstractStoreTest<S extends Store> {
 
     @Test
     void createChildObjectCreatesAnObject() {
-      CCollection parent = store.createCollection();
-      CObject child = parent.createObject();
+      PcdmCollection parent = store.createCollection();
+      PcdmObject child = parent.createObject();
       assertThat(child).isNotNull();
       assertThat(parent.memberObjects()).contains(child);
       assertThat(child.parentCollection()).contains(parent);
@@ -99,21 +103,21 @@ public abstract class AbstractStoreTest<S extends Store> {
   class Objects {
     @Test
     void objectsEmptyByDefault() {
-      Traversable<CObject> objects = store.objects();
+      Traversable<PcdmObject> objects = store.objects();
       assertThat(objects).isEmpty();
     }
 
     @Test
     void createObjectCreatesAnObject() {
-      CObject object = store.createObject();
+      PcdmObject object = store.createObject();
       assertThat(object).isNotNull();
       assertThat(store.objects()).contains(object);
     }
 
     @Test
     void createChildObjectCreatesAnObject() {
-      CObject parent = store.createObject();
-      CObject child = parent.createObject();
+      PcdmObject parent = store.createObject();
+      PcdmObject child = parent.createObject();
       assertThat(child).isNotNull();
       assertThat(parent.memberObjects()).contains(child);
       assertThat(child.parentObject()).contains(parent);
@@ -122,8 +126,8 @@ public abstract class AbstractStoreTest<S extends Store> {
 
     @Test
     void createChildFileCreatesAFile() {
-      CObject parent = store.createObject();
-      CFile child = parent.createFile();
+      PcdmObject parent = store.createObject();
+      PcdmFile child = parent.createFile();
       assertThat(child).isNotNull();
       assertThat(parent.memberFiles()).contains(child);
       assertThat(child.parentObject()).isEqualTo(parent);
@@ -136,7 +140,7 @@ public abstract class AbstractStoreTest<S extends Store> {
   class Files {
     @Test
     void filesEmptyByDefault() {
-      Traversable<CFile> files = store.files();
+      Traversable<PcdmFile> files = store.files();
       assertThat(files).isEmpty();
     }
   }
@@ -146,16 +150,16 @@ public abstract class AbstractStoreTest<S extends Store> {
   class Relations {
     @Test
     void relationsEmptyByDefault() {
-      Traversable<CRelation> relations = store.relations();
+      Traversable<PcdmRelation> relations = store.relations();
       assertThat(relations.isEmpty());
     }
 
     @Test
     void createRelationCreatesARelation() {
-      CObject fromObject = store.createObject();
-      CObject toObject = store.createObject();
+      PcdmObject fromObject = store.createObject();
+      PcdmObject toObject = store.createObject();
 
-      CRelation relation = fromObject.relateTo(toObject);
+      PcdmRelation relation = fromObject.relateTo(toObject);
       assertThat(relation.fromObject()).isEqualTo(fromObject);
       assertThat(relation.toObject()).isEqualTo(toObject);
 
@@ -170,25 +174,25 @@ public abstract class AbstractStoreTest<S extends Store> {
   class Find {
     @Test
     void findFindsAWorkspace() {
-      CWorkspace workspace = store.createWorkspace();
+      Workspace workspace = store.createWorkspace();
       assertThat(store.find(workspace.identifier())).contains(workspace);
     }
 
     @Test
     void findFindsACollection() {
-      CCollection collection = store.createCollection();
+      PcdmCollection collection = store.createCollection();
       assertThat(store.find(collection.identifier())).contains(collection);
     }
 
     @Test
     void findFindsAnObject() {
-      CObject object = store.createObject();
+      PcdmObject object = store.createObject();
       assertThat(store.find(object.identifier())).contains(object);
     }
 
     @Test
     void findFindsAFile() {
-      CFile file = store.createObject().createFile();
+      PcdmFile file = store.createObject().createFile();
       assertThat(store.find(file.identifier())).contains(file);
     }
 

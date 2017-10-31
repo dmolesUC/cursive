@@ -2,20 +2,20 @@ package org.cdlib.cursive.core;
 
 import io.vavr.collection.Traversable;
 import io.vavr.control.Option;
-import org.cdlib.cursive.core.*;
+import org.cdlib.cursive.pcdm.*;
 
 public interface Store {
-  Traversable<CWorkspace> workspaces();
-  CWorkspace createWorkspace();
+  Traversable<Workspace> workspaces();
+  Workspace createWorkspace();
 
-  Traversable<CCollection> collections();
-  CCollection createCollection();
+  Traversable<PcdmCollection> collections();
+  PcdmCollection createCollection();
 
-  Traversable<CObject> objects();
-  CObject createObject();
+  Traversable<PcdmObject> objects();
+  PcdmObject createObject();
 
-  Traversable<CFile> files();
-  Traversable<CRelation> relations();
+  Traversable<PcdmFile> files();
+  Traversable<PcdmRelation> relations();
 
-  Option<Resource> find(String identifier);
+  Option<PcdmResource> find(String identifier);
 }
