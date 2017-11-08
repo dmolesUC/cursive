@@ -22,6 +22,18 @@ public class RxAssertions extends Assertions {
     return valueObservedBy(maybe.test());
   }
 
+  public static Throwable errorEmittedBy(Maybe<?> maybe) {
+    assertThat(maybe).isNotNull();
+    return errorObservedBy(maybe.test());
+  }
+
+  public static Throwable errorObservedBy(TestObserver<?> observer) {
+    assertThat(observer).isNotNull();
+    assertThat(observer.errorCount()).isEqualTo(1);
+    List<Throwable> errors = List.ofAll(observer.errors());
+    return errors.head();
+  }
+
   public static <T> T valueObservedBy(TestObserver<T> observer) {
     assertThat(observer).isNotNull();
     assertThat(observer).observedNoErrors();

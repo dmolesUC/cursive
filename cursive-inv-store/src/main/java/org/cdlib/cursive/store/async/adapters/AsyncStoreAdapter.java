@@ -3,6 +3,8 @@ package org.cdlib.cursive.store.async.adapters;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import io.vavr.control.Option;
+import io.vavr.control.Try;
 import org.cdlib.cursive.core.async.*;
 import org.cdlib.cursive.core.Store;
 import org.cdlib.cursive.core.async.AsyncStore;
@@ -70,7 +72,10 @@ public class AsyncStoreAdapter<S extends Store> implements AsyncStore {
   }
 
   @Override
-  public Maybe<AsyncPcdmResource> find(String identifier) {
-    return RxUtils.toMaybe(store.find(identifier)).map(AsyncPcdmResourceImpl::from);
+  public Maybe<AsyncResource> find(String identifier) {
+    return store.find(identifier)
+      .map(AsyncResourceImpl::from)
+      .map(RxUtils::toMaybe)
+      .getOrElse(Maybe.empty());
   }
 }

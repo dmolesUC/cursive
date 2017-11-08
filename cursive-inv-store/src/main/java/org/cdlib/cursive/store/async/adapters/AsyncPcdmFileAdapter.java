@@ -5,7 +5,7 @@ import org.cdlib.cursive.pcdm.PcdmFile;
 import org.cdlib.cursive.pcdm.async.AsyncPcdmFile;
 import org.cdlib.cursive.pcdm.async.AsyncPcdmObject;
 
-class AsyncPcdmFileAdapter extends AsyncPcdmResourceImpl<PcdmFile> implements AsyncPcdmFile {
+class AsyncPcdmFileAdapter extends AsyncResourceImpl<PcdmFile> implements AsyncPcdmFile {
 
   AsyncPcdmFileAdapter(PcdmFile file) {
     super(file);

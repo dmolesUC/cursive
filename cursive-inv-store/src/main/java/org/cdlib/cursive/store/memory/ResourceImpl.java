@@ -1,15 +1,15 @@
 package org.cdlib.cursive.store.memory;
 
 import io.vavr.Lazy;
-import org.cdlib.cursive.pcdm.PcdmResource;
+import org.cdlib.cursive.core.Resource;
 
 import java.util.Objects;
 
-class PcdmResourceImpl implements PcdmResource {
+abstract class ResourceImpl implements Resource {
   private final String identifier;
   private final Lazy<String> stringVal = Lazy.of(() -> getClass().getName() + "<" + identifier() + ">");
 
-  PcdmResourceImpl(String identifier) {
+  ResourceImpl(String identifier) {
     Objects.requireNonNull(identifier, () -> String.format("%s must have an identifier", getClass().getSimpleName()));
     this.identifier = identifier;
   }
@@ -27,7 +27,7 @@ class PcdmResourceImpl implements PcdmResource {
       return false;
     }
 
-    PcdmResourceImpl that = (PcdmResourceImpl) o;
+    ResourceImpl that = (ResourceImpl) o;
     return identifier.equals(that.identifier);
   }
 

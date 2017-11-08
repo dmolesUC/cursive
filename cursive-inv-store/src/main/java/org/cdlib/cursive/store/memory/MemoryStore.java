@@ -23,7 +23,7 @@ public class MemoryStore implements Store {
   private final AtomicReference<Vector<PcdmFile>> files = new AtomicReference<>(Vector.empty());
   private final AtomicReference<Vector<PcdmRelation>> relations = new AtomicReference<>(Vector.empty());
 
-  private final AtomicReference<Map<String, PcdmResource>> identifiers = new AtomicReference<>(HashMap.empty());
+  private final AtomicReference<Map<String, Resource>> identifiers = new AtomicReference<>(HashMap.empty());
 
   // ------------------------------------------------------------
   // Store
@@ -32,7 +32,7 @@ public class MemoryStore implements Store {
     return Identifiers.mintIdentifier();
   }
 
-  private <T extends PcdmResource> void register(AtomicReference<Vector<T>> registry, Lazy<T> lazyValue) {
+  private <T extends Resource> void register(AtomicReference<Vector<T>> registry, Lazy<T> lazyValue) {
     registry.updateAndGet(v -> v.append(lazyValue.get()));
     T value = lazyValue.get();
     String identifier = value.identifier();
@@ -40,7 +40,7 @@ public class MemoryStore implements Store {
   }
 
   @Override
-  public Option<PcdmResource> find(String identifier) {
+  public Option<Resource> find(String identifier) {
     return identifiers.get().get(identifier);
   }
 

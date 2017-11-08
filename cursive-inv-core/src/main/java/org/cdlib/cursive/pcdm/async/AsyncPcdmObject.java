@@ -3,9 +3,11 @@ package org.cdlib.cursive.pcdm.async;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import org.cdlib.cursive.core.ResourceType;
+import org.cdlib.cursive.core.async.AsyncResource;
 import org.cdlib.cursive.core.async.AsyncStore;
 
-public interface AsyncPcdmObject extends AsyncPcdmResource {
+public interface AsyncPcdmObject extends AsyncResource {
   Maybe<AsyncPcdmObject> parentObject();
   Maybe<AsyncPcdmCollection> parentCollection();
 
@@ -26,4 +28,9 @@ public interface AsyncPcdmObject extends AsyncPcdmResource {
 
   Observable<AsyncPcdmRelation> outgoingRelations();
   Observable<AsyncPcdmRelation> incomingRelations();
+
+  @Override
+  default ResourceType type() {
+    return ResourceType.OBJECT;
+  }
 }

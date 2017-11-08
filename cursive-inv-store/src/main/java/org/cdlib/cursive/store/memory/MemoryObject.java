@@ -12,7 +12,7 @@ import org.cdlib.cursive.pcdm.PcdmRelation;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
-class MemoryObject extends PcdmResourceImpl implements PcdmObject {
+class MemoryObject extends ResourceImpl implements PcdmObject {
 
   // --------------------
   // Fields

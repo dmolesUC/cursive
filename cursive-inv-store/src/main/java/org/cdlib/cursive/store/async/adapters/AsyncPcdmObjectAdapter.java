@@ -12,7 +12,7 @@ import org.cdlib.cursive.store.util.RxUtils;
 
 import java.util.Objects;
 
-class AsyncPcdmObjectAdapter extends AsyncPcdmResourceImpl<PcdmObject> implements AsyncPcdmObject {
+class AsyncPcdmObjectAdapter extends AsyncResourceImpl<PcdmObject> implements AsyncPcdmObject {
 
   AsyncPcdmObjectAdapter(PcdmObject object) {
     super(object);

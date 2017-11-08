@@ -11,7 +11,7 @@ import org.cdlib.cursive.core.Workspace;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
-class MemoryCollection extends PcdmResourceImpl implements PcdmCollection {
+class MemoryCollection extends ResourceImpl implements PcdmCollection {
 
   // --------------------
   // Fields

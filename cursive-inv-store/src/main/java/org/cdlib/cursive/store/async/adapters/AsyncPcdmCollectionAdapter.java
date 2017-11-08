@@ -9,7 +9,7 @@ import org.cdlib.cursive.pcdm.async.AsyncPcdmObject;
 import org.cdlib.cursive.core.async.AsyncWorkspace;
 import org.cdlib.cursive.store.util.RxUtils;
 
-class AsyncPcdmCollectionAdapter extends AsyncPcdmResourceImpl<PcdmCollection> implements AsyncPcdmCollection {
+class AsyncPcdmCollectionAdapter extends AsyncResourceImpl<PcdmCollection> implements AsyncPcdmCollection {
   AsyncPcdmCollectionAdapter(PcdmCollection collection) {
     super(collection);
   }

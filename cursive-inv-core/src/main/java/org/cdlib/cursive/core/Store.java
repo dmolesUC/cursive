@@ -17,5 +17,5 @@ public interface Store {
   Traversable<PcdmFile> files();
   Traversable<PcdmRelation> relations();
 
-  Option<PcdmResource> find(String identifier);
+  Option<Resource> find(String identifier);
 }

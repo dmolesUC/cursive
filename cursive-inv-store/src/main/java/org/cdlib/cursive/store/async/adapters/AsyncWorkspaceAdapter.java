@@ -6,7 +6,7 @@ import org.cdlib.cursive.core.Workspace;
 import org.cdlib.cursive.pcdm.async.AsyncPcdmCollection;
 import org.cdlib.cursive.core.async.AsyncWorkspace;
 
-class AsyncWorkspaceAdapter extends AsyncPcdmResourceImpl<Workspace> implements AsyncWorkspace {
+class AsyncWorkspaceAdapter extends AsyncResourceImpl<Workspace> implements AsyncWorkspace {
 
   AsyncWorkspaceAdapter(Workspace workspace) {
     super(workspace);

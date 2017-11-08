@@ -5,7 +5,7 @@ import org.cdlib.cursive.pcdm.PcdmObject;
 
 import java.util.Objects;
 
-class MemoryFile extends PcdmResourceImpl implements PcdmFile {
+class MemoryFile extends ResourceImpl implements PcdmFile {
 
   // --------------------
   // Fields

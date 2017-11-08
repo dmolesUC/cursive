@@ -9,7 +9,7 @@ import org.cdlib.cursive.core.Workspace;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
-class MemoryWorkspace extends PcdmResourceImpl implements Workspace {
+class MemoryWorkspace extends ResourceImpl implements Workspace {
 
   // --------------------
   // Fields

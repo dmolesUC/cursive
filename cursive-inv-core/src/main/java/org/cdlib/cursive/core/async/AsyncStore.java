@@ -18,5 +18,5 @@ public interface AsyncStore {
   Observable<AsyncPcdmFile> files();
   Observable<AsyncPcdmRelation> relations();
 
-  Maybe<AsyncPcdmResource> find(String identifier);
+  Maybe<AsyncResource> find(String identifier);
 }
