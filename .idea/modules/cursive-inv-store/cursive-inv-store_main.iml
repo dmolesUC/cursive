@@ -11,12 +11,12 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Gradle: com.fasterxml.uuid:java-uuid-generator:3.1.4" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.tinkerpop:tinkergraph-gremlin:3.3.0" level="project" />
-    <orderEntry type="library" name="Gradle: io.vavr:vavr:0.9.1" level="project" />
+    <orderEntry type="library" name="Gradle: io.vavr:vavr:0.9.0" level="project" />
     <orderEntry type="library" name="Gradle: io.reactivex.rxjava2:rxjava:2.1.5" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.tinkerpop:gremlin-test:3.3.0" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.tinkerpop:gremlin-core:3.3.0" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.commons:commons-lang3:3.3.1" level="project" />
-    <orderEntry type="library" name="Gradle: io.vavr:vavr-match:0.9.1" level="project" />
+    <orderEntry type="library" name="Gradle: io.vavr:vavr-match:0.9.0" level="project" />
     <orderEntry type="library" name="Gradle: org.reactivestreams:reactive-streams:1.0.1" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.tinkerpop:gremlin-shaded:3.3.0" level="project" />
     <orderEntry type="library" name="Gradle: commons-configuration:commons-configuration:1.10" level="project" />
