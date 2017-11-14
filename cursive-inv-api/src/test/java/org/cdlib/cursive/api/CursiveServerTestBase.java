@@ -11,7 +11,7 @@ import org.junit.runner.RunWith;
 
 // TODO: rewrite as nested if/as/when there's a vertx-junit5: https://github.com/vert-x3/vertx-unit/issues/43
 @RunWith(VertxUnitRunner.class)
-public class CursiveServerTestBase {
+public abstract class CursiveServerTestBase {
   private Vertx vertx;
   private int httpPort;
 

@@ -13,7 +13,8 @@ public class RouterFactory {
 
   public Router create(Vertx vertx) {
     Router router = Router.router(vertx);
-    router.route().handler(ctx -> ctx.response().end("Hello"));
+    router.route().handler(ctx -> ctx.response()
+      .end("Hello"));
     return router;
   }
 }

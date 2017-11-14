@@ -1,17 +1,21 @@
 package org.cdlib.cursive.api;
 
-import io.vertx.ext.unit.Async;
+import io.vertx.core.http.HttpClient;
 import io.vertx.ext.unit.TestContext;
 import org.junit.Test;
 
+import static org.cdlib.cursive.util.VertxAssertions.withContext;
+
 public class CursiveServerStartupTest extends CursiveServerTestBase {
+
   @Test
   public void serverStarts(TestContext tc) {
-    Async async = tc.async();
-    // TODO: fluent assertions
-    vertx().createHttpClient().getNow(httpPort(), "localhost", "/", response -> {
-      tc.assertEquals(response.statusCode(), 200);
-      response.bodyHandler(body -> async.complete());
-    });
+    HttpClient httpClient = vertx().createHttpClient();
+    withContext(tc)
+      .assertThat(httpClient)
+      .getNow(httpPort(), "localhost", "/")
+      .response()
+      .hasStatus(200)
+    ;
   }
 }
