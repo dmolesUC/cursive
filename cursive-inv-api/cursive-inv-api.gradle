@@ -3,13 +3,14 @@ apply plugin: 'application'
 mainClassName = 'io.vertx.core.Launcher'
 
 ext {
-  vertxVersion = '3.4.2'
+  vertxVersion = '3.5.0'
 }
 
 dependencies {
   compile project(':cursive-inv-store')
 
-  compile "io.vertx:vertx-core:${vertxVersion}"
+  compile "io.vertx:vertx-rx-java2:${vertxVersion}"
+  compile "io.vertx:vertx-web:${vertxVersion}"
   testCompile "io.vertx:vertx-unit:${vertxVersion}"
 }
 
