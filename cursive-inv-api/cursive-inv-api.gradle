@@ -11,6 +11,9 @@ dependencies {
 
   compile "io.vertx:vertx-rx-java2:${vertxVersion}"
   compile "io.vertx:vertx-web:${vertxVersion}"
+
+  testCompile project(':cursive-inv-test')
+
   testCompile "io.vertx:vertx-unit:${vertxVersion}"
 }
 

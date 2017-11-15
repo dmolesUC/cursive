@@ -7,7 +7,7 @@ import org.assertj.core.api.Assertions;
 
 public class VertxAssertions extends Assertions {
 
-  public static final int DEFAULT_TIMEOUT_MILLIS = 500;
+  public static final int DEFAULT_TIMEOUT_MILLIS = 5000;
 
   public static TestContextAssertions withContext(TestContext ctx) {
     return new TestContextAssertions(ctx);
@@ -23,10 +23,6 @@ public class VertxAssertions extends Assertions {
 
     public HttpClientAssert assertThat(HttpClient client) {
       return new HttpClientAssert(client, ctx);
-    }
-
-    public ResponseAssert assertThat(HttpClientResponse actual) {
-      return new ResponseAssert(actual, ctx);
     }
   }
 }

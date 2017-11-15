@@ -13,7 +13,7 @@ public class CursiveServerStartupTest extends CursiveServerTestBase {
     HttpClient httpClient = vertx().createHttpClient();
     withContext(tc)
       .assertThat(httpClient)
-      .getNow(httpPort(), "localhost", "/")
+      .get().host("localhost").port(httpPort()).path("/")
       .response()
       .hasStatus(200)
     ;
