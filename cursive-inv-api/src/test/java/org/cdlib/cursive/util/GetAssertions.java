@@ -1,16 +1,21 @@
 package org.cdlib.cursive.util;
 
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.util.AsciiString;
 import io.vavr.Lazy;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientRequest;
 import io.vertx.core.http.HttpClientResponse;
 import io.vertx.core.http.RequestOptions;
+import io.vertx.core.http.impl.headers.VertxHttpHeaders;
 import io.vertx.ext.unit.TestContext;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import static io.netty.handler.codec.http.HttpHeaderNames.*;
 
 public class GetAssertions {
 
@@ -21,6 +26,7 @@ public class GetAssertions {
   private final HttpClient client;
   private final TestContext ctx;
   private final RequestOptions requestOptions;
+  private final VertxHttpHeaders headers = new VertxHttpHeaders();
 
   private final Lazy<HttpClientResponse> response = Lazy.of(this::getResponse);
 
@@ -30,6 +36,11 @@ public class GetAssertions {
     this.client = client;
     this.ctx = ctx;
     this.timeoutMillis = VertxAssertions.DEFAULT_TIMEOUT_MILLIS;
+
+    CharSequence headerName = ACCEPT;
+    String headerValue = "application/hal+json";
+
+
 
     requestOptions = new RequestOptions()
       .setPort(DEFAULT_PORT)
@@ -62,6 +73,11 @@ public class GetAssertions {
     return this;
   }
 
+  public GetAssertions withHeader(CharSequence headerName, CharSequence headerValue) {
+    headers.add(headerName, headerValue);
+    return this;
+  }
+
   /**
    * Blocks until response received.
    */
@@ -85,6 +101,7 @@ public class GetAssertions {
     CompletableFuture<HttpClientResponse> resultFuture = new CompletableFuture<>();
     try {
       HttpClientRequest request = client.get(requestOptions);
+      request.headers().addAll(headers);
       request.setTimeout(timeoutMillis);
       request.handler(resultFuture::complete);
       request.exceptionHandler(resultFuture::completeExceptionally);
@@ -94,4 +111,5 @@ public class GetAssertions {
     }
     return resultFuture;
   }
+
 }
