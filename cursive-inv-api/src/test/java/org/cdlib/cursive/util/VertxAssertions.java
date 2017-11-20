@@ -1,29 +1,26 @@
 package org.cdlib.cursive.util;
 
-import io.vertx.core.http.HttpClient;
-import io.vertx.core.http.HttpClientResponse;
+import io.vertx.core.http.HttpClientRequest;
 import io.vertx.ext.unit.TestContext;
 import org.assertj.core.api.Assertions;
 
-public class VertxAssertions extends Assertions {
+public final class VertxAssertions extends Assertions {
 
-  public static final int DEFAULT_TIMEOUT_MILLIS = 5000;
+  public static final long TIMEOUT_MILLIS = 5000L;
 
-  public static TestContextAssertions withContext(TestContext ctx) {
-    return new TestContextAssertions(ctx);
+  private final TestContext tc;
+
+  private VertxAssertions(TestContext tc) {
+    this.tc = tc;
   }
 
-  public static class TestContextAssertions {
+  public static VertxAssertions inContext(TestContext tc) {
+    return new VertxAssertions(tc);
+  }
 
-    private final TestContext ctx;
-
-    private TestContextAssertions(TestContext ctx) {
-      this.ctx = ctx;
-    }
-
-    public HttpClientAssert assertThat(HttpClient client) {
-      return new HttpClientAssert(client, ctx);
-    }
+  public RequestAssert assertThat(HttpClientRequest request) {
+    return new RequestAssert(tc, request);
   }
 }
+
 

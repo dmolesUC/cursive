@@ -9,10 +9,15 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.net.ServerSocket;
+
 // TODO: rewrite as nested if/as/when there's a vertx-junit5: https://github.com/vert-x3/vertx-unit/issues/43
 @RunWith(VertxUnitRunner.class)
 public abstract class CursiveServerTestBase {
-  private Vertx vertx;
+
+  private volatile Vertx vertx;
   private int httpPort;
 
   Vertx vertx() {
@@ -23,23 +28,33 @@ public abstract class CursiveServerTestBase {
     return httpPort;
   }
 
+  private int findOpenPort() {
+    try {
+      try (ServerSocket s = new ServerSocket(0)) {
+        return s.getLocalPort();
+      }
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
+  }
+
   @Before
   public void setUp(TestContext tc) {
-    httpPort = 8180;
-    DeploymentOptions options = new DeploymentOptions()
-      .setConfig(new JsonObject().put("http.port", httpPort()));
+    httpPort = findOpenPort();
 
+    DeploymentOptions deploymentOptions = new DeploymentOptions()
+      .setConfig(new JsonObject().put("http.port", httpPort));
     vertx = Vertx.vertx();
 
-    // TODO: is there a better way to do this than Class.getName()?
-    vertx().deployVerticle(
-      CursiveServer.class.getName(),
-      options,
+    vertx.deployVerticle(
+      CursiveServer::new,
+      deploymentOptions,
       tc.asyncAssertSuccess());
   }
 
   @After
   public void tearDown(TestContext tc) {
-    vertx().close(tc.asyncAssertSuccess());
+    vertx.close(tc.asyncAssertSuccess());
   }
+
 }

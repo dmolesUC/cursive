@@ -1,39 +1,43 @@
 package org.cdlib.cursive.api;
 
 import io.netty.handler.codec.http.HttpHeaderNames;
-import io.vertx.core.http.HttpClient;
+import io.vertx.core.http.HttpClientRequest;
 import io.vertx.ext.unit.TestContext;
 import org.junit.Test;
 
+import static org.cdlib.cursive.util.RequestBuilder.withClient;
 import static org.cdlib.cursive.util.TestUtils.getResourceAsString;
-import static org.cdlib.cursive.util.VertxAssertions.withContext;
+import static org.cdlib.cursive.util.VertxAssertions.inContext;
 
 public class RouterTest extends CursiveServerTestBase {
-  @Test
-  public void getRootAsHal(TestContext tc) {
-    String expectedBody = getResourceAsString("routes_root_hal.json");
 
-    HttpClient httpClient = vertx().createHttpClient();
-    withContext(tc)
-      .assertThat(httpClient).get().host("localhost").port(httpPort()).path("/")
-      .withHeader(HttpHeaderNames.ACCEPT, "application/hal+json")
-      .response()
-      .hasContentType("application/hal+json")
-      .hasBody(expectedBody)
-    ;
+  private void makeRequest(TestContext tc, String requestedType, String expectedBody) {
+    HttpClientRequest request =
+      withClient(vertx().createHttpClient())
+        .withHeader(HttpHeaderNames.ACCEPT, requestedType)
+        .get().host("localhost").port(httpPort()).path("/")
+        .makeRequest();
+
+    inContext(tc)
+      .assertThat(request)
+      .receivedStatus(200)
+      .receivedContentType(requestedType)
+      .receivedBody(expectedBody);
+
+    request.end();
   }
 
   @Test
-  public void getRootAsJsonLD(TestContext tc) {
-    String expectedBody = getResourceAsString("routes_root_json-ld.json");
+  public void getRootAsHal(TestContext tc) {
+    String requestedType = "application/hal+json";
+    String expectedBody = getResourceAsString("routes_root_hal.json");
+    makeRequest(tc, requestedType, expectedBody);
+  }
 
-    HttpClient httpClient = vertx().createHttpClient();
-    withContext(tc)
-      .assertThat(httpClient).get().host("localhost").port(httpPort()).path("/")
-      .withHeader(HttpHeaderNames.ACCEPT, "application/ld+json")
-      .response()
-      .hasContentType("application/ld+json")
-      .hasBody(expectedBody)
-    ;
+  @Test
+  public void getRootAsJsonLd(TestContext tc) {
+    String expectedType = "application/hal+json";
+    String expectedBody = getResourceAsString("routes_root_json-ld.json");
+    makeRequest(tc, expectedType, expectedBody);
   }
 }

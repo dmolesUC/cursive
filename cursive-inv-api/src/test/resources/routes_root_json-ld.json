@@ -1,7 +1,9 @@
 {
   "@context": {
     "cursive": "https://github.com/dmolesUC3/cursive/blob/master/RELATIONS.md#",
-    "cursive:workspaces": { "@type": "@id" }
+    "cursive:workspaces": {
+      "@type": "@id"
+    }
   },
   "@id": "/",
   "cursive:workspaces": "workspaces"
