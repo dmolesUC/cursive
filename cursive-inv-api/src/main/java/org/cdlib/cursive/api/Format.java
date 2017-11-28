@@ -21,13 +21,6 @@ public enum Format {
 
   public static Format DEFAULT = HAL;
 
-//  // TODO: separate out formatter class
-//  private static final Lazy<RepresentationFactory> repFactory = Lazy.of(() ->
-//    new StandardRepresentationFactory()
-//      .withFlag(RepresentationFactory.PRETTY_PRINT)
-//      .withFlag(RepresentationFactory.COALESCE_ARRAYS)
-//  );
-
   private final String contentType;
   private final Function1<AsyncStore, String> storeFmt;
 
