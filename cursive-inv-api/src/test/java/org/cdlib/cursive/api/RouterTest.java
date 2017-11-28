@@ -36,7 +36,7 @@ public class RouterTest extends CursiveServerTestBase {
 
   @Test
   public void getRootAsJsonLd(TestContext tc) {
-    String expectedType = "application/hal+json";
+    String expectedType = "application/ld+json";
     String expectedBody = getResourceAsString("routes_root_json-ld.json");
     makeRequest(tc, expectedType, expectedBody);
   }
