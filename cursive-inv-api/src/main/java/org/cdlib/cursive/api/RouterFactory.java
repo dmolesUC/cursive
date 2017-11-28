@@ -1,7 +1,5 @@
 package org.cdlib.cursive.api;
 
-import com.theoryinpractise.halbuilder.api.RepresentationFactory;
-import com.theoryinpractise.halbuilder.standard.StandardRepresentationFactory;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vavr.control.Option;
 import io.vertx.reactivex.core.Vertx;

@@ -54,6 +54,7 @@ public abstract class CursiveServerTestBase {
 
   @After
   public void tearDown(TestContext tc) {
+    System.out.println("tearDown(): closing vertx");
     vertx.close(tc.asyncAssertSuccess());
   }
 

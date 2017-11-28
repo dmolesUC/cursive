@@ -12,7 +12,7 @@ dependencies {
   compile "io.vertx:vertx-rx-java2:${vertxVersion}"
   compile "io.vertx:vertx-web:${vertxVersion}"
 
-  compile 'com.theoryinpractise:halbuilder-standard:4.0.1'
+  compile 'com.theoryinpractise:halbuilder5:5.1.2'
 
   testCompile project(':cursive-inv-test')
 

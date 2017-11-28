@@ -24,6 +24,7 @@ public class RequestAssert extends AbstractAssert<RequestAssert, HttpClientReque
 
     Async async = tc.async();
     actual.handler(r -> {
+      // System.out.println("receivedStatus(): in handler");
       int actualStatus = r.statusCode();
       tc.assertEquals(
         expectedStatus,
@@ -31,6 +32,7 @@ public class RequestAssert extends AbstractAssert<RequestAssert, HttpClientReque
         String.format("Expected status %d, got %d", expectedStatus, actualStatus)
       );
       async.complete();
+      // System.out.println("receivedStatus(): async completed");
     });
 
     return this;
@@ -44,6 +46,7 @@ public class RequestAssert extends AbstractAssert<RequestAssert, HttpClientReque
 
     Async async = tc.async();
     actual.handler(r -> {
+      // System.out.println("receivedContentType(): in handler");
       String actualType = r.getHeader(CONTENT_TYPE);
       tc.assertEquals(
         expectedType,
@@ -55,31 +58,8 @@ public class RequestAssert extends AbstractAssert<RequestAssert, HttpClientReque
           actualType
         ));
       async.complete();
+      // System.out.println("receivedContentType(): async completed");
     });
-
-    return this;
-  }
-
-  public RequestAssert receivedBody(String expectedBody) {
-    if (actual == null) {
-      failWithMessage("Expected HttpClientRequest, but found null instead");
-      return this;
-    }
-
-    Async async = tc.async();
-    actual.handler(r -> r.bodyHandler(b -> {
-        String actualBody = b.toString();
-        tc.assertEquals(
-          expectedBody,
-          actualBody,
-          String.format("Expected body ‹%s›, got ‹%s›",
-            expectedBody,
-            actualBody)
-        );
-        async.complete();
-      }
-      )
-    );
 
     return this;
   }
@@ -91,16 +71,21 @@ public class RequestAssert extends AbstractAssert<RequestAssert, HttpClientReque
     }
 
     Async async = tc.async();
-    actual.handler(r -> r.bodyHandler(b -> {
-        String actualBody = b.toString();
-        System.out.println(actualBody);
-        try {
-          assertJsonEquals(expectedBody, actualBody);
-        } catch (Throwable t) {
-          tc.fail(t);
-        }
-        async.complete();
-      })
+    actual.handler(r -> {
+        // System.out.println("receivedBodyJson(): in handler");
+        r.bodyHandler(b -> {
+          // System.out.println("receivedBodyJson(): in bodyHandler");
+          String actualBody = b.toString();
+          // System.out.println(actualBody);
+          try {
+            assertJsonEquals(expectedBody, actualBody);
+          } catch (Throwable t) {
+            tc.fail(t);
+          }
+          async.complete();
+          // System.out.println("receivedBodyJson(): async completed");
+        });
+      }
     );
 
     return this;

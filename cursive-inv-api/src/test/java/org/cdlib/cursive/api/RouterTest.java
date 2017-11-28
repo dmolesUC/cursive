@@ -25,6 +25,8 @@ public class RouterTest extends CursiveServerTestBase {
       .receivedBodyJson(expectedBody);
 
     request.end();
+
+    System.out.println("makeRequest() completed");
   }
 
   @Test
