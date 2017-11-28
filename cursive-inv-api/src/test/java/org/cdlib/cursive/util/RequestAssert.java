@@ -6,6 +6,7 @@ import io.vertx.ext.unit.TestContext;
 import org.assertj.core.api.AbstractAssert;
 
 import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
+import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
 
 public class RequestAssert extends AbstractAssert<RequestAssert, HttpClientRequest> {
   private final TestContext tc;
@@ -78,6 +79,28 @@ public class RequestAssert extends AbstractAssert<RequestAssert, HttpClientReque
         async.complete();
       }
       )
+    );
+
+    return this;
+  }
+
+  public RequestAssert receivedBodyJson(String expectedBody) {
+    if (actual == null) {
+      failWithMessage("Expected HttpClientRequest, but found null instead");
+      return this;
+    }
+
+    Async async = tc.async();
+    actual.handler(r -> r.bodyHandler(b -> {
+        String actualBody = b.toString();
+        System.out.println(actualBody);
+        try {
+          assertJsonEquals(expectedBody, actualBody);
+        } catch (Throwable t) {
+          tc.fail(t);
+        }
+        async.complete();
+      })
     );
 
     return this;

@@ -22,7 +22,7 @@ public class RouterTest extends CursiveServerTestBase {
       .assertThat(request)
       .receivedStatus(200)
       .receivedContentType(requestedType)
-      .receivedBody(expectedBody);
+      .receivedBodyJson(expectedBody);
 
     request.end();
   }

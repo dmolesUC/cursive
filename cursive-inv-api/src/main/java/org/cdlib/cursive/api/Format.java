@@ -15,9 +15,6 @@ public enum Format {
   HAL("application/hal+json", Format::toHal),
   JSON_LD("application/ld+json", s -> "Hello");
 
-  public static final String HAL_MIME_TYPE = HAL.contentType;
-  public static final String JSON_LD_MIME_TYPE = JSON_LD.contentType;
-
   public static Format DEFAULT = HAL;
 
   // TODO: separate out formatter class

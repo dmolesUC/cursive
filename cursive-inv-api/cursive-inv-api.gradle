@@ -17,6 +17,7 @@ dependencies {
   testCompile project(':cursive-inv-test')
 
   testCompile "io.vertx:vertx-unit:${vertxVersion}"
+  testCompile 'net.javacrumbs.json-unit:json-unit:1.25.1'
 }
 
 test {

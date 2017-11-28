@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: net.javacrumbs.json-unit:json-unit:1.25.1">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.javacrumbs.json-unit/json-unit/1.25.1/45b7bdaf175370381bc03ff808bfa71e07c14150/json-unit-1.25.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.javacrumbs.json-unit/json-unit/1.25.1/2e9ecce25dacae2328061b109eeed5a1a8309c49/json-unit-1.25.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

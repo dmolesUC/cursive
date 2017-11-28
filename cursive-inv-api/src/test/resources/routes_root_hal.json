@@ -7,7 +7,7 @@
       {
         "name": "cursive",
         "href": "https://github.com/dmolesUC3/cursive/blob/master/RELATIONS.md#{rel}",
-        "templated": "true"
+        "templated": true
       }
     ],
     "cursive:workspaces": {
