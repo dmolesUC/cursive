@@ -18,7 +18,6 @@ public class RouterTest extends CursiveServerTestBase {
         .get().host("localhost").port(httpPort()).path("/")
         .makeRequest();
 
-    // TODO: single Handler<HttpClientResponse> for all assertions
     inContext(tc)
       .assertThat(request)
       .receivedStatus(200)
@@ -26,8 +25,6 @@ public class RouterTest extends CursiveServerTestBase {
       .receivedBodyJson(expectedBody);
 
     request.end();
-
-    System.out.println("makeRequest() completed");
   }
 
   @Test

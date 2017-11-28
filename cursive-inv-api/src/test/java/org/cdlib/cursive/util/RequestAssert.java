@@ -1,6 +1,10 @@
 package org.cdlib.cursive.util;
 
+import io.vavr.collection.List;
+import io.vertx.core.Handler;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpClientRequest;
+import io.vertx.core.http.HttpClientResponse;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import org.assertj.core.api.AbstractAssert;
@@ -9,11 +13,30 @@ import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
 import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
 
 public class RequestAssert extends AbstractAssert<RequestAssert, HttpClientRequest> {
+
+  private List<Handler<HttpClientResponse>> responseHandlers = List.empty();
+  private List<Handler<Buffer>> bodyHandlers = List.empty();
+
   private final TestContext tc;
 
   RequestAssert(TestContext tc, HttpClientRequest request) {
     super(request, RequestAssert.class);
     this.tc = tc;
+
+    Async async = tc.async();
+    request.handler(response -> {
+      responseHandlers.forEach(h -> h.handle(response));
+      response.bodyHandler(body -> bodyHandlers.forEach(h -> h.handle(body)));
+      async.complete();
+    });
+  }
+
+  private void addResponseHandler(Handler<HttpClientResponse> h) {
+    responseHandlers = responseHandlers.append(h);
+  }
+
+  private void addBodyHandler(Handler<Buffer> h) {
+    bodyHandlers = bodyHandlers.append(h);
   }
 
   public RequestAssert receivedStatus(int expectedStatus) {
@@ -22,17 +45,13 @@ public class RequestAssert extends AbstractAssert<RequestAssert, HttpClientReque
       return this;
     }
 
-    Async async = tc.async();
-    actual.handler(r -> {
-      // System.out.println("receivedStatus(): in handler");
-      int actualStatus = r.statusCode();
+    addResponseHandler(response -> {
+      int actualStatus = response.statusCode();
       tc.assertEquals(
         expectedStatus,
         actualStatus,
         String.format("Expected status %d, got %d", expectedStatus, actualStatus)
       );
-      async.complete();
-      // System.out.println("receivedStatus(): async completed");
     });
 
     return this;
@@ -44,10 +63,8 @@ public class RequestAssert extends AbstractAssert<RequestAssert, HttpClientReque
       return this;
     }
 
-    Async async = tc.async();
-    actual.handler(r -> {
-      // System.out.println("receivedContentType(): in handler");
-      String actualType = r.getHeader(CONTENT_TYPE);
+    addResponseHandler(response -> {
+      String actualType = response.getHeader(CONTENT_TYPE);
       tc.assertEquals(
         expectedType,
         actualType,
@@ -57,8 +74,6 @@ public class RequestAssert extends AbstractAssert<RequestAssert, HttpClientReque
           expectedType,
           actualType
         ));
-      async.complete();
-      // System.out.println("receivedContentType(): async completed");
     });
 
     return this;
@@ -70,24 +85,16 @@ public class RequestAssert extends AbstractAssert<RequestAssert, HttpClientReque
       return this;
     }
 
-    Async async = tc.async();
-    actual.handler(r -> {
-        // System.out.println("receivedBodyJson(): in handler");
-        r.bodyHandler(b -> {
-          // System.out.println("receivedBodyJson(): in bodyHandler");
-          String actualBody = b.toString();
-          // System.out.println(actualBody);
-          try {
-            assertJsonEquals(expectedBody, actualBody);
-          } catch (Throwable t) {
-            tc.fail(t);
-          }
-          async.complete();
-          // System.out.println("receivedBodyJson(): async completed");
-        });
+    addBodyHandler(body -> {
+      String actualBody = body.toString();
+      try {
+        assertJsonEquals(expectedBody, actualBody);
+      } catch (Throwable t) {
+        tc.fail(t);
       }
-    );
+    });
 
     return this;
   }
+
 }
