@@ -13,17 +13,22 @@
     <orderEntry type="library" name="Gradle: io.vertx:vertx-rx-java2:3.5.0" level="project" />
     <orderEntry type="library" name="Gradle: io.vertx:vertx-web:3.5.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.apache.tinkerpop:tinkergraph-gremlin:3.3.0" level="project" />
-    <orderEntry type="library" name="Gradle: io.reactivex.rxjava2:rxjava:2.1.5" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.apache.tinkerpop:gremlin-test:3.3.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.theoryinpractise:halbuilder-standard:4.0.1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.apache.tinkerpop:gremlin-core:3.3.0" level="project" />
+    <orderEntry type="library" name="Gradle: io.reactivex.rxjava2:rxjava:2.1.5" level="project" />
     <orderEntry type="library" name="Gradle: org.reactivestreams:reactive-streams:1.0.1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.slf4j:jcl-over-slf4j:1.7.21" level="project" />
     <orderEntry type="library" name="Gradle: io.vertx:vertx-auth-common:3.5.0" level="project" />
     <orderEntry type="library" name="Gradle: io.vertx:vertx-core:3.5.0" level="project" />
     <orderEntry type="library" name="Gradle: io.vertx:vertx-bridge-common:3.5.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.theoryinpractise:halbuilder-json:4.0.6" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.fasterxml.uuid:java-uuid-generator:3.1.4" level="project" />
+    <orderEntry type="library" name="Gradle: com.theoryinpractise:halbuilder-xml:4.0.1" level="project" />
+    <orderEntry type="library" name="Gradle: com.theoryinpractise:halbuilder-core:4.0.6" level="project" />
+    <orderEntry type="library" name="Gradle: com.theoryinpractise:halbuilder-api:4.0.1" level="project" />
     <orderEntry type="library" name="Gradle: io.vavr:vavr:0.9.2" level="project" />
     <orderEntry type="library" name="Gradle: io.netty:netty-codec-http2:4.1.15.Final" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.fasterxml.uuid:java-uuid-generator:3.1.4" level="project" />
     <orderEntry type="library" name="Gradle: io.netty:netty-handler:4.1.15.Final" level="project" />
     <orderEntry type="library" name="Gradle: io.netty:netty-handler-proxy:4.1.15.Final" level="project" />
     <orderEntry type="library" name="Gradle: io.netty:netty-resolver-dns:4.1.15.Final" level="project" />
@@ -38,6 +43,9 @@
     <orderEntry type="library" name="Gradle: io.netty:netty-common:4.1.15.Final" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-databind:2.9.0" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-core:2.9.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.guava:guava:18.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.code.findbugs:jsr305:3.0.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.jdom:jdom:2.0.2" level="project" />
     <orderEntry type="library" name="Gradle: io.vavr:vavr-match:0.9.2" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-annotations:2.9.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.apache.tinkerpop:gremlin-shaded:3.3.0" level="project" />

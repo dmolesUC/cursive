@@ -1,5 +1,7 @@
 package org.cdlib.cursive.api;
 
+import com.theoryinpractise.halbuilder.api.RepresentationFactory;
+import com.theoryinpractise.halbuilder.standard.StandardRepresentationFactory;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vavr.control.Option;
 import io.vertx.reactivex.core.Vertx;
@@ -27,12 +29,12 @@ public class RouterFactory {
 
     Route route = router.route();
     route = Format.all().foldLeft(route, (r, f) -> r.produces(f.contentType()));
-    route.handler(RouterFactory::getRoot);
+    route.handler(this::getRoot);
 
     return router;
   }
 
-  private static void getRoot(RoutingContext ctx) {
+  private void getRoot(RoutingContext ctx) {
     Option<Format> acceptedFormat = getAcceptedFormat(ctx);
     acceptedFormat
       .onEmpty(() -> ctx.response()
@@ -40,7 +42,7 @@ public class RouterFactory {
         .end())
       .forEach(fmt -> ctx.response()
         .putHeader(CONTENT_TYPE.toString(), fmt.contentType())
-        .end("Hello"));
+        .end(fmt.format(store)));
   }
 
   private static Option<Format> getAcceptedFormat(RoutingContext ctx) {
