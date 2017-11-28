@@ -18,6 +18,7 @@ public class RouterTest extends CursiveServerTestBase {
         .get().host("localhost").port(httpPort()).path("/")
         .makeRequest();
 
+    // TODO: single Handler<HttpClientResponse> for all assertions
     inContext(tc)
       .assertThat(request)
       .receivedStatus(200)
