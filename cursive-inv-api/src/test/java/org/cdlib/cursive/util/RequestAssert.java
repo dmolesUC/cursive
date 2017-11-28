@@ -90,6 +90,8 @@ public class RequestAssert extends AbstractAssert<RequestAssert, HttpClientReque
       try {
         assertJsonEquals(expectedBody, actualBody);
       } catch (Throwable t) {
+        System.err.printf("Expected: <%s>%n", expectedBody);
+        System.err.printf("Actual:   <%s>%n", actualBody);
         tc.fail(t);
       }
     });

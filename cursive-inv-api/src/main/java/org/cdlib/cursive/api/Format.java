@@ -1,5 +1,9 @@
 package org.cdlib.cursive.api;
 
+import com.github.jsonldjava.core.JsonLdError;
+import com.github.jsonldjava.core.JsonLdOptions;
+import com.github.jsonldjava.core.JsonLdProcessor;
+import com.github.jsonldjava.utils.JsonUtils;
 import com.theoryinpractise.halbuilder5.Rel;
 import com.theoryinpractise.halbuilder5.Rels;
 import com.theoryinpractise.halbuilder5.ResourceRepresentation;
@@ -9,15 +13,15 @@ import io.vavr.collection.Array;
 import io.vavr.control.Option;
 import org.cdlib.cursive.core.async.AsyncStore;
 
+import java.io.IOException;
 import java.io.StringWriter;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Objects;
+import java.io.UncheckedIOException;
+import java.util.*;
 
 public enum Format {
 
   HAL("application/hal+json", Format::toHal),
-  JSON_LD("application/ld+json", s -> "Hello");
+  JSON_LD("application/ld+json", Format::toJsonLd);
 
   public static Format DEFAULT = HAL;
 
@@ -60,4 +64,25 @@ public enum Format {
     return out.toString();
   }
 
+  private static String toJsonLd(AsyncStore s) {
+    Map<String, Object> context = new LinkedHashMap<>();
+    context.put("cursive", "https://github.com/dmolesUC3/cursive/blob/master/RELATIONS.md#");
+    context.put("cursive:workspaces", new HashMap<String, String>(){{
+      put("@type", "@id");
+    }});
+
+    Map<String, Object> object = new LinkedHashMap<>();
+    object.put("@id", "/");
+    object.put("cursive:workspaces", "workspaces");
+
+    JsonLdOptions options = new JsonLdOptions();
+    try {
+      Map<String, Object> compact = JsonLdProcessor.compact(object, context, options);
+      return JsonUtils.toPrettyString(compact);
+    } catch (JsonLdError jsonLdError) {
+      throw new IllegalStateException(jsonLdError);
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
+  }
 }
