@@ -17,7 +17,7 @@ public class LinkRelation {
     this.namespace = namespace;
     this.term = term;
     this.uri = URI.create(namespace.getUriBase() + term);
-    this.prefixedForm = namespace.getPrefix() + ":" + term;
+    this.prefixedForm = namespace.prefix(term);
   }
 
   public Namespace getNamespace() {

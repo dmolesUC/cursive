@@ -25,6 +25,10 @@ public class Namespace {
     return uriBase;
   }
 
+  public String prefix(String term) {
+    return prefix + ":" + term;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
