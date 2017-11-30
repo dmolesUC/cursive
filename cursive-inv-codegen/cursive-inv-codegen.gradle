@@ -9,10 +9,6 @@ buildscript {
 
 apply plugin: "com.github.jruby-gradle.base"
 
-apply plugin: 'application'
-
-mainClassName = 'org.cdlib.cursive.Generators'
-
 ext {
   jrubyVersion = '9.1.14.0'
 }
@@ -20,5 +16,7 @@ ext {
 dependencies {
   jrubyExec "rubygems:rdf-vocab:2.2.8"
   compile "org.jruby:jruby-complete:$jrubyVersion"
+  compile 'com.squareup:javapoet:1.8.0'
+  compile 'it.unimi.dsi:fastutil:8.1.1'
 }
 

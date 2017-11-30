@@ -16,7 +16,8 @@
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.junit.jupiter:junit-jupiter-engine:5.0.0" level="project" />
     <orderEntry type="library" name="Gradle: org.mockito:mockito-core:2.7.22" level="project" />
     <orderEntry type="library" name="Gradle: org.assertj:assertj-core:3.8.0" level="project" />
-    <orderEntry type="library" name="Gradle: commons-io:commons-io:2.4" level="project" />
+    <orderEntry type="library" name="Gradle: commons-io:commons-io:2.6" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.commons:commons-text:1.1" level="project" />
     <orderEntry type="library" name="Gradle: io.vavr:vavr:0.9.2" level="project" />
     <orderEntry type="library" name="Gradle: org.slf4j:slf4j-simple:1.7.25" level="project" />
     <orderEntry type="library" name="Gradle: org.slf4j:slf4j-api:1.7.25" level="project" />
@@ -29,6 +30,7 @@
     <orderEntry type="library" name="Gradle: net.bytebuddy:byte-buddy:1.6.11" level="project" />
     <orderEntry type="library" name="Gradle: net.bytebuddy:byte-buddy-agent:1.6.11" level="project" />
     <orderEntry type="library" name="Gradle: org.objenesis:objenesis:2.5" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.commons:commons-lang3:3.5" level="project" />
     <orderEntry type="library" name="Gradle: io.vavr:vavr-match:0.9.2" level="project" />
     <orderEntry type="module" module-name="cursive-inv-core_main" />
     <orderEntry type="library" name="Gradle: org.reactivestreams:reactive-streams:1.0.1" level="project" />

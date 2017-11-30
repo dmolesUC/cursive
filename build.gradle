@@ -36,6 +36,12 @@ subprojects {
   dependencies {
 
     // ------------------------------------------------------------
+    // Apache Commons
+
+    compile 'commons-io:commons-io:2.6'
+    compile 'org.apache.commons:commons-text:1.1'
+
+    // ------------------------------------------------------------
     // Vavr
 
     compile "io.vavr:vavr:${vavrVersion}"
