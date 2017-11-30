@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module external.linked.project.id=":cursive-inv-test:test" external.linked.project.path="$MODULE_DIR$/../../../cursive-inv-test" external.root.project.path="$MODULE_DIR$/../../.." external.system.id="GRADLE" external.system.module.group="cursive" external.system.module.type="sourceSet" external.system.module.version="unspecified" type="JAVA_MODULE" version="4">
+<module external.linked.project.id=":cursive-inv-codegen:test" external.linked.project.path="$MODULE_DIR$/../../../cursive-inv-codegen" external.root.project.path="$MODULE_DIR$/../../.." external.system.id="GRADLE" external.system.module.group="cursive" external.system.module.type="sourceSet" external.system.module.version="unspecified" type="JAVA_MODULE" version="4">
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_9">
-    <output-test url="file://$MODULE_DIR$/../../../cursive-inv-test/out/test/classes" />
+    <output-test url="file://$MODULE_DIR$/../../../cursive-inv-codegen/out/test/classes" />
     <exclude-output />
-    <content url="file://$MODULE_DIR$/../../../cursive-inv-test/src/test">
-      <sourceFolder url="file://$MODULE_DIR$/../../../cursive-inv-test/src/test/java" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/../../../cursive-inv-test/src/test/resources" type="java-test-resource" />
+    <content url="file://$MODULE_DIR$/../../../cursive-inv-codegen/src/test">
+      <sourceFolder url="file://$MODULE_DIR$/../../../cursive-inv-codegen/src/test/java" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/../../../cursive-inv-codegen/src/test/resources" type="java-test-resource" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="cursive-inv-test_main" />
+    <orderEntry type="module" module-name="cursive-inv-codegen_main" />
+    <orderEntry type="library" name="Gradle: io.vavr:vavr:0.9.2" level="project" />
+    <orderEntry type="library" name="Gradle: org.slf4j:slf4j-simple:1.7.25" level="project" />
+    <orderEntry type="library" name="Gradle: org.slf4j:slf4j-api:1.7.25" level="project" />
+    <orderEntry type="library" name="Gradle: org.jruby:jruby-complete:9.1.14.0" level="project" />
     <orderEntry type="library" name="Gradle: org.junit.jupiter:junit-jupiter-params:5.0.0" level="project" />
     <orderEntry type="library" name="Gradle: org.junit.jupiter:junit-jupiter-api:5.0.0" level="project" />
     <orderEntry type="library" name="Gradle: org.junit.vintage:junit-vintage-engine:4.12.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.junit.jupiter:junit-jupiter-engine:5.0.0" level="project" />
     <orderEntry type="library" name="Gradle: org.mockito:mockito-core:2.7.22" level="project" />
     <orderEntry type="library" name="Gradle: org.assertj:assertj-core:3.8.0" level="project" />
-    <orderEntry type="library" name="Gradle: commons-io:commons-io:2.4" level="project" />
-    <orderEntry type="library" name="Gradle: io.vavr:vavr:0.9.2" level="project" />
-    <orderEntry type="library" name="Gradle: org.slf4j:slf4j-simple:1.7.25" level="project" />
-    <orderEntry type="library" name="Gradle: org.slf4j:slf4j-api:1.7.25" level="project" />
-    <orderEntry type="library" name="Gradle: io.reactivex.rxjava2:rxjava:2.1.5" level="project" />
+    <orderEntry type="library" name="Gradle: io.vavr:vavr-match:0.9.2" level="project" />
     <orderEntry type="library" name="Gradle: org.junit.platform:junit-platform-engine:1.0.0" level="project" />
     <orderEntry type="library" name="Gradle: org.junit.platform:junit-platform-commons:1.0.0" level="project" />
     <orderEntry type="library" name="Gradle: org.apiguardian:apiguardian-api:1.0.0" level="project" />
@@ -29,10 +29,7 @@
     <orderEntry type="library" name="Gradle: net.bytebuddy:byte-buddy:1.6.11" level="project" />
     <orderEntry type="library" name="Gradle: net.bytebuddy:byte-buddy-agent:1.6.11" level="project" />
     <orderEntry type="library" name="Gradle: org.objenesis:objenesis:2.5" level="project" />
-    <orderEntry type="library" name="Gradle: io.vavr:vavr-match:0.9.2" level="project" />
-    <orderEntry type="module" module-name="cursive-inv-core_main" />
-    <orderEntry type="library" name="Gradle: org.reactivestreams:reactive-streams:1.0.1" level="project" />
     <orderEntry type="library" name="Gradle: org.hamcrest:hamcrest-core:1.3" level="project" />
   </component>
-  <component name="TestModuleProperties" production-module="cursive-inv-test_main" />
+  <component name="TestModuleProperties" production-module="cursive-inv-codegen_main" />
 </module>

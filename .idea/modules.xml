@@ -6,6 +6,9 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/cursive-inv-api/cursive-inv-api.iml" filepath="$PROJECT_DIR$/.idea/modules/cursive-inv-api/cursive-inv-api.iml" group="cursive-inv-api" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/cursive-inv-api/cursive-inv-api_main.iml" filepath="$PROJECT_DIR$/.idea/modules/cursive-inv-api/cursive-inv-api_main.iml" group="cursive-inv-api" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/cursive-inv-api/cursive-inv-api_test.iml" filepath="$PROJECT_DIR$/.idea/modules/cursive-inv-api/cursive-inv-api_test.iml" group="cursive-inv-api" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cursive-inv-codegen/cursive-inv-codegen.iml" filepath="$PROJECT_DIR$/.idea/modules/cursive-inv-codegen/cursive-inv-codegen.iml" group="cursive-inv-codegen" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cursive-inv-codegen/cursive-inv-codegen_main.iml" filepath="$PROJECT_DIR$/.idea/modules/cursive-inv-codegen/cursive-inv-codegen_main.iml" group="cursive-inv-codegen" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cursive-inv-codegen/cursive-inv-codegen_test.iml" filepath="$PROJECT_DIR$/.idea/modules/cursive-inv-codegen/cursive-inv-codegen_test.iml" group="cursive-inv-codegen" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/cursive-inv-core/cursive-inv-core.iml" filepath="$PROJECT_DIR$/.idea/modules/cursive-inv-core/cursive-inv-core.iml" group="cursive-inv-core" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/cursive-inv-core/cursive-inv-core_main.iml" filepath="$PROJECT_DIR$/.idea/modules/cursive-inv-core/cursive-inv-core_main.iml" group="cursive-inv-core" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/cursive-inv-core/cursive-inv-core_test.iml" filepath="$PROJECT_DIR$/.idea/modules/cursive-inv-core/cursive-inv-core_test.iml" group="cursive-inv-core" />

@@ -4,6 +4,8 @@
     <bytecodeTargetLevel>
       <module name="cursive-inv-api_main" target="1.9" />
       <module name="cursive-inv-api_test" target="1.9" />
+      <module name="cursive-inv-codegen_main" target="1.9" />
+      <module name="cursive-inv-codegen_test" target="1.9" />
       <module name="cursive-inv-core_main" target="1.9" />
       <module name="cursive-inv-core_test" target="1.9" />
       <module name="cursive-inv-store_main" target="1.9" />

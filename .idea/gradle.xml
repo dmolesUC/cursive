@@ -10,6 +10,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/cursive-inv-api" />
+            <option value="$PROJECT_DIR$/cursive-inv-codegen" />
             <option value="$PROJECT_DIR$/cursive-inv-core" />
             <option value="$PROJECT_DIR$/cursive-inv-store" />
             <option value="$PROJECT_DIR$/cursive-inv-test" />
