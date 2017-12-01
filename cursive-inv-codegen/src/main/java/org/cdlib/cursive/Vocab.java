@@ -49,7 +49,10 @@ class Vocab implements Comparable<Vocab> {
   }
 
   TypeSpec.Builder addVocabEnumConstant(TypeSpec.Builder vocabsBuilder) {
-    return vocabsBuilder.addEnumConstant(constName);
+    return vocabsBuilder.addEnumConstant(
+      constName,
+      TypeSpec.anonymousClassBuilder("$S, new URI($S)", prefix, uri.toString()).build()
+    );
   }
 
   @Override

@@ -2,6 +2,7 @@ package org.cdlib.cursive;
 
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
+import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
@@ -10,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jruby.RubyHash;
 import org.jruby.embed.ScriptingContainer;
 
+import javax.lang.model.element.Modifier;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URI;
@@ -31,9 +33,15 @@ class Generators {
     TypeSpec.Builder vocabsBuilder = vocabs.foldLeft(
       TypeSpec.enumBuilder(VOCAB_CLASS_NAME),
       (b, v) -> v.addVocabEnumConstant(b)
-    );
+    ).addModifiers(Modifier.PUBLIC);
+
+    vocabsBuilder = addField(vocabsBuilder, String.class, "prefix", "getPrefix");
+    vocabsBuilder = addField(vocabsBuilder, URI.class, "uri", "getURI");
+
     TypeSpec vocabsSpec = vocabsBuilder.build();
     JavaFile.Builder vocabsFileBuilder = JavaFile.builder(CURSIVE_RTF_PACKAGE, vocabsSpec);
+
+    // TODO: what if we just had one enum per vocab, w/static methods for prefix & URI?
 
     TypeSpec.Builder termsBuilder = vocabs.foldLeft(
       TypeSpec.enumBuilder(TERM_CLASS_NAME),
@@ -54,6 +62,21 @@ class Generators {
         throw new UncheckedIOException(e);
       }
     });
+  }
+
+  private TypeSpec.Builder addField(TypeSpec.Builder vocabsBuilder, Class<?> fieldType, String fieldName, String getterName) {
+    vocabsBuilder = vocabsBuilder
+      .addMethod(MethodSpec.constructorBuilder()
+        .addParameter(fieldType, fieldName)
+        .addStatement("this.$N = $N", fieldName, fieldName)
+        .build())
+      .addField(URI.class, fieldName)
+      .addMethod(MethodSpec.methodBuilder(getterName)
+        .addModifiers(Modifier.PUBLIC)
+        .returns(URI.class)
+        .addStatement("return this.$N", fieldName)
+        .build());
+    return vocabsBuilder;
   }
 
   // ------------------------------------------------------------
