@@ -3,9 +3,11 @@ package org.cdlib.cursive;
 import com.squareup.javapoet.*;
 import io.vavr.Lazy;
 import io.vavr.collection.Array;
+import org.apache.commons.text.WordUtils;
 import org.cdlib.cursive.util.Strings;
 
 import javax.lang.model.element.Modifier;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.Objects;
 
@@ -16,7 +18,7 @@ class Vocab implements Comparable<Vocab> {
   private final URI uri;
   private final Array<String> terms;
   private final String constName;
-  private final String className;
+  private final ClassName className;
   private final String rubyClassName;
 
   Vocab(String rubyClassName, String prefix, URI uri, Array<String> terms) {
@@ -30,10 +32,10 @@ class Vocab implements Comparable<Vocab> {
     this.constName = toConstName(rubyClassName);
     this.uri = uri;
     this.terms = terms.sortBy(Vocab::toConstName);
-    className = toClassName(rubyClassName);
+    this.className = ClassName.get(CURSIVE_RTF_PACKAGE, toClassName(rubyClassName));
   }
 
-  static String toConstName(String rValue) {
+  private static String toConstName(String rValue) {
     return rValue
       .replaceAll("/+$", "")
       .replaceAll("([a-z])([A-Z])", "$1_$2")
@@ -52,82 +54,90 @@ class Vocab implements Comparable<Vocab> {
       .replaceAll("^([^_a-zA-Z])", "_$1")
       .replaceAll("[^_$a-zA-Z0-9]", "_");
 
-    StringBuilder sb = new StringBuilder()
-      .append(Character.toUpperCase(validIdentifier.charAt(0)));
-
-    if (validIdentifier.length() > 1) {
-      sb.append(validIdentifier.substring(1));
-    }
-
-    return sb.toString();
+    return WordUtils.capitalize(validIdentifier);
   }
 
-  public String getPrefix() {
-    return prefix;
-  }
-
-  public URI getUri() {
-    return uri;
-  }
-
-  public Array<String> getTerms() {
+  Array<String> getTerms() {
     return terms;
   }
 
-  public String getClassName() {
-    return className;
-  }
-
-  public String getConstName() {
-    return constName;
-  }
-
-  TypeSpec.Builder addVocabEnumConstant(TypeSpec.Builder vocabsBuilder) {
-    return vocabsBuilder.addEnumConstant(
-      constName,
-      TypeSpec.anonymousClassBuilder("$S, new URI($S)", prefix, uri.toString()).build()
-    );
-  }
-
   JavaFile generateEnum() {
-    ClassName className = ClassName.get(CURSIVE_RTF_PACKAGE, this.className);
-    TypeSpec.Builder enumSpecBuilder = terms.foldLeft(TypeSpec.enumBuilder(className), (b, t) ->
-      b.addEnumConstant(toConstName(t), TypeSpec.anonymousClassBuilder("$S", t).build())
-    )
-      .addJavadoc("From RDF::Vocab::$L\n", rubyClassName)
-      .addField(FieldSpec.builder(URI.class, "PREFIX", Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
-        .initializer("$S", prefix)
-        .build())
-      .addField(FieldSpec.builder(URI.class, "BASE_URI", Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
-        .initializer("URI.create($S)", uri)
-        .build())
-      .addMethod(MethodSpec.constructorBuilder()
-        .addParameter(String.class, "term")
-        .addStatement("this.$N = $N", "term", "term")
-        .build())
-      .addField(FieldSpec.builder(String.class, "term", Modifier.PRIVATE, Modifier.FINAL).build())
-      .addField(FieldSpec.builder(ParameterizedTypeName.get(Lazy.class, URI.class), "uri", Modifier.PRIVATE, Modifier.FINAL)
-        .initializer("Lazy.of(this::buildUri)")
-        .build())
-      .addMethod(MethodSpec.methodBuilder("getTerm")
-        .addModifiers(Modifier.PUBLIC)
-        .returns(String.class)
-        .addStatement("return this.$N", "term")
-        .build())
-      .addMethod(MethodSpec.methodBuilder("getUri")
-        .addModifiers(Modifier.PUBLIC)
-        .returns(URI.class)
-        .addStatement("return this.$N.get()", "uri")
-        .build())
-      .addMethod(MethodSpec.methodBuilder("buildUri")
-        .returns(URI.class)
-        .addModifiers(Modifier.PRIVATE)
-        .addStatement("return URI.create(BASE_URI.toString() + getTerm())")
-        .build());
+    MethodSpec.Builder constructorBuilder = MethodSpec.constructorBuilder();
 
-    TypeSpec spec = enumSpecBuilder.build();
+    TypeSpec.Builder builder =
+      terms.foldLeft(TypeSpec.enumBuilder(className), this::addTerm)
+        .addJavadoc("From RDF::Vocab::$L\n", rubyClassName);
+
+    addConstant(builder, URI.class, "PREFIX", "URI.create($S)", this.prefix);
+    addConstant(builder, URI.class, "BASE_URI", "URI.create($S)", uri);
+    addField(builder, constructorBuilder, String.class, "term");
+    addLazyField(builder, URI.class, "uri", "return URI.create(BASE_URI.toString() + getTerm())");
+    addLazyField(builder, String.class, "prefixedForm", "String.format(\"%s:%s\", PREFIX, getTerm())");
+
+    builder.addMethod(constructorBuilder.build());
+
+    TypeSpec spec = builder.build();
     return JavaFile.builder(CURSIVE_RTF_PACKAGE, spec).build();
   }
+
+  private TypeSpec.Builder addTerm(TypeSpec.Builder builder, String term) {
+    return builder.addEnumConstant(toConstName(term), TypeSpec.anonymousClassBuilder("$S", term).build());
+  }
+
+  // ------------------------------------------------------------
+  // Builder helpers
+
+  private void addField(TypeSpec.Builder builder, MethodSpec.Builder constructorBuilder, Type fieldType, String fieldName) {
+    FieldSpec field = FieldSpec.builder(fieldType, fieldName, Modifier.PRIVATE, Modifier.FINAL).build();
+
+    MethodSpec accessor = MethodSpec.methodBuilder("get" + WordUtils.capitalize(fieldName))
+      .addModifiers(Modifier.PUBLIC)
+      .returns(fieldType)
+      .addStatement("return this.$N", fieldName)
+      .build();
+
+    constructorBuilder
+      .addParameter(fieldType, fieldName)
+      .addStatement("this.$N = $N", fieldName, fieldName);
+
+    builder.addField(field)
+      .addMethod(accessor);
+  }
+
+  private void addLazyField(TypeSpec.Builder builder, Type valueType, String fieldName, String valueStmt) {
+    String valueMethod = fieldName + "Value";
+
+    MethodSpec valueInitializer = MethodSpec.methodBuilder(valueMethod)
+      .returns(valueType)
+      .addModifiers(Modifier.PRIVATE)
+      .addStatement(valueStmt)
+      .build();
+
+    FieldSpec field = FieldSpec.builder(ParameterizedTypeName.get(Lazy.class, valueType), fieldName, Modifier.PRIVATE, Modifier.FINAL)
+      .initializer(String.format("Lazy.of(this::%s)", valueMethod))
+      .build();
+
+    MethodSpec accessor = MethodSpec.methodBuilder("get" + WordUtils.capitalize(fieldName))
+      .addModifiers(Modifier.PUBLIC)
+      .returns(valueType)
+      .addStatement("return this.$N.get()", fieldName)
+      .build();
+
+    builder.addField(field)
+      .addMethod(accessor)
+      .addMethod(valueInitializer);
+  }
+
+  private void addConstant(TypeSpec.Builder builder, Type constClass, String constName, String format, Object... args) {
+    FieldSpec fieldSpec = FieldSpec.builder(constClass, constName)
+      .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
+      .initializer(format, args)
+      .build();
+    builder.addField(fieldSpec);
+  }
+
+  // ------------------------------------------------------------
+  // Overrides
 
   @Override
   public String toString() {
