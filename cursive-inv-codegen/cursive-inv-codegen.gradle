@@ -21,6 +21,7 @@ dependencies {
 }
 
 task('genvocab', type: JavaExec) {
+  description 'Generates vocabulary enums.'
   classpath = sourceSets.main.runtimeClasspath
   main = 'org.cdlib.cursive.GenVocab'
   // TODO: pass this in from cursive-inv-api instead

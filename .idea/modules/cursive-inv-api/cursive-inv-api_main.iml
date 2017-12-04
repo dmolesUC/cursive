@@ -15,8 +15,8 @@
     <orderEntry type="library" name="Gradle: org.apache.commons:commons-text:1.1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.apache.tinkerpop:tinkergraph-gremlin:3.3.0" level="project" />
     <orderEntry type="library" name="Gradle: com.theoryinpractise:halbuilder5:5.1.2" level="project" />
-    <orderEntry type="library" name="Gradle: io.vavr:vavr:0.9.2" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.apache.tinkerpop:gremlin-test:3.3.0" level="project" />
+    <orderEntry type="library" name="Gradle: io.vavr:vavr:0.9.2" level="project" />
     <orderEntry type="library" name="Gradle: org.slf4j:jcl-over-slf4j:1.7.25" level="project" />
     <orderEntry type="library" name="Gradle: org.slf4j:slf4j-api:1.7.25" level="project" />
     <orderEntry type="library" name="Gradle: io.vertx:vertx-rx-java2:3.5.0" level="project" />

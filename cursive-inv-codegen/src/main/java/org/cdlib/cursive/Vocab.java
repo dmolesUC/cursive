@@ -36,7 +36,7 @@ class Vocab implements Comparable<Vocab> {
   }
 
   private static String toConstName(String rValue) {
-    return rValue
+    String constName = rValue
       .replaceAll("/+$", "")
       .replaceAll("([a-z])([A-Z])", "$1_$2")
       .replaceAll("([0-9])([A-Z])", "$1_$2")
@@ -44,6 +44,7 @@ class Vocab implements Comparable<Vocab> {
       .replaceAll("([0-9])([A-Z])", "$1_$2")
       .replaceAll("^([^_A-Z])", "_$1")
       .replaceAll("[^_$A-Z0-9]", "_");
+    return constName;
   }
 
   private static String toClassName(String rValue) {
@@ -68,11 +69,27 @@ class Vocab implements Comparable<Vocab> {
       terms.foldLeft(TypeSpec.enumBuilder(className), this::addTerm)
         .addJavadoc("From RDF::Vocab::$L\n", rubyClassName);
 
-    addConstant(builder, URI.class, "PREFIX", "URI.create($S)", this.prefix);
-    addConstant(builder, URI.class, "BASE_URI", "URI.create($S)", uri);
+    addConstant(builder, String.class, "CURIE_PREFIX", "$S", this.prefix);
+    addConstant(builder, URI.class, "BASE_URI", "java.net.URI.create($S)", uri);
     addField(builder, constructorBuilder, String.class, "term");
-    addLazyField(builder, URI.class, "uri", "return URI.create(BASE_URI.toString() + getTerm())");
-    addLazyField(builder, String.class, "prefixedForm", "return String.format(\"%s:%s\", PREFIX, getTerm())");
+    addLazyField(builder, URI.class, "uri", "return java.net.URI.create(BASE_URI.toString() + getTerm())");
+    addLazyField(builder, String.class, "prefixedForm", "return String.format(\"%s:%s\", prefix(), getTerm())");
+
+    MethodSpec prefixAccessor = MethodSpec.methodBuilder("prefix")
+      .addModifiers(Modifier.PUBLIC)
+      .addModifiers(Modifier.STATIC)
+      .returns(String.class)
+      .addStatement("return CURIE_PREFIX")
+      .build();
+    builder.addMethod(prefixAccessor);
+
+    MethodSpec baseUriAccessor = MethodSpec.methodBuilder("baseUri")
+      .addModifiers(Modifier.PUBLIC)
+      .addModifiers(Modifier.STATIC)
+      .returns(URI.class)
+      .addStatement("return BASE_URI")
+      .build();
+    builder.addMethod(baseUriAccessor);
 
     builder.addMethod(constructorBuilder.build());
 

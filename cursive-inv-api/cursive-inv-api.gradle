@@ -31,7 +31,19 @@ dependencies {
 }
 
 // TODO: make this work
+compileJava {
+  dependsOn ':cursive-inv-codegen:genvocab'
+}
+
+//task compileJava(dependsOn: ':cursive-inv-codegen:genvocab')
 //task compileJava(dependsOn: rootProject.project('cursive-inv-codegen').tasks['genvocab'])
+
+/*
+// something like
+genvocab {
+  args projectDir + "/src/generated/java"
+}
+ */
 
 test {
   // TODO: some sort of environment configuration
