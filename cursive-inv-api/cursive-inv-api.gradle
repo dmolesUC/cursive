@@ -6,7 +6,15 @@ ext {
   vertxVersion = '3.5.0'
 }
 
+sourceSets {
+  generated
+}
+
 dependencies {
+  // TODO: figure out how not to have to specify Vavr here
+  generatedCompile "io.vavr:vavr:${vavrVersion}"
+  compile sourceSets.generated.output
+
   compile project(':cursive-inv-store')
 
   compile "io.vertx:vertx-rx-java2:${vertxVersion}"
@@ -21,6 +29,9 @@ dependencies {
   testCompile "io.vertx:vertx-unit:${vertxVersion}"
   testCompile 'net.javacrumbs.json-unit:json-unit:1.25.1'
 }
+
+// TODO: make this work
+//task compileJava(dependsOn: rootProject.project('cursive-inv-codegen').tasks['genvocab'])
 
 test {
   // TODO: some sort of environment configuration

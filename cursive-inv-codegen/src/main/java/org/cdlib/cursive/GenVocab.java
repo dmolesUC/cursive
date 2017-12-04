@@ -1,5 +1,6 @@
 package org.cdlib.cursive;
 
+import com.squareup.javapoet.JavaFile;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import io.vavr.collection.Array;
@@ -7,13 +8,21 @@ import io.vavr.collection.LinkedHashMap;
 import org.apache.commons.lang3.StringUtils;
 import org.jruby.RubyHash;
 import org.jruby.embed.ScriptingContainer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 @SuppressWarnings("unchecked")
-class Generators {
+class GenVocab {
+
+  private static final Logger log = LoggerFactory.getLogger(GenVocab.class);
 
   static final String CURSIVE_RTF_PACKAGE = "org.cdlib.cursive.rtf";
 
@@ -22,14 +31,22 @@ class Generators {
     .removeAll(v -> v.getTerms().isEmpty())
     .sorted();
 
-  void generate() {
-    vocabs.map(Vocab::generateEnum).forEach(jf -> {
-      try {
-        jf.writeTo(System.out);
+  void generate(File targetDir) {
+    Path srcPath = Array.of(CURSIVE_RTF_PACKAGE.split("\\.")).foldLeft(targetDir.toPath(), Path::resolve);
+    log.debug("Writing generated files to %s", srcPath);
+    srcPath.toFile().mkdirs();
+
+    Array<JavaFile> files = vocabs.map(Vocab::generateEnum);
+    files.forEach(jf -> {
+      Path filePath = srcPath.resolve(jf.typeSpec.name + ".java");
+      try (BufferedWriter out = Files.newBufferedWriter(filePath)) {
+        jf.writeTo(out);
       } catch (IOException e) {
         throw new UncheckedIOException(e);
       }
     });
+
+    log.debug("Generated %d files", files.size());
   }
 
   // ------------------------------------------------------------
@@ -79,6 +96,6 @@ class Generators {
   // Main program
 
   public static void main(String[] args) {
-    new Generators().generate();
+    new GenVocab().generate(new File(args[0]));
   }
 }

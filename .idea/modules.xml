@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/cursive.iml" filepath="$PROJECT_DIR$/cursive.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/cursive-inv-api/cursive-inv-api.iml" filepath="$PROJECT_DIR$/.idea/modules/cursive-inv-api/cursive-inv-api.iml" group="cursive-inv-api" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cursive-inv-api/cursive-inv-api_generated.iml" filepath="$PROJECT_DIR$/.idea/modules/cursive-inv-api/cursive-inv-api_generated.iml" group="cursive-inv-api" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/cursive-inv-api/cursive-inv-api_main.iml" filepath="$PROJECT_DIR$/.idea/modules/cursive-inv-api/cursive-inv-api_main.iml" group="cursive-inv-api" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/cursive-inv-api/cursive-inv-api_test.iml" filepath="$PROJECT_DIR$/.idea/modules/cursive-inv-api/cursive-inv-api_test.iml" group="cursive-inv-api" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/cursive-inv-codegen/cursive-inv-codegen.iml" filepath="$PROJECT_DIR$/.idea/modules/cursive-inv-codegen/cursive-inv-codegen.iml" group="cursive-inv-codegen" />

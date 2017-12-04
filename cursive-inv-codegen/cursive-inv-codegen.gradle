@@ -20,3 +20,9 @@ dependencies {
   compile 'it.unimi.dsi:fastutil:8.1.1'
 }
 
+task('genvocab', type: JavaExec) {
+  classpath = sourceSets.main.runtimeClasspath
+  main = 'org.cdlib.cursive.GenVocab'
+  // TODO: pass this in from cursive-inv-api instead
+  args(new File(rootProject.project('cursive-inv-api').projectDir, "/src/generated/java"))
+}

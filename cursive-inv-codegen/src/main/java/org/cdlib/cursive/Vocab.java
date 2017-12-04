@@ -11,7 +11,7 @@ import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.Objects;
 
-import static org.cdlib.cursive.Generators.CURSIVE_RTF_PACKAGE;
+import static org.cdlib.cursive.GenVocab.CURSIVE_RTF_PACKAGE;
 
 class Vocab implements Comparable<Vocab> {
   private final String prefix;
@@ -72,7 +72,7 @@ class Vocab implements Comparable<Vocab> {
     addConstant(builder, URI.class, "BASE_URI", "URI.create($S)", uri);
     addField(builder, constructorBuilder, String.class, "term");
     addLazyField(builder, URI.class, "uri", "return URI.create(BASE_URI.toString() + getTerm())");
-    addLazyField(builder, String.class, "prefixedForm", "String.format(\"%s:%s\", PREFIX, getTerm())");
+    addLazyField(builder, String.class, "prefixedForm", "return String.format(\"%s:%s\", PREFIX, getTerm())");
 
     builder.addMethod(constructorBuilder.build());
 
