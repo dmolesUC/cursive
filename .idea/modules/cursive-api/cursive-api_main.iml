@@ -30,8 +30,8 @@
     <orderEntry type="library" name="Gradle: io.vertx:vertx-auth-common:3.5.0" level="project" />
     <orderEntry type="library" name="Gradle: io.vertx:vertx-core:3.5.0" level="project" />
     <orderEntry type="library" name="Gradle: io.vertx:vertx-bridge-common:3.5.0" level="project" />
-    <orderEntry type="library" name="Gradle: com.squareup.okio:okio:1.13.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: com.fasterxml.uuid:java-uuid-generator:3.1.4" level="project" />
+    <orderEntry type="library" name="Gradle: com.squareup.okio:okio:1.13.0" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-databind:2.9.2" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-core:2.9.2" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-annotations:2.9.2" level="project" />
@@ -73,5 +73,6 @@
     <orderEntry type="module" module-name="cursive-store_main" />
     <orderEntry type="module" module-name="cursive-util_main" />
     <orderEntry type="module" module-name="cursive-core_main" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.derive4j:derive4j-annotation:0.12.3" level="project" />
   </component>
 </module>

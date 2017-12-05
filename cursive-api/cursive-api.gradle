@@ -21,7 +21,10 @@ dependencies {
   compile "io.vertx:vertx-web:${vertxVersion}"
 
   compile 'javax.ws.rs:javax.ws.rs-api:2.1'
+
   compile 'com.theoryinpractise:halbuilder5:5.1.2'
+  compileOnly 'org.derive4j:derive4j-annotation:0.12.3' // avoid HalBuilder-related compile warnings
+
   compile 'com.github.jsonld-java:jsonld-java:0.11.1'
 
   testCompile project(':cursive-test')
