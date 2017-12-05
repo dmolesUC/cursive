@@ -15,7 +15,7 @@ dependencies {
   generatedCompile "io.vavr:vavr:${vavrVersion}"
   compile sourceSets.generated.output
 
-  compile project(':cursive-inv-store')
+  compile project(':cursive-store')
 
   compile "io.vertx:vertx-rx-java2:${vertxVersion}"
   compile "io.vertx:vertx-web:${vertxVersion}"
@@ -24,7 +24,7 @@ dependencies {
   compile 'com.theoryinpractise:halbuilder5:5.1.2'
   compile 'com.github.jsonld-java:jsonld-java:0.11.1'
 
-  testCompile project(':cursive-inv-test')
+  testCompile project(':cursive-test')
 
   testCompile "io.vertx:vertx-unit:${vertxVersion}"
   testCompile 'net.javacrumbs.json-unit:json-unit:1.25.1'
@@ -32,11 +32,11 @@ dependencies {
 
 // TODO: make this work
 compileJava {
-  dependsOn ':cursive-inv-codegen:genvocab'
+  dependsOn ':cursive-codegen:genvocab'
 }
 
-//task compileJava(dependsOn: ':cursive-inv-codegen:genvocab')
-//task compileJava(dependsOn: rootProject.project('cursive-inv-codegen').tasks['genvocab'])
+//task compileJava(dependsOn: ':cursive-codegen:genvocab')
+//task compileJava(dependsOn: rootProject.project('cursive-codegen').tasks['genvocab'])
 
 /*
 // something like

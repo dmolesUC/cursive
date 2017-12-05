@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module external.linked.project.id=":cursive-inv-store:test" external.linked.project.path="$MODULE_DIR$/../../../cursive-inv-store" external.root.project.path="$MODULE_DIR$/../../.." external.system.id="GRADLE" external.system.module.group="cursive" external.system.module.type="sourceSet" external.system.module.version="unspecified" type="JAVA_MODULE" version="4">
+<module external.linked.project.id=":cursive-store:test" external.linked.project.path="$MODULE_DIR$/../../../cursive-store" external.root.project.path="$MODULE_DIR$/../../.." external.system.id="GRADLE" external.system.module.group="cursive" external.system.module.type="sourceSet" external.system.module.version="unspecified" type="JAVA_MODULE" version="4">
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_9">
-    <output-test url="file://$MODULE_DIR$/../../../cursive-inv-store/out/test/classes" />
+    <output-test url="file://$MODULE_DIR$/../../../cursive-store/out/test/classes" />
     <exclude-output />
-    <content url="file://$MODULE_DIR$/../../../cursive-inv-store/src/test">
-      <sourceFolder url="file://$MODULE_DIR$/../../../cursive-inv-store/src/test/java" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/../../../cursive-inv-store/src/test/resources" type="java-test-resource" />
+    <content url="file://$MODULE_DIR$/../../../cursive-store/src/test">
+      <sourceFolder url="file://$MODULE_DIR$/../../../cursive-store/src/test/java" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/../../../cursive-store/src/test/resources" type="java-test-resource" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="cursive-inv-store_main" />
+    <orderEntry type="module" module-name="cursive-store_main" />
     <orderEntry type="library" name="Gradle: org.apache.tinkerpop:tinkergraph-gremlin:3.3.0" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.tinkerpop:gremlin-test:3.3.0" level="project" />
     <orderEntry type="library" name="Gradle: commons-io:commons-io:2.6" level="project" />
@@ -48,9 +48,9 @@
     <orderEntry type="library" name="Gradle: org.hamcrest:hamcrest-all:1.3" level="project" />
     <orderEntry type="library" name="Gradle: org.hamcrest:hamcrest-core:1.3" level="project" />
     <orderEntry type="library" name="Gradle: commons-lang:commons-lang:2.6" level="project" />
-    <orderEntry type="module" module-name="cursive-inv-core_main" />
-    <orderEntry type="module" module-name="cursive-inv-test_main" />
+    <orderEntry type="module" module-name="cursive-core_main" />
+    <orderEntry type="module" module-name="cursive-test_main" />
     <orderEntry type="library" name="Gradle: com.jcabi:jcabi-log:0.14" level="project" />
   </component>
-  <component name="TestModuleProperties" production-module="cursive-inv-store_main" />
+  <component name="TestModuleProperties" production-module="cursive-store_main" />
 </module>
