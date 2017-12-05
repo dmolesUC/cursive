@@ -24,6 +24,8 @@
       <module name="cursive-store_test" target="1.9" />
       <module name="cursive-test_main" target="1.9" />
       <module name="cursive-test_test" target="1.9" />
+      <module name="cursive-util_main" target="1.9" />
+      <module name="cursive-util_test" target="1.9" />
     </bytecodeTargetLevel>
   </component>
 </project>

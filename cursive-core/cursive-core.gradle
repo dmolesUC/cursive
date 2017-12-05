@@ -5,5 +5,6 @@ ext {
 }
 
 dependencies {
+  api project(':cursive-util')
   api "io.reactivex.rxjava2:rxjava:${rxJavaVersion}"
 }

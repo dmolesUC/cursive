@@ -14,6 +14,7 @@ ext {
 }
 
 dependencies {
+  compile project(':cursive-util')
   jrubyExec "rubygems:rdf-vocab:2.2.8"
   compile "org.jruby:jruby-complete:$jrubyVersion"
   compile 'com.squareup:javapoet:1.8.0'
