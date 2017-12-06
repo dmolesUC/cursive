@@ -33,20 +33,13 @@ dependencies {
   testCompile 'net.javacrumbs.json-unit:json-unit:1.25.1'
 }
 
-// TODO: make this work
+task genvocab(type: org.cdlib.cursive.GenVocabTask) {
+  targetDir = new File(projectDir, 'src/generated/java')
+}
+
 compileJava {
-  dependsOn ':cursive-codegen:genvocab'
+  dependsOn genvocab
 }
-
-//task compileJava(dependsOn: ':cursive-codegen:genvocab')
-//task compileJava(dependsOn: rootProject.project('cursive-codegen').tasks['genvocab'])
-
-/*
-// something like
-genvocab {
-  args projectDir + "/src/generated/java"
-}
- */
 
 test {
   // TODO: some sort of environment configuration

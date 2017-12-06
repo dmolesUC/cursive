@@ -1,4 +1,4 @@
-include 'cursive-util', 'cursive-codegen', 'cursive-core', 'cursive-api', 'cursive-store', 'cursive-test'
+include 'cursive-util', 'cursive-core', 'cursive-api', 'cursive-store', 'cursive-test'
 
     rootProject.children.each { project ->
       print project

@@ -9,8 +9,8 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="cursive-api_generated" />
     <orderEntry type="module" module-name="cursive-api_main" />
+    <orderEntry type="module" module-name="cursive-api_generated" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: com.jcabi:jcabi-log:0.14" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: commons-lang:commons-lang:2.6" level="project" />
     <orderEntry type="library" name="Gradle: com.github.jsonld-java:jsonld-java:0.11.1" level="project" />
@@ -87,10 +87,10 @@
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.javatuples:javatuples:1.2" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: com.carrotsearch:hppc:0.7.1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: com.jcabi:jcabi-manifests:1.1" level="project" />
-    <orderEntry type="module" module-name="cursive-test_main" />
     <orderEntry type="module" module-name="cursive-core_main" />
     <orderEntry type="module" module-name="cursive-util_main" />
     <orderEntry type="module" module-name="cursive-store_main" />
+    <orderEntry type="module" module-name="cursive-test_main" />
   </component>
   <component name="TestModuleProperties" production-module="cursive-api_main" />
 </module>

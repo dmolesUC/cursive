@@ -18,21 +18,33 @@ import java.io.UncheckedIOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 
 @SuppressWarnings("unchecked")
 class GenVocab {
+
+  // ------------------------------------------------------------
+  // Cosntants
 
   // TODO: fix SLF4J configuration
   private static final Logger log = LoggerFactory.getLogger(GenVocab.class);
 
   static final String CURSIVE_RTF_PACKAGE = "org.cdlib.cursive.rtf";
 
+  // ------------------------------------------------------------
+  // Fields
+
   private final ScriptingContainer scriptingContainer = initScriptingContainer();
   private final Array<Vocab> vocabs = vocabsMap().toArray().map(this::toVocab)
     .removeAll(v -> v.getTerms().isEmpty())
     .sorted();
 
+  // ------------------------------------------------------------
+  // Package-private methods
+
   void generate(File targetDir) {
+    Objects.requireNonNull(targetDir, "targetDir cannot be null");
+
     Path srcPath = Array.of(CURSIVE_RTF_PACKAGE.split("\\.")).foldLeft(targetDir.toPath(), Path::resolve);
     log.debug("Writing generated files to %s", srcPath);
     srcPath.toFile().mkdirs();

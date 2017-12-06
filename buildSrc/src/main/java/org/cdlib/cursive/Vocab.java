@@ -4,7 +4,6 @@ import com.squareup.javapoet.*;
 import io.vavr.Lazy;
 import io.vavr.collection.Array;
 import org.apache.commons.text.WordUtils;
-import org.cdlib.cursive.util.Strings;
 
 import javax.lang.model.element.Modifier;
 import java.lang.reflect.Type;
@@ -48,8 +47,6 @@ class Vocab implements Comparable<Vocab> {
   }
 
   private static String toClassName(String rValue) {
-    Strings.requireNotBlank(rValue);
-
     String validIdentifier = rValue
       .replaceAll("/+$", "")
       .replaceAll("^([^_a-zA-Z])", "_$1")

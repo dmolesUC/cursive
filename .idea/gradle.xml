@@ -9,8 +9,8 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/buildSrc" />
             <option value="$PROJECT_DIR$/cursive-api" />
-            <option value="$PROJECT_DIR$/cursive-codegen" />
             <option value="$PROJECT_DIR$/cursive-core" />
             <option value="$PROJECT_DIR$/cursive-store" />
             <option value="$PROJECT_DIR$/cursive-test" />

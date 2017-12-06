@@ -2,14 +2,14 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/buildSrc.iml" filepath="$PROJECT_DIR$/.idea/modules/buildSrc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/buildSrc_main.iml" filepath="$PROJECT_DIR$/.idea/modules/buildSrc_main.iml" group="buildSrc" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/buildSrc_test.iml" filepath="$PROJECT_DIR$/.idea/modules/buildSrc_test.iml" group="buildSrc" />
       <module fileurl="file://$PROJECT_DIR$/cursive.iml" filepath="$PROJECT_DIR$/cursive.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/cursive-api/cursive-api.iml" filepath="$PROJECT_DIR$/.idea/modules/cursive-api/cursive-api.iml" group="cursive-api" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/cursive-api/cursive-api_generated.iml" filepath="$PROJECT_DIR$/.idea/modules/cursive-api/cursive-api_generated.iml" group="cursive-api" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/cursive-api/cursive-api_main.iml" filepath="$PROJECT_DIR$/.idea/modules/cursive-api/cursive-api_main.iml" group="cursive-api" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/cursive-api/cursive-api_test.iml" filepath="$PROJECT_DIR$/.idea/modules/cursive-api/cursive-api_test.iml" group="cursive-api" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cursive-codegen/cursive-codegen.iml" filepath="$PROJECT_DIR$/.idea/modules/cursive-codegen/cursive-codegen.iml" group="cursive-codegen" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cursive-codegen/cursive-codegen_main.iml" filepath="$PROJECT_DIR$/.idea/modules/cursive-codegen/cursive-codegen_main.iml" group="cursive-codegen" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cursive-codegen/cursive-codegen_test.iml" filepath="$PROJECT_DIR$/.idea/modules/cursive-codegen/cursive-codegen_test.iml" group="cursive-codegen" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/cursive-core/cursive-core.iml" filepath="$PROJECT_DIR$/.idea/modules/cursive-core/cursive-core.iml" group="cursive-core" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/cursive-core/cursive-core_main.iml" filepath="$PROJECT_DIR$/.idea/modules/cursive-core/cursive-core_main.iml" group="cursive-core" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/cursive-core/cursive-core_test.iml" filepath="$PROJECT_DIR$/.idea/modules/cursive-core/cursive-core_test.iml" group="cursive-core" />
