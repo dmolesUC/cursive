@@ -26,7 +26,6 @@ class GenVocab {
   // ------------------------------------------------------------
   // Cosntants
 
-  // TODO: fix SLF4J configuration
   private static final Logger log = LoggerFactory.getLogger(GenVocab.class);
 
   static final String CURSIVE_RTF_PACKAGE = "org.cdlib.cursive.rtf";
