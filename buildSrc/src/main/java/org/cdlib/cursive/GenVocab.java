@@ -1,16 +1,20 @@
 package org.cdlib.cursive;
 
+import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
+import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.TypeSpec;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import io.vavr.collection.Array;
 import io.vavr.collection.LinkedHashMap;
 import org.apache.commons.lang3.StringUtils;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 import org.jruby.RubyHash;
 import org.jruby.embed.ScriptingContainer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import javax.lang.model.element.Modifier;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
@@ -26,9 +30,10 @@ class GenVocab {
   // ------------------------------------------------------------
   // Cosntants
 
-  private static final Logger log = LoggerFactory.getLogger(GenVocab.class);
+  private final Logger  log;
 
-  static final String CURSIVE_RTF_PACKAGE = "org.cdlib.cursive.rtf";
+  static final String CURSIVE_PACKAGE = "org.cdlib.cursive";
+  static final String CURSIVE_RTF_PACKAGE = CURSIVE_PACKAGE + ".rtf";
 
   // ------------------------------------------------------------
   // Fields
@@ -38,19 +43,44 @@ class GenVocab {
     .removeAll(v -> v.getTerms().isEmpty())
     .sorted();
 
+  public GenVocab(Logger log) {
+    this.log = log;
+  }
+
   // ------------------------------------------------------------
   // Package-private methods
 
   void generate(File targetDir) {
     Objects.requireNonNull(targetDir, "targetDir cannot be null");
+    Path targetPath = targetDir.toPath();
 
-    Path srcPath = Array.of(CURSIVE_RTF_PACKAGE.split("\\.")).foldLeft(targetDir.toPath(), Path::resolve);
-    log.debug("Writing generated files to %s", srcPath);
-    srcPath.toFile().mkdirs();
+    log.lifecycle("Writing generated files to {}", targetDir.getAbsolutePath());
 
-    Array<JavaFile> files = vocabs.map(Vocab::generateEnum);
+    // TODO: enum for known vocabularies, implementing as Namespace
+
+    ClassName nsClassName = ClassName.get(CURSIVE_PACKAGE, "Namespace");
+    TypeSpec.Builder nsIFBuilder = TypeSpec.interfaceBuilder(nsClassName)
+      .addMethod(MethodSpec.methodBuilder("getBaseUri").returns(URI.class).addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT).build())
+      .addMethod(MethodSpec.methodBuilder("getPrefix").returns(String.class).addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT).build());
+    TypeSpec nsIFSpec = nsIFBuilder.build();
+    JavaFile nsIFFile = JavaFile.builder(CURSIVE_PACKAGE, nsIFSpec).build();
+
+    ClassName termClassName = ClassName.get(CURSIVE_PACKAGE, "Term");
+    TypeSpec.Builder termIFBuilder = TypeSpec.interfaceBuilder(termClassName)
+      .addMethod(MethodSpec.methodBuilder("getNamespace").returns(nsClassName).addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT).build())
+      .addMethod(MethodSpec.methodBuilder("getUri").returns(URI.class).addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT).build())
+      .addMethod(MethodSpec.methodBuilder("getTerm").returns(String.class).addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT).build());
+    TypeSpec termIFSpec = termIFBuilder.build();
+    JavaFile termIFFile = JavaFile.builder(CURSIVE_PACKAGE, termIFSpec).build();
+
+    Array<JavaFile> files = Array.of(nsIFFile, termIFFile)
+        .appendAll(vocabs.map(Vocab::generateEnum));
+
     files.forEach(jf -> {
-      Path filePath = srcPath.resolve(jf.typeSpec.name + ".java");
+      Path outPath = Array.of(jf.packageName.split("\\.")).foldLeft(targetPath, Path::resolve);
+      outPath.toFile().mkdirs();
+      Path filePath = outPath.resolve(jf.typeSpec.name + ".java");
+      log.debug("Writing " + filePath);
       try (BufferedWriter out = Files.newBufferedWriter(filePath)) {
         jf.writeTo(out);
       } catch (IOException e) {
@@ -58,7 +88,7 @@ class GenVocab {
       }
     });
 
-    log.debug("Generated %d files", files.size());
+    log.lifecycle("Generated {} files", files.size());
   }
 
   // ------------------------------------------------------------
@@ -102,12 +132,5 @@ class GenVocab {
     ScriptingContainer scriptingContainer = new ScriptingContainer();
     scriptingContainer.runScriptlet("require 'rdf/vocab'");
     return scriptingContainer;
-  }
-
-  // ------------------------------------------------------------
-  // Main program
-
-  public static void main(String[] args) {
-    new GenVocab().generate(new File(args[0]));
   }
 }

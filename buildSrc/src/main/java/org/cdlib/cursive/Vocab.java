@@ -10,9 +10,14 @@ import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.Objects;
 
+import static org.cdlib.cursive.GenVocab.CURSIVE_PACKAGE;
 import static org.cdlib.cursive.GenVocab.CURSIVE_RTF_PACKAGE;
 
 class Vocab implements Comparable<Vocab> {
+
+  public static final boolean IS_OVERRIDE = true;
+  public static final boolean NOT_OVERRIDE = false;
+
   private final String prefix;
   private final URI uri;
   private final Array<String> terms;
@@ -62,15 +67,18 @@ class Vocab implements Comparable<Vocab> {
   JavaFile generateEnum() {
     MethodSpec.Builder constructorBuilder = MethodSpec.constructorBuilder();
 
+    // TODO: initialize namespace in addTerm()
     TypeSpec.Builder builder =
       terms.foldLeft(TypeSpec.enumBuilder(className), this::addTerm)
-        .addJavadoc("From RDF::Vocab::$L\n", rubyClassName);
+        .addJavadoc("From RDF::Vocab::$L\n", rubyClassName)
+        .addSuperinterface(ClassName.get(CURSIVE_PACKAGE, "Term"));
 
     addConstant(builder, String.class, "CURIE_PREFIX", "$S", this.prefix);
     addConstant(builder, URI.class, "BASE_URI", "java.net.URI.create($S)", uri);
-    addField(builder, constructorBuilder, String.class, "term");
-    addLazyField(builder, URI.class, "uri", "return java.net.URI.create(BASE_URI.toString() + getTerm())");
-    addLazyField(builder, String.class, "prefixedForm", "return String.format(\"%s:%s\", prefix(), getTerm())");
+    addField(builder, constructorBuilder, ClassName.get(CURSIVE_PACKAGE, "Namespace"), "namespace", IS_OVERRIDE);
+    addField(builder, constructorBuilder, String.class, "term", IS_OVERRIDE);
+    addLazyField(builder, URI.class, "uri", "return java.net.URI.create(BASE_URI.toString() + getTerm())", IS_OVERRIDE);
+    addLazyField(builder, String.class, "prefixedForm", "return String.format(\"%s:%s\", prefix(), getTerm())", NOT_OVERRIDE);
 
     MethodSpec prefixAccessor = MethodSpec.methodBuilder("prefix")
       .addModifiers(Modifier.PUBLIC)
@@ -101,24 +109,35 @@ class Vocab implements Comparable<Vocab> {
   // ------------------------------------------------------------
   // Builder helpers
 
-  private void addField(TypeSpec.Builder builder, MethodSpec.Builder constructorBuilder, Type fieldType, String fieldName) {
+  private void addField(TypeSpec.Builder builder, MethodSpec.Builder constructorBuilder, Type fieldType, String fieldName, boolean isOverride) {
     FieldSpec field = FieldSpec.builder(fieldType, fieldName, Modifier.PRIVATE, Modifier.FINAL).build();
-
-    MethodSpec accessor = MethodSpec.methodBuilder("get" + WordUtils.capitalize(fieldName))
-      .addModifiers(Modifier.PUBLIC)
-      .returns(fieldType)
-      .addStatement("return this.$N", fieldName)
-      .build();
-
-    constructorBuilder
-      .addParameter(fieldType, fieldName)
-      .addStatement("this.$N = $N", fieldName, fieldName);
-
-    builder.addField(field)
-      .addMethod(accessor);
+    addField(builder, constructorBuilder, field, isOverride);
   }
 
-  private void addLazyField(TypeSpec.Builder builder, Type valueType, String fieldName, String valueStmt) {
+  private void addField(TypeSpec.Builder builder, MethodSpec.Builder constructorBuilder, TypeName fieldType, String fieldName, boolean isOverride) {
+    FieldSpec field = FieldSpec.builder(fieldType, fieldName, Modifier.PRIVATE, Modifier.FINAL).build();
+    addField(builder, constructorBuilder, field, isOverride);
+  }
+
+  private void addField(TypeSpec.Builder builder, MethodSpec.Builder constructorBuilder, FieldSpec field, boolean isOverride) {
+    MethodSpec.Builder accessorSpec = MethodSpec.methodBuilder("get" + WordUtils.capitalize(field.name))
+      .addModifiers(Modifier.PUBLIC)
+      .returns(field.type)
+      .addStatement("return this.$N", field.name);
+
+    if (isOverride) {
+      accessorSpec = accessorSpec.addAnnotation(Override.class);
+    }
+
+    constructorBuilder
+      .addParameter(field.type, field.name)
+      .addStatement("this.$N = $N", field.type, field.name);
+
+    builder.addField(field)
+      .addMethod(accessorSpec.build());
+  }
+
+  private void addLazyField(TypeSpec.Builder builder, Type valueType, String fieldName, String valueStmt, boolean isOverride) {
     String valueMethod = fieldName + "Value";
 
     MethodSpec valueInitializer = MethodSpec.methodBuilder(valueMethod)
@@ -131,14 +150,18 @@ class Vocab implements Comparable<Vocab> {
       .initializer(String.format("Lazy.of(this::%s)", valueMethod))
       .build();
 
-    MethodSpec accessor = MethodSpec.methodBuilder("get" + WordUtils.capitalize(fieldName))
+    MethodSpec.Builder accessorSpec = MethodSpec.methodBuilder("get" + WordUtils.capitalize(fieldName))
       .addModifiers(Modifier.PUBLIC)
       .returns(valueType)
-      .addStatement("return this.$N.get()", fieldName)
-      .build();
+      .addStatement("return this.$N.get()", fieldName);
+
+    if (isOverride) {
+      accessorSpec = accessorSpec.addAnnotation(Override.class);
+    }
 
     builder.addField(field)
-      .addMethod(accessor)
+      .addMethod(accessorSpec
+        .build())
       .addMethod(valueInitializer);
   }
 
