@@ -1,18 +1,54 @@
 package org.cdlib.cursive.store.graph;
 
+import io.vavr.Lazy;
 import io.vavr.collection.Stream;
 import io.vavr.control.Option;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.cdlib.cursive.core.Resource;
 import org.cdlib.cursive.core.ResourceType;
 
+import java.util.Objects;
+
 abstract class AbstractGraphResource implements Resource {
+
+  private final Lazy<String> stringVal = Lazy.of(() -> getClass().getName() + "<" + identifier() + ">");
 
   protected final Vertex vertex;
 
   AbstractGraphResource(ResourceType resourceType, Vertex vertex) {
-    this.vertex = vertex;
+    Objects.requireNonNull(resourceType);
+    Objects.requireNonNull(vertex);
     requireTypeLabel(resourceType, vertex);
+    this.vertex = vertex;
+  }
+
+  // ------------------------------------------------------
+  // Object
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    AbstractGraphResource that = (AbstractGraphResource) o;
+    if (this.type() != that.type()) {
+      return false;
+    }
+    return Objects.equals(this.vertex.id(), that.vertex.id());
+  }
+
+  @Override
+  public int hashCode() {
+    return vertex.id().hashCode();
+  }
+
+  @Override
+  public String toString() {
+    return stringVal.get();
   }
 
   // ------------------------------------------------------
