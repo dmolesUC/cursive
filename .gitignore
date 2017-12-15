@@ -1,3 +1,13 @@
+############################################################
+# Custom ignores
+
+#### Redundant IDEA files (generated from Gradle) ####
+
+**/*.iml
+
+############################################################
+# Generated ignores
+
 #### joe made this: http://goel.io/joe
 
 #####=== Java ===#####
