@@ -8,6 +8,7 @@ dependencies {
   api project(':cursive-core')
 
   implementation 'com.fasterxml.uuid:java-uuid-generator:3.1.4'
+  implementation "org.apache.tinkerpop:gremlin-driver:${tinkerpopVersion}"
   implementation "org.apache.tinkerpop:tinkergraph-gremlin:${tinkerpopVersion}"
 
   testCompile project(':cursive-test')

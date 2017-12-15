@@ -13,6 +13,7 @@ import org.cdlib.cursive.store.util.RxUtils;
 
 import java.util.Objects;
 
+// TODO: Figure out where the work should happen for each call, & what combination of observeOn()/subscribeOn() makes sense
 public class AsyncStoreAdapter<S extends Store> implements AsyncStore {
 
   // ------------------------------

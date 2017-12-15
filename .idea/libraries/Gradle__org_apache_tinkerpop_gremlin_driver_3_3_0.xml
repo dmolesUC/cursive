@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.apache.tinkerpop:gremlin-driver:3.3.0">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.tinkerpop/gremlin-driver/3.3.0/82e977f2640059de54c068e29fe9f2356b506eea/gremlin-driver-3.3.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.tinkerpop/gremlin-driver/3.3.0/df2965873a974026da76bba1161b9ad27ca3bdd4/gremlin-driver-3.3.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
