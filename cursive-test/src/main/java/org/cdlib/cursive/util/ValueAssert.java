@@ -26,7 +26,7 @@ public class ValueAssert<T> extends AbstractAssert<ValueAssert<T>, Value<T>> {
   @SuppressWarnings("UnusedReturnValue")
   public ValueAssert<T> contains(T value) {
     if (actual == null) {
-      failWithMessage("Exected value to contain <%s>, but value was null", value);
+      failWithMessage("Expected value to contain <%s>, but value was null", value);
     }
     else if (!actual.contains(value)) {
       if (actual.isEmpty()) {
