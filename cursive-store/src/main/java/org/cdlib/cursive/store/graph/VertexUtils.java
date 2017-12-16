@@ -14,11 +14,11 @@ import org.cdlib.cursive.pcdm.PcdmObject;
 public class VertexUtils {
 
   static Stream<Vertex> parentsOf(Vertex child) {
-    return Stream.ofAll(() -> child.vertices(Direction.IN, Labels.PARENT));
+    return Stream.ofAll(() -> child.vertices(Direction.IN, Labels.PARENT_CHILD));
   }
 
   static Stream<Vertex> childrenOf(Vertex parent) {
-    return Stream.ofAll(() -> parent.vertices(Direction.OUT, Labels.PARENT));
+    return Stream.ofAll(() -> parent.vertices(Direction.OUT, Labels.PARENT_CHILD));
   }
 
   static Stream<Workspace> findWorkspaces(Stream<Vertex> vertices) {
@@ -76,7 +76,7 @@ public class VertexUtils {
   static Vertex createChild(Vertex parent, ResourceType type) {
     Graph graph = parent.graph();
     Vertex child = graph.addVertex(Labels.labelFor(type));
-    parent.addEdge(Labels.PARENT, child);
+    parent.addEdge(Labels.PARENT_CHILD, child);
     return child;
   }
 

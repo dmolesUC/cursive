@@ -9,7 +9,7 @@ import org.cdlib.cursive.core.ResourceType;
 class Labels {
 
   static String STORE = "STORE";
-  static String PARENT = "PARENT";
+  static String PARENT_CHILD = "PARENT_CHILD";
 
   private static Map<String, ResourceType> directory = Stream.of(ResourceType.values()).toMap(t -> Tuple.of(labelFor(t), t));
 
