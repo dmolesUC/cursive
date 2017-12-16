@@ -1,7 +1,9 @@
 package org.cdlib.cursive.store;
 
+import io.vavr.collection.Array;
 import io.vavr.collection.Traversable;
-import org.cdlib.cursive.core.*;
+import org.cdlib.cursive.core.Store;
+import org.cdlib.cursive.core.Workspace;
 import org.cdlib.cursive.pcdm.PcdmCollection;
 import org.cdlib.cursive.pcdm.PcdmFile;
 import org.cdlib.cursive.pcdm.PcdmObject;
@@ -10,7 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static org.cdlib.cursive.util.VavrAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public abstract class AbstractStoreTest<S extends Store> {
 
@@ -43,6 +45,14 @@ public abstract class AbstractStoreTest<S extends Store> {
       Workspace workspace = store.createWorkspace();
       assertThat(workspace).isNotNull();
       assertThat(store.workspaces()).contains(workspace);
+    }
+
+    @Test
+    void createWorkspaceCreatesMultipleWorkspaces() {
+      Workspace w1 = store.createWorkspace();
+      Workspace w2 = store.createWorkspace();
+      Array<Workspace> workspaces = store.workspaces().toArray();
+      assertThat(workspaces).containsOnly(w1, w2);
     }
 
     @Test
