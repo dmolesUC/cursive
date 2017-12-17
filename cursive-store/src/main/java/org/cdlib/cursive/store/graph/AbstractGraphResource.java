@@ -11,9 +11,14 @@ import java.util.Objects;
 
 abstract class AbstractGraphResource implements Resource {
 
-  private final Lazy<String> stringVal = Lazy.of(() -> getClass().getName() + "<" + identifier() + ">");
+  // ------------------------------------------------------
+  // Instance fields
 
   protected final Vertex vertex;
+  private final Lazy<String> stringVal = Lazy.of(() -> getClass().getName() + "<" + identifier() + ">");
+
+  // ------------------------------------------------------
+  // Constructors
 
   AbstractGraphResource(ResourceType resourceType, Vertex vertex) {
     Objects.requireNonNull(resourceType);

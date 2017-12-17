@@ -1,5 +1,7 @@
 package org.cdlib.cursive.store.graph;
 
+import io.vavr.collection.HashMap;
+import io.vavr.collection.Map;
 import io.vavr.collection.Stream;
 import io.vavr.control.Option;
 import org.apache.tinkerpop.gremlin.structure.Direction;
@@ -12,8 +14,22 @@ import org.cdlib.cursive.pcdm.PcdmFile;
 import org.cdlib.cursive.pcdm.PcdmObject;
 
 import java.util.Iterator;
+import java.util.function.Function;
 
 public class VertexUtils {
+
+  // ------------------------------------------------------
+  // Class fields
+
+  private static final Map<ResourceType, Function<Vertex, AbstractGraphResource>> adapters = HashMap.of(
+    ResourceType.WORKSPACE, GraphWorkspace::new,
+    ResourceType.COLLECTION, GraphCollection::new,
+    ResourceType.OBJECT, GraphObject::new,
+    ResourceType.FILE, GraphObject::new
+  );
+
+  // ------------------------------------------------------
+  // Class methods
 
   static Stream<Vertex> parentsOf(Vertex child) {
     return Stream.ofAll(() -> child.vertices(Direction.IN, Labels.PARENT_CHILD));
@@ -66,6 +82,7 @@ public class VertexUtils {
     return Labels.resourceTypeOf(vertex.label());
   }
 
+  // TODO: benchmark this vs. relating to type nodes
   static boolean isOfType(Vertex vertex, ResourceType requiredType) {
     return typeOf(vertex).contains(requiredType);
   }
@@ -91,6 +108,10 @@ public class VertexUtils {
     Vertex child = graph.addVertex(Labels.labelFor(type));
     parent.addEdge(Labels.PARENT_CHILD, child);
     return child;
+  }
+
+  static Option<AbstractGraphResource> toResource(Vertex v) {
+    return typeOf(v).flatMap(adapters::get).map(f -> f.apply(v));
   }
 
   // ------------------------------------------------------

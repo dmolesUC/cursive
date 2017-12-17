@@ -85,7 +85,10 @@ public class GraphStore implements Store {
 
   @Override
   public Option<Resource> find(String identifier) {
-    return null;
+    // TODO: figure out how to (1) ensure string internal IDs or (2) map back from strings to internal IDs
+    Stream<Vertex> vertices = Stream.ofAll(() -> graph.vertices(identifier));
+    return vertices.headOption()
+      .flatMap(VertexUtils::toResource);
   }
 
   // ------------------------------------------------------
