@@ -40,6 +40,7 @@ public class GraphStore implements Store {
 
   @Override
   public Traversable<Workspace> workspaces() {
+    // workspaces can only be direct children
     return findWorkspaces(children());
   }
 
@@ -51,7 +52,7 @@ public class GraphStore implements Store {
 
   @Override
   public Traversable<PcdmCollection> collections() {
-    return findCollections(children());
+    return findCollections(descendants());
   }
 
   @Override
@@ -62,7 +63,7 @@ public class GraphStore implements Store {
 
   @Override
   public Traversable<PcdmObject> objects() {
-    return findObjects(children());
+    return findObjects(descendants());
   }
 
   @Override
@@ -73,7 +74,7 @@ public class GraphStore implements Store {
 
   @Override
   public Traversable<PcdmFile> files() {
-    return findFiles(children());
+    return findFiles(descendants());
 
   }
 
@@ -92,5 +93,10 @@ public class GraphStore implements Store {
 
   private Stream<Vertex> children() {
     return childrenOf(vertex);
+  }
+
+  // TODO: benchmark this vs. adding type nodes & relating all vertices of type to those nodes
+  private Stream<Vertex> descendants() {
+    return descendantsOf(vertex);
   }
 }

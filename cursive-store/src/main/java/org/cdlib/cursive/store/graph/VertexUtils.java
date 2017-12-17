@@ -11,6 +11,8 @@ import org.cdlib.cursive.pcdm.PcdmCollection;
 import org.cdlib.cursive.pcdm.PcdmFile;
 import org.cdlib.cursive.pcdm.PcdmObject;
 
+import java.util.Iterator;
+
 public class VertexUtils {
 
   static Stream<Vertex> parentsOf(Vertex child) {
@@ -19,6 +21,16 @@ public class VertexUtils {
 
   static Stream<Vertex> childrenOf(Vertex parent) {
     return Stream.ofAll(() -> parent.vertices(Direction.OUT, Labels.PARENT_CHILD));
+  }
+
+  // TODO: something graph-native & smarter
+  static Stream<Vertex> descendantsOf(Vertex parent) {
+    Stream<Vertex> selfStream = Stream.of(parent);
+    Iterator<Vertex> children = parent.vertices(Direction.OUT, Labels.PARENT_CHILD);
+    if (!children.hasNext()) {
+      return selfStream;
+    }
+    return selfStream.appendAll(Stream.ofAll(() -> children).flatMap(VertexUtils::descendantsOf));
   }
 
   static Stream<Workspace> findWorkspaces(Stream<Vertex> vertices) {
@@ -49,6 +61,7 @@ public class VertexUtils {
     return vertices.find(VertexUtils::isObject).map(GraphObject::new);
   }
 
+  // TODO: benchmark this vs. relating to type nodes
   static Option<ResourceType> typeOf(Vertex vertex) {
     return Labels.resourceTypeOf(vertex.label());
   }
