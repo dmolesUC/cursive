@@ -43,13 +43,13 @@ abstract class AsyncResourceImpl<R extends Resource> implements AsyncResource {
     return Try.of(() ->
       adapters
         .get(r.type())
-        .getOrElse(AsyncResourceImpl::throwUnknownResourceType)
+        .getOrElseThrow(() -> unknownResourceType(r))
         .apply(r)
     );
   }
 
-  private static AsyncResourceImpl<?> throwUnknownResourceType(Resource r1) {
-    throw new IllegalArgumentException(String.format("Unknown resource type %s for resource <%s>", r1.getClass().getName(), r1));
+  private static IllegalArgumentException unknownResourceType(Resource r1) {
+    return new IllegalArgumentException(String.format("Unknown resource type %s for resource <%s>", r1.getClass().getName(), r1));
   }
 
   // ------------------------------
