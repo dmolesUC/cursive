@@ -1,13 +1,18 @@
 package org.cdlib.cursive.store.graph;
 
+import io.vavr.collection.Stream;
 import io.vavr.collection.Traversable;
 import io.vavr.control.Option;
+import org.apache.tinkerpop.gremlin.structure.Direction;
+import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.cdlib.cursive.core.ResourceType;
 import org.cdlib.cursive.pcdm.PcdmCollection;
 import org.cdlib.cursive.pcdm.PcdmFile;
 import org.cdlib.cursive.pcdm.PcdmObject;
 import org.cdlib.cursive.pcdm.PcdmRelation;
+
+import java.util.Iterator;
 
 import static org.cdlib.cursive.store.graph.VertexUtils.*;
 
@@ -50,21 +55,28 @@ class GraphObject extends AbstractGraphResource implements PcdmObject {
 
   @Override
   public Traversable<PcdmObject> relatedObjects() {
-    throw new UnsupportedOperationException("Not implemented");
+    Iterator<Edge> edges = vertex.edges(Direction.OUT, Labels.RELATION);
+    return Stream.ofAll(() -> edges).map(Edge::inVertex).map(GraphObject::new);
   }
 
   @Override
   public PcdmRelation relateTo(PcdmObject toObject) {
-    throw new UnsupportedOperationException("Not implemented");
+    // TODO: error handling for bad casts
+    Vertex fromVertex = vertex;
+    Vertex toVertex = ((GraphObject) toObject).vertex();
+    Edge edge = fromVertex.addEdge(Labels.RELATION, toVertex);
+    return new GraphRelation(edge);
   }
 
   @Override
   public Traversable<PcdmRelation> outgoingRelations() {
-    throw new UnsupportedOperationException("Not implemented");
+    Iterator<Edge> edges = vertex.edges(Direction.OUT, Labels.RELATION);
+    return Stream.ofAll(() -> edges).map(GraphRelation::new);
   }
 
   @Override
   public Traversable<PcdmRelation> incomingRelations() {
-    throw new UnsupportedOperationException("Not implemented");
+    Iterator<Edge> edges = vertex.edges(Direction.IN, Labels.RELATION);
+    return Stream.ofAll(() -> edges).map(GraphRelation::new);
   }
 }

@@ -3,7 +3,6 @@ package org.cdlib.cursive.store.graph;
 import io.vavr.collection.Stream;
 import io.vavr.collection.Traversable;
 import io.vavr.control.Option;
-import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
@@ -86,7 +85,8 @@ public class GraphStore implements Store {
 
   @Override
   public Traversable<PcdmRelation> relations() {
-    return null;
+    // TODO: is there a faster graph-native way to do this?
+    return objects().flatMap(PcdmObject::outgoingRelations);
   }
 
   @Override

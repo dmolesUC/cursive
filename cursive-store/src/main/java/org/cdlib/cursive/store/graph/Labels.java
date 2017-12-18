@@ -10,8 +10,13 @@ class Labels {
 
   static String STORE = "STORE";
   static String PARENT_CHILD = "PARENT_CHILD";
+  static String RELATION = "RELATION";
 
   private static Map<String, ResourceType> directory = Stream.of(ResourceType.values()).toMap(t -> Tuple.of(labelFor(t), t));
+
+  private Labels() {
+    // private to prevent instantiation
+  }
 
   public static String labelFor(ResourceType resourceType) {
     return resourceType.name();
@@ -19,9 +24,5 @@ class Labels {
 
   public static Option<ResourceType> resourceTypeOf(String label) {
     return directory.get(label);
-  }
-
-  private Labels() {
-    // private to prevent instantiation
   }
 }

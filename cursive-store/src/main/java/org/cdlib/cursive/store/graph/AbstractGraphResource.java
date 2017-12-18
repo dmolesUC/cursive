@@ -30,12 +30,31 @@ abstract class AbstractGraphResource implements Resource {
   // ------------------------------------------------------
   // Public methods
 
-  Vertex vertex() {
-    return vertex;
+  private static void requireTypeLabel(ResourceType requiredType, Vertex vertex) {
+    Option<ResourceType> actualType = VertexUtils.typeOf(vertex);
+    if (!actualType.contains(requiredType)) {
+      String expectedLabel = Labels.labelFor(requiredType);
+      String actualLabel = vertex.label();
+
+      String msg = actualLabel == null
+        ? String.format("Expected vertex labelFor <%s>, was null", expectedLabel)
+        : String.format("Expected vertex labelFor <%s>, was <%s>", expectedLabel, actualLabel);
+
+      throw new IllegalArgumentException(msg);
+    }
   }
 
   // ------------------------------------------------------
   // Object
+
+  Vertex vertex() {
+    return vertex;
+  }
+
+  @Override
+  public int hashCode() {
+    return vertex.id().hashCode();
+  }
 
   @Override
   public boolean equals(Object o) {
@@ -53,10 +72,8 @@ abstract class AbstractGraphResource implements Resource {
     return Objects.equals(this.vertex.id(), that.vertex.id());
   }
 
-  @Override
-  public int hashCode() {
-    return vertex.id().hashCode();
-  }
+  // ------------------------------------------------------
+  // Resource
 
   @Override
   public String toString() {
@@ -64,39 +81,22 @@ abstract class AbstractGraphResource implements Resource {
   }
 
   // ------------------------------------------------------
-  // Resource
+  // Instance methods
 
   @Override
   public String identifier() {
     return vertex.id().toString();
   }
 
-  // ------------------------------------------------------
-  // Instance methods
-
   Stream<Vertex> parents() {
     return VertexUtils.parentsOf(this.vertex);
-  }
-
-  Stream<Vertex> children() {
-    return VertexUtils.childrenOf(this.vertex);
   }
 
   // ------------------------------------------------------
   // Class methods
 
-  private static void requireTypeLabel(ResourceType requiredType, Vertex vertex) {
-    Option<ResourceType> actualType = VertexUtils.typeOf(vertex);
-    if (!actualType.contains(requiredType)) {
-      String expectedLabel = Labels.labelFor(requiredType);
-      String actualLabel = vertex.label();
-
-      String msg = actualLabel == null
-        ? String.format("Expected vertex labelFor <%s>, was null", expectedLabel)
-        : String.format("Expected vertex labelFor <%s>, was <%s>", expectedLabel, actualLabel);
-
-      throw new IllegalArgumentException(msg);
-    }
+  Stream<Vertex> children() {
+    return VertexUtils.childrenOf(this.vertex);
   }
 
 }

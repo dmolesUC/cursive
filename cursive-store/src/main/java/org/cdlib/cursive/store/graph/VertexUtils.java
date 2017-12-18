@@ -15,7 +15,6 @@ import org.cdlib.cursive.pcdm.PcdmCollection;
 import org.cdlib.cursive.pcdm.PcdmFile;
 import org.cdlib.cursive.pcdm.PcdmObject;
 
-import java.util.Iterator;
 import java.util.function.Function;
 
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.out;
@@ -35,6 +34,10 @@ public class VertexUtils {
   // ------------------------------------------------------
   // Class methods
 
+  private VertexUtils() {
+    // private to prevent accidental instantiation
+  }
+
   static Stream<Vertex> parentsOf(Vertex child) {
     return Stream.ofAll(() -> child.vertices(Direction.IN, Labels.PARENT_CHILD));
   }
@@ -46,8 +49,7 @@ public class VertexUtils {
   static Stream<Vertex> childrenOf(Vertex parent, String label) {
     GraphTraversal<Vertex, Vertex> traversal = parent.graph().traversal().V(parent)
       .out(Labels.PARENT_CHILD)
-      .hasLabel(label)
-      ;
+      .hasLabel(label);
     return Stream.ofAll(() -> traversal);
   }
 
@@ -94,9 +96,8 @@ public class VertexUtils {
     return vertices.find(VertexUtils::isObject).map(GraphObject::new);
   }
 
-  // TODO: benchmark this vs. relating to type nodes
-  static Option<ResourceType> typeOf(Vertex vertex) {
-    return Labels.resourceTypeOf(vertex.label());
+  static boolean isWorkspace(Vertex v) {
+    return isOfType(v, ResourceType.WORKSPACE);
   }
 
   // TODO: benchmark this vs. relating to type nodes
@@ -104,8 +105,9 @@ public class VertexUtils {
     return typeOf(vertex).contains(requiredType);
   }
 
-  static boolean isWorkspace(Vertex v) {
-    return isOfType(v, ResourceType.WORKSPACE);
+  // TODO: benchmark this vs. relating to type nodes
+  static Option<ResourceType> typeOf(Vertex vertex) {
+    return Labels.resourceTypeOf(vertex.label());
   }
 
   static boolean isCollection(Vertex v) {
@@ -127,14 +129,10 @@ public class VertexUtils {
     return child;
   }
 
-  static Option<AbstractGraphResource> toResource(Vertex v) {
-    return typeOf(v).flatMap(adapters::get).map(f -> f.apply(v));
-  }
-
   // ------------------------------------------------------
   // Constructor
 
-  private VertexUtils() {
-    // private to prevent accidental instantiation
+  static Option<AbstractGraphResource> toResource(Vertex v) {
+    return typeOf(v).flatMap(adapters::get).map(f -> f.apply(v));
   }
 }
