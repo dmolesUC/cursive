@@ -3,6 +3,7 @@ package org.cdlib.cursive.store.graph;
 import io.vavr.collection.Stream;
 import io.vavr.collection.Traversable;
 import io.vavr.control.Option;
+import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
@@ -30,7 +31,6 @@ public class GraphStore implements Store {
 
   public GraphStore() {
     // TODO: configure alternative graph DBs
-    // TODO: in-memory TinkerGraph specifics like indices
     graph = TinkerGraph.open();
     root = graph.addVertex(Labels.STORE);
   }
@@ -91,10 +91,16 @@ public class GraphStore implements Store {
 
   @Override
   public Option<Resource> find(String identifier) {
-    // TODO: figure out how to (1) ensure string internal IDs or (2) map back from strings to internal IDs
-    Stream<Vertex> vertices = Stream.ofAll(() -> graph.vertices(identifier));
-    return vertices.headOption()
-      .flatMap(VertexUtils::toResource);
+    try {
+      // TODO: look into what ID types are supported by Neo4J, Janus, and Neptune
+      Long longId = Long.valueOf(identifier);
+      Stream<Vertex> vertices = Stream.ofAll(() -> graph.vertices(longId));
+      return vertices.headOption()
+        .flatMap(VertexUtils::toResource);
+    } catch (NumberFormatException e) {
+      // TODO: use Try (if we still need this after sorting out IDs)
+      return Option.none();
+    }
   }
 
   // ------------------------------------------------------
