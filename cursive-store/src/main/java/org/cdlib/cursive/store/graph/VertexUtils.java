@@ -5,6 +5,7 @@ import io.vavr.collection.Map;
 import io.vavr.collection.Stream;
 import io.vavr.control.Option;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
@@ -17,7 +18,6 @@ import org.cdlib.cursive.pcdm.PcdmObject;
 import java.util.Iterator;
 import java.util.function.Function;
 
-import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.V;
 import static org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.__.out;
 
 public class VertexUtils {
@@ -43,14 +43,27 @@ public class VertexUtils {
     return Stream.ofAll(() -> parent.vertices(Direction.OUT, Labels.PARENT_CHILD));
   }
 
-  // TODO: something graph-native & smarter
+  static Stream<Vertex> childrenOf(Vertex parent, String label) {
+    GraphTraversal<Vertex, Vertex> traversal = parent.graph().traversal().V(parent)
+      .out(Labels.PARENT_CHILD)
+      .hasLabel(label)
+      ;
+    return Stream.ofAll(() -> traversal);
+  }
+
   static Stream<Vertex> descendantsOf(Vertex parent) {
-    Stream<Vertex> selfStream = Stream.of(parent);
-    Iterator<Vertex> children = parent.vertices(Direction.OUT, Labels.PARENT_CHILD);
-    if (!children.hasNext()) {
-      return selfStream;
-    }
-    return selfStream.appendAll(Stream.ofAll(() -> children).flatMap(VertexUtils::descendantsOf));
+    GraphTraversal<Vertex, Vertex> traversal = parent.graph().traversal().V(parent)
+      .repeat(out(Labels.PARENT_CHILD))
+      .emit();
+    return Stream.ofAll(() -> traversal);
+  }
+
+  // TODO: benchmark this vs. adding type nodes & relating all vertices of type to those nodes
+  static Stream<Vertex> descendantsOf(Vertex parent, String label) {
+    GraphTraversal<Vertex, Vertex> traversal = parent.graph().traversal().V(parent)
+      .repeat(out(Labels.PARENT_CHILD))
+      .emit(__.hasLabel(label));
+    return Stream.ofAll(() -> traversal);
   }
 
   static Stream<Workspace> findWorkspaces(Stream<Vertex> vertices) {
@@ -123,42 +136,5 @@ public class VertexUtils {
 
   private VertexUtils() {
     // private to prevent accidental instantiation
-  }
-
-  public static void main(String[] args) {
-    GraphStore store = new GraphStore();
-    store.root().property("name", "root");
-
-    GraphObject o0 = store.createObject();
-    o0.vertex.property("name", "o0");
-
-    GraphObject o01 = o0.createObject();
-    o01.vertex.property("name", "o0.o1");
-
-    GraphWorkspace w1 = store.createWorkspace();
-    w1.vertex.property("name", "w1");
-
-    GraphWorkspace w2 = store.createWorkspace();
-    w2.vertex.property("name", "w2");
-
-    GraphCollection w1c1 = w1.createCollection();
-    w1c1.vertex.property("name", "w1.c1");
-
-    GraphCollection w2c2 = w2.createCollection();
-    w2c2.vertex.property("name", "w2.c2");
-
-    GraphObject w1c1o1 = w1c1.createObject();
-    w1c1o1.vertex.property("name", "w1.c1.o1");
-
-    GraphObject w2c2o2 = w2c2.createObject();
-    w2c2o2.vertex.property("name", "w2.c2.o2");
-
-    for (
-      GraphTraversal<Object, Vertex> t = V(store.root().id()).repeat(out()).emit();
-      t.hasNext();
-      ) {
-      Vertex next = t.next();
-      System.out.println(next.property("name"));
-    }
   }
 }
