@@ -30,7 +30,7 @@ class GraphCollection extends AbstractGraphResource implements PcdmCollection {
   }
 
   @Override
-  public PcdmObject createObject() {
+  public GraphObject createObject() {
     Vertex t = VertexUtils.createChild(vertex, ResourceType.OBJECT);
     return new GraphObject(t);
   }
@@ -41,7 +41,7 @@ class GraphCollection extends AbstractGraphResource implements PcdmCollection {
   }
 
   @Override
-  public PcdmCollection createCollection() {
+  public GraphCollection createCollection() {
     Vertex v = VertexUtils.createChild(vertex, ResourceType.COLLECTION);
     return new GraphCollection(v);
   }

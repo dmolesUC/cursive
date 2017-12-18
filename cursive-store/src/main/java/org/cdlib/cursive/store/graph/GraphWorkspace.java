@@ -20,7 +20,7 @@ class GraphWorkspace extends AbstractGraphResource implements Workspace {
   }
 
   @Override
-  public PcdmCollection createCollection() {
+  public GraphCollection createCollection() {
     Vertex v = VertexUtils.createChild(vertex, ResourceType.COLLECTION);
     return new GraphCollection(v);
   }

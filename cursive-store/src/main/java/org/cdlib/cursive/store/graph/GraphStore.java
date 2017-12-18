@@ -23,7 +23,7 @@ public class GraphStore implements Store {
   // Fields
 
   private final Graph graph;
-  private final Vertex vertex;
+  private final Vertex root;
 
   // ------------------------------------------------------
   // Constructor
@@ -32,7 +32,14 @@ public class GraphStore implements Store {
     // TODO: configure alternative graph DBs
     // TODO: in-memory TinkerGraph specifics like indices
     graph = TinkerGraph.open();
-    vertex = graph.addVertex(Labels.STORE);
+    root = graph.addVertex(Labels.STORE);
+  }
+
+  // ------------------------------------------------------
+  // Public
+
+  Vertex root() {
+    return root;
   }
 
   // ------------------------------------------------------
@@ -45,8 +52,8 @@ public class GraphStore implements Store {
   }
 
   @Override
-  public Workspace createWorkspace() {
-    Vertex v = VertexUtils.createChild(vertex, ResourceType.WORKSPACE);
+  public GraphWorkspace createWorkspace() {
+    Vertex v = VertexUtils.createChild(root, ResourceType.WORKSPACE);
     return new GraphWorkspace(v);
   }
 
@@ -56,8 +63,8 @@ public class GraphStore implements Store {
   }
 
   @Override
-  public PcdmCollection createCollection() {
-    Vertex v = VertexUtils.createChild(vertex, ResourceType.COLLECTION);
+  public GraphCollection createCollection() {
+    Vertex v = VertexUtils.createChild(root, ResourceType.COLLECTION);
     return new GraphCollection(v);
   }
 
@@ -67,8 +74,8 @@ public class GraphStore implements Store {
   }
 
   @Override
-  public PcdmObject createObject() {
-    Vertex v = VertexUtils.createChild(vertex, ResourceType.OBJECT);
+  public GraphObject createObject() {
+    Vertex v = VertexUtils.createChild(root, ResourceType.OBJECT);
     return new GraphObject(v);
   }
 
@@ -95,11 +102,11 @@ public class GraphStore implements Store {
   // Private methods
 
   private Stream<Vertex> children() {
-    return childrenOf(vertex);
+    return childrenOf(root);
   }
 
   // TODO: benchmark this vs. adding type nodes & relating all vertices of type to those nodes
   private Stream<Vertex> descendants() {
-    return descendantsOf(vertex);
+    return descendantsOf(root);
   }
 }

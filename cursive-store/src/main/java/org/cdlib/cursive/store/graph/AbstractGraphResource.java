@@ -28,6 +28,13 @@ abstract class AbstractGraphResource implements Resource {
   }
 
   // ------------------------------------------------------
+  // Public methods
+
+  Vertex vertex() {
+    return vertex;
+  }
+
+  // ------------------------------------------------------
   // Object
 
   @Override

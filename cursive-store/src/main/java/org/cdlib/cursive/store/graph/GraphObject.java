@@ -32,7 +32,7 @@ class GraphObject extends AbstractGraphResource implements PcdmObject {
   }
 
   @Override
-  public PcdmFile createFile() {
+  public GraphFile createFile() {
     Vertex v = VertexUtils.createChild(vertex, ResourceType.FILE);
     return new GraphFile(v);
   }
@@ -43,7 +43,7 @@ class GraphObject extends AbstractGraphResource implements PcdmObject {
   }
 
   @Override
-  public PcdmObject createObject() {
+  public GraphObject createObject() {
     Vertex v = VertexUtils.createChild(vertex, ResourceType.OBJECT);
     return new GraphObject(v);
   }
