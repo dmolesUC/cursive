@@ -29,7 +29,7 @@ public class VertexUtils {
     ResourceType.WORKSPACE, GraphWorkspace::new,
     ResourceType.COLLECTION, GraphCollection::new,
     ResourceType.OBJECT, GraphObject::new,
-    ResourceType.FILE, GraphObject::new
+    ResourceType.FILE, GraphFile::new
   );
 
   // ------------------------------------------------------
