@@ -31,6 +31,18 @@ subprojects {
 
     mockitoVersion = '2.7.22'
     assertJVersion = '3.8.0'
+
+    nettyVersion = "4.1.19.Final"
+  }
+
+  configurations.all {
+    resolutionStrategy.eachDependency { details ->
+      // Make sure Vert.x and TinkerPop don't import incompatible versions
+      // of different parts of the Netty stack
+      if (details.requested.group == 'io.netty') {
+        details.useVersion nettyVersion
+      }
+    }
   }
 
   dependencies {
