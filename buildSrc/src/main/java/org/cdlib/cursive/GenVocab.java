@@ -9,10 +9,10 @@ import io.vavr.Tuple2;
 import io.vavr.collection.Array;
 import io.vavr.collection.LinkedHashMap;
 import org.apache.commons.lang3.StringUtils;
-import org.gradle.api.logging.Logger;
-import org.gradle.api.logging.Logging;
 import org.jruby.RubyHash;
 import org.jruby.embed.ScriptingContainer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.lang.model.element.Modifier;
 import java.io.BufferedWriter;
@@ -24,13 +24,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 
+import static org.cdlib.cursive.BuilderUtils.addField;
+
 @SuppressWarnings("unchecked")
 class GenVocab {
 
   // ------------------------------------------------------------
   // Cosntants
 
-  private final Logger  log;
+  private final Logger log;
 
   static final String CURSIVE_PACKAGE = "org.cdlib.cursive";
   static final String CURSIVE_RTF_PACKAGE = CURSIVE_PACKAGE + ".rtf";
@@ -47,6 +49,10 @@ class GenVocab {
     this.log = log;
   }
 
+  private GenVocab() {
+    this(LoggerFactory.getLogger(GenVocab.class));
+  }
+
   // ------------------------------------------------------------
   // Package-private methods
 
@@ -54,9 +60,9 @@ class GenVocab {
     Objects.requireNonNull(targetDir, "targetDir cannot be null");
     Path targetPath = targetDir.toPath();
 
-    log.lifecycle("Writing generated files to {}", targetDir.getAbsolutePath());
+    log("Writing generated files to {}", targetDir.getAbsolutePath());
 
-    // TODO: enum for known vocabularies, implementing as Namespace
+    // TODO: figure out which functionality belongs in org.cdlib.cursive.rtf.Vocabulary & which in the individual enums
 
     ClassName nsClassName = ClassName.get(CURSIVE_PACKAGE, "Namespace");
     TypeSpec.Builder nsIFBuilder = TypeSpec.interfaceBuilder(nsClassName)
@@ -73,7 +79,17 @@ class GenVocab {
     TypeSpec termIFSpec = termIFBuilder.build();
     JavaFile termIFFile = JavaFile.builder(CURSIVE_PACKAGE, termIFSpec).build();
 
-    Array<JavaFile> files = Array.of(nsIFFile, termIFFile)
+    ClassName vocabClassName = ClassName.get(CURSIVE_RTF_PACKAGE, "Vocabulary");
+    TypeSpec.Builder vocabEnumBuilder = vocabs.foldLeft(TypeSpec.enumBuilder(vocabClassName), (b, v) -> v.addVocabEnumInstance(b));
+    vocabEnumBuilder.addSuperinterface(nsClassName);
+    MethodSpec.Builder constructorBuilder = MethodSpec.constructorBuilder();
+    addField(vocabEnumBuilder, constructorBuilder, String.class, "prefix", true);
+    addField(vocabEnumBuilder, constructorBuilder, URI.class, "baseUri", true);
+    vocabEnumBuilder.addMethod(constructorBuilder.build());
+    TypeSpec vocabEnumSpec = vocabEnumBuilder.build();
+    JavaFile vocabEnumFile = JavaFile.builder(CURSIVE_RTF_PACKAGE, vocabEnumSpec).build();
+
+    Array<JavaFile> files = Array.of(nsIFFile, termIFFile, vocabEnumFile)
         .appendAll(vocabs.map(Vocab::generateEnum));
 
     files.forEach(jf -> {
@@ -88,7 +104,15 @@ class GenVocab {
       }
     });
 
-    log.lifecycle("Generated {} files", files.size());
+    log("Generated {} files", files.size());
+  }
+
+  private void log(String msg, Object argument) {
+    if (log instanceof org.gradle.api.logging.Logger) {
+      ((org.gradle.api.logging.Logger) log).lifecycle(msg, argument);
+    } else {
+      log.debug(msg, argument);
+    }
   }
 
   // ------------------------------------------------------------
@@ -132,5 +156,10 @@ class GenVocab {
     ScriptingContainer scriptingContainer = new ScriptingContainer();
     scriptingContainer.runScriptlet("require 'rdf/vocab'");
     return scriptingContainer;
+  }
+
+  public static void main(String[] args) throws IOException {
+    Path tempDir = Files.createTempDirectory("genvocab");
+    new GenVocab().generate(tempDir.toFile());
   }
 }

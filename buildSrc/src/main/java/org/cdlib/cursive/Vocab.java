@@ -1,15 +1,16 @@
 package org.cdlib.cursive;
 
 import com.squareup.javapoet.*;
-import io.vavr.Lazy;
 import io.vavr.collection.Array;
 import org.apache.commons.text.WordUtils;
 
 import javax.lang.model.element.Modifier;
-import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.Objects;
 
+import static org.cdlib.cursive.BuilderUtils.addConstant;
+import static org.cdlib.cursive.BuilderUtils.addField;
+import static org.cdlib.cursive.BuilderUtils.addLazyField;
 import static org.cdlib.cursive.GenVocab.CURSIVE_PACKAGE;
 import static org.cdlib.cursive.GenVocab.CURSIVE_RTF_PACKAGE;
 
@@ -64,6 +65,11 @@ class Vocab implements Comparable<Vocab> {
     return terms;
   }
 
+  TypeSpec.Builder addVocabEnumInstance(TypeSpec.Builder vocabEnumBuilder) {
+    vocabEnumBuilder.addEnumConstant(constName, TypeSpec.anonymousClassBuilder("$S, URI.create($S)", prefix, uri).build());
+    return vocabEnumBuilder;
+  }
+
   JavaFile generateEnum() {
     MethodSpec.Builder constructorBuilder = MethodSpec.constructorBuilder();
 
@@ -104,73 +110,6 @@ class Vocab implements Comparable<Vocab> {
 
   private TypeSpec.Builder addTerm(TypeSpec.Builder builder, String term) {
     return builder.addEnumConstant(toConstName(term), TypeSpec.anonymousClassBuilder("$S", term).build());
-  }
-
-  // ------------------------------------------------------------
-  // Builder helpers
-
-  private void addField(TypeSpec.Builder builder, MethodSpec.Builder constructorBuilder, Type fieldType, String fieldName, boolean isOverride) {
-    FieldSpec field = FieldSpec.builder(fieldType, fieldName, Modifier.PRIVATE, Modifier.FINAL).build();
-    addField(builder, constructorBuilder, field, isOverride);
-  }
-
-  private void addField(TypeSpec.Builder builder, MethodSpec.Builder constructorBuilder, TypeName fieldType, String fieldName, boolean isOverride) {
-    FieldSpec field = FieldSpec.builder(fieldType, fieldName, Modifier.PRIVATE, Modifier.FINAL).build();
-    addField(builder, constructorBuilder, field, isOverride);
-  }
-
-  private void addField(TypeSpec.Builder builder, MethodSpec.Builder constructorBuilder, FieldSpec field, boolean isOverride) {
-    MethodSpec.Builder accessorSpec = MethodSpec.methodBuilder("get" + WordUtils.capitalize(field.name))
-      .addModifiers(Modifier.PUBLIC)
-      .returns(field.type)
-      .addStatement("return this.$N", field.name);
-
-    if (isOverride) {
-      accessorSpec = accessorSpec.addAnnotation(Override.class);
-    }
-
-    constructorBuilder
-      .addParameter(field.type, field.name)
-      .addStatement("this.$N = $N", field.type, field.name);
-
-    builder.addField(field)
-      .addMethod(accessorSpec.build());
-  }
-
-  private void addLazyField(TypeSpec.Builder builder, Type valueType, String fieldName, String valueStmt, boolean isOverride) {
-    String valueMethod = fieldName + "Value";
-
-    MethodSpec valueInitializer = MethodSpec.methodBuilder(valueMethod)
-      .returns(valueType)
-      .addModifiers(Modifier.PRIVATE)
-      .addStatement(valueStmt)
-      .build();
-
-    FieldSpec field = FieldSpec.builder(ParameterizedTypeName.get(Lazy.class, valueType), fieldName, Modifier.PRIVATE, Modifier.FINAL)
-      .initializer(String.format("Lazy.of(this::%s)", valueMethod))
-      .build();
-
-    MethodSpec.Builder accessorSpec = MethodSpec.methodBuilder("get" + WordUtils.capitalize(fieldName))
-      .addModifiers(Modifier.PUBLIC)
-      .returns(valueType)
-      .addStatement("return this.$N.get()", fieldName);
-
-    if (isOverride) {
-      accessorSpec = accessorSpec.addAnnotation(Override.class);
-    }
-
-    builder.addField(field)
-      .addMethod(accessorSpec
-        .build())
-      .addMethod(valueInitializer);
-  }
-
-  private void addConstant(TypeSpec.Builder builder, Type constClass, String constName, String format, Object... args) {
-    FieldSpec fieldSpec = FieldSpec.builder(constClass, constName)
-      .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
-      .initializer(format, args)
-      .build();
-    builder.addField(fieldSpec);
   }
 
   // ------------------------------------------------------------
