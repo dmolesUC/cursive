@@ -37,7 +37,10 @@ class GraphCollection extends AbstractGraphResource implements PcdmCollection {
 
   @Override
   public Traversable<PcdmCollection> memberCollections() {
-    return VertexUtils.findCollections(children());
+    // TODO: share code w/GraphWorkspace.memberCollections() & other memberXXX() methods
+    return VertexUtils
+      .childrenOf(vertex, Labels.labelFor(ResourceType.COLLECTION))
+      .map(GraphCollection::new);
   }
 
   @Override

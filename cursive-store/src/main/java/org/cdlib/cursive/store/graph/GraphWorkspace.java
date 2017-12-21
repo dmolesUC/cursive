@@ -6,8 +6,6 @@ import org.cdlib.cursive.core.ResourceType;
 import org.cdlib.cursive.core.Workspace;
 import org.cdlib.cursive.pcdm.PcdmCollection;
 
-import static org.cdlib.cursive.store.graph.VertexUtils.findCollections;
-
 class GraphWorkspace extends AbstractGraphResource implements Workspace {
 
   GraphWorkspace(Vertex vertex) {
@@ -16,7 +14,9 @@ class GraphWorkspace extends AbstractGraphResource implements Workspace {
 
   @Override
   public Traversable<PcdmCollection> memberCollections() {
-    return findCollections(children());
+    return VertexUtils
+      .childrenOf(vertex, Labels.labelFor(ResourceType.COLLECTION))
+      .map(GraphCollection::new);
   }
 
   @Override
