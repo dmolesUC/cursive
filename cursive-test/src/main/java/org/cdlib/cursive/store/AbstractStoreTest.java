@@ -106,6 +106,16 @@ public abstract class AbstractStoreTest<S extends Store> {
       assertThat(child.parentCollection()).contains(parent);
       assertThat(store.objects()).contains(child);
     }
+
+    @Test
+    void collectionsFoundAtVariousLevels() {
+      PcdmCollection c1 = store.createCollection();
+      PcdmCollection c2 = store.createWorkspace().createCollection();
+      PcdmCollection c3 = c1.createCollection();
+      PcdmCollection c4 = c2.createCollection();
+      PcdmCollection c5 = c3.createCollection();
+      assertThat(store.collections()).containsOnly(c1, c2, c3, c4, c5);
+    }
   }
 
   @Nested
@@ -142,6 +152,27 @@ public abstract class AbstractStoreTest<S extends Store> {
       assertThat(parent.memberFiles()).contains(child);
       assertThat(child.parentObject()).isEqualTo(parent);
       assertThat(store.files()).contains(child);
+    }
+
+    @Test
+    void objectsFoundAtVariousLevels() {
+      Workspace w1 = store.createWorkspace();
+      PcdmCollection c1 = w1.createCollection();
+      PcdmCollection c2 = store.createCollection();
+      PcdmCollection c3 = c1.createCollection();
+      PcdmCollection c4 = c3.createCollection();
+
+      PcdmObject o1 = store.createObject();
+      PcdmObject o2 = c1.createObject();
+      PcdmObject o3 = c2.createObject();
+      PcdmObject o4 = o1.createObject();
+      PcdmObject o5 = o2.createObject();
+      PcdmObject o6 = o3.createObject();
+      PcdmObject o7 = o4.createObject();
+      PcdmObject o8 = c3.createObject();
+      PcdmObject o9 = c4.createObject();
+
+      assertThat(store.objects()).containsOnly(o1, o2, o3, o4, o5, o6, o7, o8, o9);
     }
   }
 
