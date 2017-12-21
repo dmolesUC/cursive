@@ -43,14 +43,15 @@ public class GenVocabTask extends DefaultTask {
       try {
         logger.lifecycle("Deleting existing target directory " + targetDir);
         FileUtils.deleteDirectory(targetDir);
-        return false;
       } catch (IOException e) {
         logger.error("Unable to delete target directory " + targetDir, e);
+        return false;
       }
     }
 
+    logger.lifecycle("Creating target directory " + targetDir);
     if (!targetDir.mkdirs()) {
-      logger.error("Unable to recreate target directory " + targetDir);
+      logger.error("Unable to create target directory " + targetDir);
       return false;
     }
     return true;
