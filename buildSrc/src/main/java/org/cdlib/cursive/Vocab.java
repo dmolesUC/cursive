@@ -66,7 +66,7 @@ class Vocab implements Comparable<Vocab> {
   }
 
   TypeSpec.Builder addVocabEnumInstance(TypeSpec.Builder vocabEnumBuilder) {
-    vocabEnumBuilder.addEnumConstant(constName, TypeSpec.anonymousClassBuilder("$S, URI.create($S)", prefix, uri).build());
+    vocabEnumBuilder.addEnumConstant(constName, TypeSpec.anonymousClassBuilder("$S, $S", prefix, uri).build());
     return vocabEnumBuilder;
   }
 
@@ -109,7 +109,7 @@ class Vocab implements Comparable<Vocab> {
   }
 
   private TypeSpec.Builder addTerm(TypeSpec.Builder builder, String term) {
-    return builder.addEnumConstant(toConstName(term), TypeSpec.anonymousClassBuilder("$S", term).build());
+    return builder.addEnumConstant(toConstName(term), TypeSpec.anonymousClassBuilder("Vocabulary.$L, $S", constName, term).build());
   }
 
   // ------------------------------------------------------------

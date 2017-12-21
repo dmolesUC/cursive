@@ -1,14 +1,12 @@
 package org.cdlib.cursive;
 
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.JavaFile;
-import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.TypeSpec;
+import com.squareup.javapoet.*;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import io.vavr.collection.Array;
 import io.vavr.collection.LinkedHashMap;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.WordUtils;
 import org.jruby.RubyHash;
 import org.jruby.embed.ScriptingContainer;
 import org.slf4j.Logger;
@@ -44,6 +42,9 @@ class GenVocab {
   private final Array<Vocab> vocabs = vocabsMap().toArray().map(this::toVocab)
     .removeAll(v -> v.getTerms().isEmpty())
     .sorted();
+  public static final ClassName NS_CLASS_NAME = ClassName.get(CURSIVE_PACKAGE, "Namespace");
+  public static final ClassName TERM_CLASS_NAME = ClassName.get(CURSIVE_PACKAGE, "Term");
+  public static final ClassName VOCAB_CLASS_NAME = ClassName.get(CURSIVE_RTF_PACKAGE, "Vocabulary");
 
   public GenVocab(Logger log) {
     this.log = log;
@@ -64,47 +65,79 @@ class GenVocab {
 
     // TODO: figure out which functionality belongs in org.cdlib.cursive.rtf.Vocabulary & which in the individual enums
 
-    ClassName nsClassName = ClassName.get(CURSIVE_PACKAGE, "Namespace");
-    TypeSpec.Builder nsIFBuilder = TypeSpec.interfaceBuilder(nsClassName)
-      .addMethod(MethodSpec.methodBuilder("getBaseUri").returns(URI.class).addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT).build())
-      .addMethod(MethodSpec.methodBuilder("getPrefix").returns(String.class).addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT).build());
-    TypeSpec nsIFSpec = nsIFBuilder.build();
-    JavaFile nsIFFile = JavaFile.builder(CURSIVE_PACKAGE, nsIFSpec).build();
+    JavaFile nsIFFile = makeNamespaceInterface();
+    JavaFile termIFFile = makeTermInterface();
+    JavaFile vocabEnumFile = makeVocabularyEnum();
+    Array<JavaFile> rtfVocabularyEnums = makeRtfVocabularyEnums();
 
-    ClassName termClassName = ClassName.get(CURSIVE_PACKAGE, "Term");
-    TypeSpec.Builder termIFBuilder = TypeSpec.interfaceBuilder(termClassName)
-      .addMethod(MethodSpec.methodBuilder("getNamespace").returns(nsClassName).addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT).build())
+    Array<JavaFile> allFiles = Array.of(nsIFFile, termIFFile, vocabEnumFile).appendAll(rtfVocabularyEnums);
+    allFiles.forEach(jf -> writeSourceFile(targetPath, jf));
+
+    log("Generated {} files", allFiles.size());
+  }
+
+  private void writeSourceFile(Path targetPath, JavaFile jf) {
+    Path outPath = Array.of(jf.packageName.split("\\.")).foldLeft(targetPath, Path::resolve);
+    outPath.toFile().mkdirs();
+    Path filePath = outPath.resolve(jf.typeSpec.name + ".java");
+    log.debug("Writing " + filePath);
+    try (BufferedWriter out = Files.newBufferedWriter(filePath)) {
+      jf.writeTo(out);
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
+  }
+
+  private Array<JavaFile> makeRtfVocabularyEnums() {
+    return vocabs.map(Vocab::generateEnum);
+  }
+
+  private JavaFile makeVocabularyEnum() {
+    TypeSpec.Builder vocabEnumBuilder = vocabs.foldLeft(
+      TypeSpec.enumBuilder(VOCAB_CLASS_NAME),
+      (b, v) -> v.addVocabEnumInstance(b)
+    )
+      .addSuperinterface(NS_CLASS_NAME)
+      .addModifiers(Modifier.PUBLIC);
+    MethodSpec.Builder constructorBuilder = MethodSpec.constructorBuilder();
+    addField(vocabEnumBuilder, constructorBuilder, String.class, "prefix", true);
+
+    FieldSpec field = FieldSpec.builder(URI.class, "baseUri", Modifier.PRIVATE, Modifier.FINAL).build();
+
+    MethodSpec.Builder accessorSpec = MethodSpec.methodBuilder("get" + WordUtils.capitalize(field.name))
+      .addModifiers(Modifier.PUBLIC)
+      .returns(field.type)
+      .addStatement("return this.$N", field.name);
+    accessorSpec = accessorSpec.addAnnotation(Override.class);
+    vocabEnumBuilder.addField(field).addMethod(accessorSpec.build());
+
+    constructorBuilder
+      .addParameter(String.class, field.name)
+      .addStatement("this.$N = URI.create($N)", field.name, field.name);
+
+
+    vocabEnumBuilder.addMethod(constructorBuilder.build());
+    TypeSpec vocabEnumSpec = vocabEnumBuilder.build();
+    return JavaFile.builder(CURSIVE_RTF_PACKAGE, vocabEnumSpec).build();
+  }
+
+  private JavaFile makeTermInterface() {
+    TypeSpec.Builder termIFBuilder = TypeSpec.interfaceBuilder(TERM_CLASS_NAME)
+      .addModifiers(Modifier.PUBLIC)
+      .addMethod(MethodSpec.methodBuilder("getNamespace").returns(NS_CLASS_NAME).addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT).build())
       .addMethod(MethodSpec.methodBuilder("getUri").returns(URI.class).addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT).build())
       .addMethod(MethodSpec.methodBuilder("getTerm").returns(String.class).addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT).build());
     TypeSpec termIFSpec = termIFBuilder.build();
-    JavaFile termIFFile = JavaFile.builder(CURSIVE_PACKAGE, termIFSpec).build();
+    return JavaFile.builder(CURSIVE_PACKAGE, termIFSpec).build();
+  }
 
-    ClassName vocabClassName = ClassName.get(CURSIVE_RTF_PACKAGE, "Vocabulary");
-    TypeSpec.Builder vocabEnumBuilder = vocabs.foldLeft(TypeSpec.enumBuilder(vocabClassName), (b, v) -> v.addVocabEnumInstance(b));
-    vocabEnumBuilder.addSuperinterface(nsClassName);
-    MethodSpec.Builder constructorBuilder = MethodSpec.constructorBuilder();
-    addField(vocabEnumBuilder, constructorBuilder, String.class, "prefix", true);
-    addField(vocabEnumBuilder, constructorBuilder, URI.class, "baseUri", true);
-    vocabEnumBuilder.addMethod(constructorBuilder.build());
-    TypeSpec vocabEnumSpec = vocabEnumBuilder.build();
-    JavaFile vocabEnumFile = JavaFile.builder(CURSIVE_RTF_PACKAGE, vocabEnumSpec).build();
-
-    Array<JavaFile> files = Array.of(nsIFFile, termIFFile, vocabEnumFile)
-        .appendAll(vocabs.map(Vocab::generateEnum));
-
-    files.forEach(jf -> {
-      Path outPath = Array.of(jf.packageName.split("\\.")).foldLeft(targetPath, Path::resolve);
-      outPath.toFile().mkdirs();
-      Path filePath = outPath.resolve(jf.typeSpec.name + ".java");
-      log.debug("Writing " + filePath);
-      try (BufferedWriter out = Files.newBufferedWriter(filePath)) {
-        jf.writeTo(out);
-      } catch (IOException e) {
-        throw new UncheckedIOException(e);
-      }
-    });
-
-    log("Generated {} files", files.size());
+  private JavaFile makeNamespaceInterface() {
+    TypeSpec.Builder nsIFBuilder = TypeSpec.interfaceBuilder(NS_CLASS_NAME)
+      .addModifiers(Modifier.PUBLIC)
+      .addMethod(MethodSpec.methodBuilder("getBaseUri").returns(URI.class).addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT).build())
+      .addMethod(MethodSpec.methodBuilder("getPrefix").returns(String.class).addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT).build());
+    TypeSpec nsIFSpec = nsIFBuilder.build();
+    return JavaFile.builder(CURSIVE_PACKAGE, nsIFSpec).build();
   }
 
   private void log(String msg, Object argument) {
