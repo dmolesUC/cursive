@@ -2,26 +2,10 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel>
-      <module name="buildSrc_main" target="1.9" />
-      <module name="buildSrc_test" target="1.9" />
-      <module name="cursive-api_generated" target="1.9" />
       <module name="cursive-api_main" target="1.9" />
       <module name="cursive-api_test" target="1.9" />
-      <module name="cursive-codegen_main" target="1.9" />
-      <module name="cursive-codegen_test" target="1.9" />
       <module name="cursive-core_main" target="1.9" />
       <module name="cursive-core_test" target="1.9" />
-      <module name="cursive-inv-api_generated" target="1.9" />
-      <module name="cursive-inv-api_main" target="1.9" />
-      <module name="cursive-inv-api_test" target="1.9" />
-      <module name="cursive-inv-codegen_main" target="1.9" />
-      <module name="cursive-inv-codegen_test" target="1.9" />
-      <module name="cursive-inv-core_main" target="1.9" />
-      <module name="cursive-inv-core_test" target="1.9" />
-      <module name="cursive-inv-store_main" target="1.9" />
-      <module name="cursive-inv-store_test" target="1.9" />
-      <module name="cursive-inv-test_main" target="1.9" />
-      <module name="cursive-inv-test_test" target="1.9" />
       <module name="cursive-store_main" target="1.9" />
       <module name="cursive-store_test" target="1.9" />
       <module name="cursive-test_main" target="1.9" />

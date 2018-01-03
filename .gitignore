@@ -4,6 +4,8 @@
 #### Redundant IDEA files (generated from Gradle) ####
 
 **/*.iml
+.idea/gradle.xml
+.idea/libraries/*.xml
 .idea/modules.xml
 
 ############################################################
