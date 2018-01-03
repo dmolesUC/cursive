@@ -42,52 +42,65 @@ public class GraphStore implements Store {
   }
 
   // ------------------------------------------------------
-  // Resource
+  // Workspaces
 
   @Override
   public Traversable<Workspace> workspaces() {
+    // Workspaces can only exist at the root
     return childrenOf(root, Labels.labelFor(ResourceType.WORKSPACE)).map(GraphWorkspace::new);
   }
 
   @Override
   public GraphWorkspace createWorkspace() {
-    Vertex v = VertexUtils.createChild(root, ResourceType.WORKSPACE);
+    Vertex v = GraphResourceUtils.createChild(root, ResourceType.WORKSPACE);
     return new GraphWorkspace(v);
   }
 
+  // ------------------------------------------------------
+  // Collections
+
   @Override
-  public Traversable<PcdmCollection> collections() {
+  public Traversable<PcdmCollection> allCollections() {
     return descendantsOf(root, Labels.labelFor(ResourceType.COLLECTION)).map(GraphCollection::new);
   }
 
   @Override
   public GraphCollection createCollection() {
-    Vertex v = VertexUtils.createChild(root, ResourceType.COLLECTION);
-    return new GraphCollection(v);
+    return GraphResourceUtils.createCollection(root);
   }
 
+  // ------------------------------------------------------
+  // Objects
+
   @Override
-  public Traversable<PcdmObject> objects() {
+  public Traversable<PcdmObject> allObjects() {
     return descendantsOf(root, Labels.labelFor(ResourceType.OBJECT)).map(GraphObject::new);
   }
 
   @Override
   public GraphObject createObject() {
-    Vertex v = VertexUtils.createChild(root, ResourceType.OBJECT);
-    return new GraphObject(v);
+    return GraphResourceUtils.createObject(root);
   }
 
-  @Override
-  public Traversable<PcdmFile> files() {
-    return findFiles(descendantsOf(root));
+  // ------------------------------------------------------
+  // Files
 
+  @Override
+  public Traversable<PcdmFile> allFiles() {
+    return GraphResourceUtils.findFiles(descendantsOf(root));
   }
 
+  // ------------------------------------------------------
+  // Relations
+
   @Override
-  public Traversable<PcdmRelation> relations() {
+  public Traversable<PcdmRelation> allRelations() {
     // TODO: is there a faster graph-native way to do this?
-    return objects().flatMap(PcdmObject::outgoingRelations);
+    return allObjects().flatMap(PcdmObject::outgoingRelations);
   }
+
+  // ------------------------------------------------------
+  // Finders
 
   @Override
   public Option<Resource> find(String identifier) {
@@ -96,7 +109,7 @@ public class GraphStore implements Store {
       Long longId = Long.valueOf(identifier);
       Stream<Vertex> vertices = Stream.ofAll(() -> graph.vertices(longId));
       return vertices.headOption()
-        .flatMap(VertexUtils::toResource);
+        .flatMap(GraphResourceUtils::toResource);
     } catch (NumberFormatException e) {
       // TODO: use Try (if we still need this after sorting out IDs)
       return Option.none();

@@ -12,16 +12,11 @@ class GraphWorkspace extends AbstractGraphResource implements Workspace {
     super(ResourceType.WORKSPACE, vertex);
   }
 
-  @Override
   public Traversable<PcdmCollection> memberCollections() {
-    return VertexUtils
-      .childrenOf(vertex, Labels.labelFor(ResourceType.COLLECTION))
-      .map(GraphCollection::new);
+    return GraphResourceUtils.memberCollections(this.vertex());
   }
 
-  @Override
   public GraphCollection createCollection() {
-    Vertex v = VertexUtils.createChild(vertex, ResourceType.COLLECTION);
-    return new GraphCollection(v);
+    return GraphResourceUtils.createCollection(this.vertex());
   }
 }

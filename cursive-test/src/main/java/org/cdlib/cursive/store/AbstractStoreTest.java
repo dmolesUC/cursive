@@ -67,7 +67,7 @@ public abstract class AbstractStoreTest<S extends Store> {
       PcdmCollection collection = workspace.createCollection();
       assertThat(workspace.memberCollections()).contains(collection);
       assertThat(collection.parentWorkspace()).contains(workspace);
-      assertThat(store.collections()).contains(collection);
+      assertThat(store.allCollections()).contains(collection);
     }
   }
 
@@ -76,7 +76,7 @@ public abstract class AbstractStoreTest<S extends Store> {
   class Collections {
     @Test
     void collectionsEmptyByDefault() {
-      Traversable<PcdmCollection> collections = store.collections();
+      Traversable<PcdmCollection> collections = store.allCollections();
       assertThat(collections).isEmpty();
     }
 
@@ -84,7 +84,7 @@ public abstract class AbstractStoreTest<S extends Store> {
     void createCollectionCreatesACollection() {
       PcdmCollection collection = store.createCollection();
       assertThat(collection).isNotNull();
-      assertThat(store.collections()).contains(collection);
+      assertThat(store.allCollections()).contains(collection);
     }
 
     @Test
@@ -94,7 +94,7 @@ public abstract class AbstractStoreTest<S extends Store> {
       assertThat(child).isNotNull();
       assertThat(parent.memberCollections()).contains(child);
       assertThat(child.parentCollection()).contains(parent);
-      assertThat(store.collections()).contains(child);
+      assertThat(store.allCollections()).contains(child);
     }
 
     @Test
@@ -104,7 +104,7 @@ public abstract class AbstractStoreTest<S extends Store> {
       assertThat(child).isNotNull();
       assertThat(parent.memberObjects()).contains(child);
       assertThat(child.parentCollection()).contains(parent);
-      assertThat(store.objects()).contains(child);
+      assertThat(store.allObjects()).contains(child);
     }
 
     @Test
@@ -114,7 +114,7 @@ public abstract class AbstractStoreTest<S extends Store> {
       PcdmCollection c3 = c1.createCollection();
       PcdmCollection c4 = c2.createCollection();
       PcdmCollection c5 = c3.createCollection();
-      assertThat(store.collections()).containsOnly(c1, c2, c3, c4, c5);
+      assertThat(store.allCollections()).containsOnly(c1, c2, c3, c4, c5);
     }
   }
 
@@ -123,7 +123,7 @@ public abstract class AbstractStoreTest<S extends Store> {
   class Objects {
     @Test
     void objectsEmptyByDefault() {
-      Traversable<PcdmObject> objects = store.objects();
+      Traversable<PcdmObject> objects = store.allObjects();
       assertThat(objects).isEmpty();
     }
 
@@ -131,7 +131,7 @@ public abstract class AbstractStoreTest<S extends Store> {
     void createObjectCreatesAnObject() {
       PcdmObject object = store.createObject();
       assertThat(object).isNotNull();
-      assertThat(store.objects()).contains(object);
+      assertThat(store.allObjects()).contains(object);
     }
 
     @Test
@@ -141,7 +141,7 @@ public abstract class AbstractStoreTest<S extends Store> {
       assertThat(child).isNotNull();
       assertThat(parent.memberObjects()).contains(child);
       assertThat(child.parentObject()).contains(parent);
-      assertThat(store.objects()).contains(child);
+      assertThat(store.allObjects()).contains(child);
     }
 
     @Test
@@ -151,7 +151,7 @@ public abstract class AbstractStoreTest<S extends Store> {
       assertThat(child).isNotNull();
       assertThat(parent.memberFiles()).contains(child);
       assertThat(child.parentObject()).isEqualTo(parent);
-      assertThat(store.files()).contains(child);
+      assertThat(store.allFiles()).contains(child);
     }
 
     @Test
@@ -172,7 +172,7 @@ public abstract class AbstractStoreTest<S extends Store> {
       PcdmObject o8 = c3.createObject();
       PcdmObject o9 = c4.createObject();
 
-      assertThat(store.objects()).containsOnly(o1, o2, o3, o4, o5, o6, o7, o8, o9);
+      assertThat(store.allObjects()).containsOnly(o1, o2, o3, o4, o5, o6, o7, o8, o9);
     }
   }
 
@@ -181,7 +181,7 @@ public abstract class AbstractStoreTest<S extends Store> {
   class Files {
     @Test
     void filesEmptyByDefault() {
-      Traversable<PcdmFile> files = store.files();
+      Traversable<PcdmFile> files = store.allFiles();
       assertThat(files).isEmpty();
     }
   }
@@ -191,7 +191,7 @@ public abstract class AbstractStoreTest<S extends Store> {
   class Relations {
     @Test
     void relationsEmptyByDefault() {
-      Traversable<PcdmRelation> relations = store.relations();
+      Traversable<PcdmRelation> relations = store.allRelations();
       assertThat(relations.isEmpty());
     }
 

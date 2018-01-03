@@ -3,8 +3,6 @@ package org.cdlib.cursive.store.async.adapters;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
-import io.vavr.control.Option;
-import io.vavr.control.Try;
 import org.cdlib.cursive.core.async.*;
 import org.cdlib.cursive.core.Store;
 import org.cdlib.cursive.core.async.AsyncStore;
@@ -44,7 +42,7 @@ public class AsyncStoreAdapter<S extends Store> implements AsyncStore {
 
   @Override
   public Observable<AsyncPcdmCollection> collections() {
-    return Observable.fromIterable(store.collections()).map(AsyncPcdmCollectionAdapter::new);
+    return Observable.fromIterable(store.allCollections()).map(AsyncPcdmCollectionAdapter::new);
   }
 
   @Override
@@ -54,7 +52,7 @@ public class AsyncStoreAdapter<S extends Store> implements AsyncStore {
 
   @Override
   public Observable<AsyncPcdmObject> objects() {
-    return Observable.fromIterable(store.objects()).map(AsyncPcdmObjectAdapter::new);
+    return Observable.fromIterable(store.allObjects()).map(AsyncPcdmObjectAdapter::new);
   }
 
   @Override
@@ -64,12 +62,12 @@ public class AsyncStoreAdapter<S extends Store> implements AsyncStore {
 
   @Override
   public Observable<AsyncPcdmFile> files() {
-    return Observable.fromIterable(store.files()).map(AsyncPcdmFileAdapter::new);
+    return Observable.fromIterable(store.allFiles()).map(AsyncPcdmFileAdapter::new);
   }
 
   @Override
   public Observable<AsyncPcdmRelation> relations() {
-    return Observable.fromIterable(store.relations()).map(AsyncPcdmRelationAdapter::new);
+    return Observable.fromIterable(store.allRelations()).map(AsyncPcdmRelationAdapter::new);
   }
 
   @Override

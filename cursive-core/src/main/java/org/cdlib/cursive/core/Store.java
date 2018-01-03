@@ -8,14 +8,14 @@ public interface Store {
   Traversable<Workspace> workspaces();
   Workspace createWorkspace();
 
-  Traversable<PcdmCollection> collections();
+  Traversable<PcdmCollection> allCollections();
   PcdmCollection createCollection();
 
-  Traversable<PcdmObject> objects();
+  Traversable<PcdmObject> allObjects();
   PcdmObject createObject();
 
-  Traversable<PcdmFile> files();
-  Traversable<PcdmRelation> relations();
+  Traversable<PcdmFile> allFiles();
+  Traversable<PcdmRelation> allRelations();
 
   Option<Resource> find(String identifier);
 }

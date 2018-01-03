@@ -63,7 +63,7 @@ public class MemoryStore implements Store {
   // Collections
 
   @Override
-  public Traversable<PcdmCollection> collections() {
+  public Traversable<PcdmCollection> allCollections() {
     return collections.get();
   }
 
@@ -90,7 +90,7 @@ public class MemoryStore implements Store {
   // Objects
 
   @Override
-  public Traversable<PcdmObject> objects() {
+  public Traversable<PcdmObject> allObjects() {
     return objects.get();
   }
 
@@ -117,11 +117,11 @@ public class MemoryStore implements Store {
   // Files
 
   @Override
-  public Traversable<PcdmFile> files() {
+  public Traversable<PcdmFile> allFiles() {
     return files.get();
   }
 
-  // TODO: create files in objects, replace this with recordFile() or similar
+  // TODO: create allFiles in allObjects, replace this with recordFile() or similar
   PcdmFile createFile(MemoryObject parent) {
     Lazy<PcdmFile> newFile = Lazy.of(() -> new MemoryFile(parent, mintIdentifier()));
     register(files, newFile);
@@ -132,7 +132,7 @@ public class MemoryStore implements Store {
   // Relationships
 
   @Override
-  public Traversable<PcdmRelation> relations() {
+  public Traversable<PcdmRelation> allRelations() {
     return relations.get();
   }
 

@@ -14,7 +14,7 @@ abstract class AbstractGraphResource implements Resource {
   // ------------------------------------------------------
   // Instance fields
 
-  protected final Vertex vertex;
+  private final Vertex vertex;
   private final Lazy<String> stringVal = Lazy.of(() -> getClass().getName() + "<" + identifier() + ">");
 
   // ------------------------------------------------------
@@ -30,30 +30,16 @@ abstract class AbstractGraphResource implements Resource {
   // ------------------------------------------------------
   // Public methods
 
-  private static void requireTypeLabel(ResourceType requiredType, Vertex vertex) {
-    Option<ResourceType> actualType = VertexUtils.typeOf(vertex);
-    if (!actualType.contains(requiredType)) {
-      String expectedLabel = Labels.labelFor(requiredType);
-      String actualLabel = vertex.label();
-
-      String msg = actualLabel == null
-        ? String.format("Expected vertex labelFor <%s>, was null", expectedLabel)
-        : String.format("Expected vertex labelFor <%s>, was <%s>", expectedLabel, actualLabel);
-
-      throw new IllegalArgumentException(msg);
-    }
+  public Vertex vertex() {
+    return vertex;
   }
 
   // ------------------------------------------------------
   // Object
 
-  Vertex vertex() {
-    return vertex;
-  }
-
   @Override
   public int hashCode() {
-    return vertex.id().hashCode();
+    return vertex().id().hashCode();
   }
 
   @Override
@@ -69,7 +55,7 @@ abstract class AbstractGraphResource implements Resource {
     if (this.type() != that.type()) {
       return false;
     }
-    return Objects.equals(this.vertex.id(), that.vertex.id());
+    return Objects.equals(this.vertex().id(), that.vertex().id());
   }
 
   // ------------------------------------------------------
@@ -80,23 +66,37 @@ abstract class AbstractGraphResource implements Resource {
     return stringVal.get();
   }
 
+  @Override
+  public String identifier() {
+    return vertex().id().toString();
+  }
+
   // ------------------------------------------------------
   // Instance methods
 
-  @Override
-  public String identifier() {
-    return vertex.id().toString();
+  Stream<Vertex> parents() {
+    return VertexUtils.parentsOf(this.vertex());
   }
 
-  Stream<Vertex> parents() {
-    return VertexUtils.parentsOf(this.vertex);
+  Stream<Vertex> children() {
+    return VertexUtils.childrenOf(this.vertex());
   }
 
   // ------------------------------------------------------
   // Class methods
 
-  Stream<Vertex> children() {
-    return VertexUtils.childrenOf(this.vertex);
+  private static void requireTypeLabel(ResourceType requiredType, Vertex vertex) {
+    Option<ResourceType> actualType = GraphResourceUtils.typeOf(vertex);
+    if (!actualType.contains(requiredType)) {
+      String expectedLabel = Labels.labelFor(requiredType);
+      String actualLabel = vertex.label();
+
+      String msg = actualLabel == null
+        ? String.format("Expected vertex labelFor <%s>, was null", expectedLabel)
+        : String.format("Expected vertex labelFor <%s>, was <%s>", expectedLabel, actualLabel);
+
+      throw new IllegalArgumentException(msg);
+    }
   }
 
 }

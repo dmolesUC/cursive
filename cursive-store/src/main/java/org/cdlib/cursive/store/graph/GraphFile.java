@@ -5,7 +5,7 @@ import org.cdlib.cursive.core.ResourceType;
 import org.cdlib.cursive.pcdm.PcdmFile;
 import org.cdlib.cursive.pcdm.PcdmObject;
 
-import static org.cdlib.cursive.store.graph.VertexUtils.findFirstObject;
+import static org.cdlib.cursive.store.graph.GraphResourceUtils.findFirstObject;
 
 class GraphFile extends AbstractGraphResource implements PcdmFile {
 
