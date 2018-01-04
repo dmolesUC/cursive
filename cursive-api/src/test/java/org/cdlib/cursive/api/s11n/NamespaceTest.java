@@ -1,4 +1,4 @@
-package org.cdlib.cursive.api.serializers;
+package org.cdlib.cursive.api.s11n;
 
 import org.junit.jupiter.api.Test;
 

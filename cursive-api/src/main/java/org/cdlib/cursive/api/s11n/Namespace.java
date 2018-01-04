@@ -1,4 +1,4 @@
-package org.cdlib.cursive.api.serializers;
+package org.cdlib.cursive.api.s11n;
 
 import org.cdlib.cursive.util.Strings;
 
@@ -27,6 +27,11 @@ public class Namespace {
 
   public String prefix(String term) {
     return prefix + ":" + term;
+  }
+
+  @Override
+  public String toString() {
+    return "Namespace(" + prefix + ", " + uriBase + ")";
   }
 
   @Override

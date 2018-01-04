@@ -1,0 +1,10 @@
+{
+  "@context": {
+    "schema.org": "http://schema.org/",
+    "schema.org:spouse": {
+      "@type": "@id"
+    }
+  },
+  "@id": "http://dbpedia.org/resource/John_Lennon",
+  "schema.org:spouse": "http://dbpedia.org/resource/Cynthia_Lennon"
+}

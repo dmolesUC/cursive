@@ -1,4 +1,4 @@
-package org.cdlib.cursive.api.serializers;
+package org.cdlib.cursive.api.s11n;
 
 import org.cdlib.cursive.util.Strings;
 
@@ -20,20 +20,25 @@ public class LinkRelation {
     this.prefixedForm = namespace.prefix(term);
   }
 
-  public Namespace getNamespace() {
+  public Namespace namespace() {
     return namespace;
   }
 
-  public String getTerm() {
+  public String term() {
     return term;
   }
 
-  public URI getUri() {
+  public URI uri() {
     return uri;
   }
 
-  public String getPrefixedForm() {
+  public String prefixedForm() {
     return prefixedForm;
+  }
+
+  @Override
+  public String toString() {
+    return "LinkRelation(" + namespace + ", " + term + ")";
   }
 
   @Override
