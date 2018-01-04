@@ -2,14 +2,17 @@ apply plugin: 'java-library'
 
 ext {
   tinkerpopVersion = '3.3.0'
+  janusVersion = '0.2.0'
 }
 
 dependencies {
   api project(':cursive-core')
 
   implementation 'com.fasterxml.uuid:java-uuid-generator:3.1.4'
-  implementation "org.apache.tinkerpop:gremlin-driver:${tinkerpopVersion}"
-  implementation "org.apache.tinkerpop:tinkergraph-gremlin:${tinkerpopVersion}"
+  implementation "org.apache.tinkerpop:gremlin-driver:$tinkerpopVersion"
+
+  testCompile "org.apache.tinkerpop:tinkergraph-gremlin:$tinkerpopVersion"
+  testCompile "org.janusgraph:janusgraph-core:$janusVersion"
 
   testCompile project(':cursive-test')
 }

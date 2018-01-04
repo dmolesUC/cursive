@@ -5,7 +5,6 @@ import io.vavr.collection.Traversable;
 import io.vavr.control.Option;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
-import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 import org.cdlib.cursive.core.Resource;
 import org.cdlib.cursive.core.ResourceType;
 import org.cdlib.cursive.core.Store;
@@ -15,7 +14,8 @@ import org.cdlib.cursive.pcdm.PcdmFile;
 import org.cdlib.cursive.pcdm.PcdmObject;
 import org.cdlib.cursive.pcdm.PcdmRelation;
 
-import static org.cdlib.cursive.store.graph.VertexUtils.*;
+import static org.cdlib.cursive.store.graph.VertexUtils.childrenOf;
+import static org.cdlib.cursive.store.graph.VertexUtils.descendantsOf;
 
 public class GraphStore implements Store {
 
@@ -28,10 +28,9 @@ public class GraphStore implements Store {
   // ------------------------------------------------------
   // Constructor
 
-  public GraphStore() {
-    // TODO: configure alternative graph DBs
-    graph = TinkerGraph.open();
-    root = graph.addVertex(Labels.STORE);
+  public GraphStore(Graph graph) {
+    this.graph = graph;
+    this.root = graph.addVertex(Labels.STORE);
   }
 
   // ------------------------------------------------------
