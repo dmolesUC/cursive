@@ -72,6 +72,10 @@ subprojects {
     testRuntime "org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion"
     testCompile "org.junit.vintage:junit-vintage-engine:$junitVintageVersion"
 
+    // TODO: when JUnit 5.1.0 ships, remove apiguardian dependency
+    // https://github.com/junit-team/junit5/issues/1104
+    testCompile 'org.apiguardian:apiguardian-api:1.0.0'
+
     testCompile "org.mockito:mockito-core:$mockitoVersion"
     testCompile "org.assertj:assertj-core:$assertJVersion"
 
