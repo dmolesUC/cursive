@@ -121,7 +121,7 @@ public class MemoryStore implements Store {
     return files.get();
   }
 
-  // TODO: create allFiles in allObjects, replace this with recordFile() or similar
+  // TODO: create files in objects, replace this with recordFile() or similar
   PcdmFile createFile(MemoryObject parent) {
     Lazy<PcdmFile> newFile = Lazy.of(() -> new MemoryFile(parent, mintIdentifier()));
     register(files, newFile);
