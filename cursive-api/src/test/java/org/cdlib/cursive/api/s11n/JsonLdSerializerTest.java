@@ -10,7 +10,7 @@ public class JsonLdSerializerTest {
   void writesContext() {
     Namespace schemaDotOrg = new Namespace("schema.org", "http://schema.org/");
     LinkRelation spouse = new LinkRelation(schemaDotOrg, "spouse");
-    ResourceSerialization rs = new ResourceSerialization("http://dbpedia.org/resource/John_Lennon")
+    LinkedResult rs = new LinkedResult("http://dbpedia.org/resource/John_Lennon")
       .withLink(spouse, "http://dbpedia.org/resource/Cynthia_Lennon");
 
     String expected = getResourceAsString("json-ld-simple-example-curieized.json");

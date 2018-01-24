@@ -11,10 +11,10 @@ public class HalSerializerTest {
   void writesCuries() {
     Namespace acme = new Namespace("acme", "http://docs.acme.com/relations/");
     LinkRelation acmeWidgets = new LinkRelation(acme, "widgets");
-    ResourceSerialization rs = new ResourceSerialization("/orders").withLink(acmeWidgets, "/widgets");
+    LinkedResult res = new LinkedResult("/orders").withLink(acmeWidgets, "/widgets");
 
     String expected = getResourceAsString("hal-draft-8.2.json");
-    String actual = new HalSerializer().toString(rs);
+    String actual = new HalSerializer().toString(res);
 
     System.out.println("expected: \n" + expected);
     System.out.println("actual: \n" + actual);

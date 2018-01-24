@@ -37,21 +37,21 @@ public class HalSerializer implements Serializer {
   private final JsonRepresentationWriter jsonWriter = JsonRepresentationWriter.create();
 
   @Override
-  public String toString(ResourceSerialization resource) {
-    String selfPath = resource.selfPath();
+  public String toString(LinkedResult result) {
+    String selfPath = result.selfPath();
     Map<String, Object> properties = Collections.emptyMap();
 
     ResourceRepresentation<Map<String, Object>> halRep = ResourceRepresentation.create(selfPath, properties);
-    halRep = resource.allNamespaces()
+    halRep = result.allNamespaces()
       .filter((ns) -> !IANA.equals(ns))
       .foldLeft(halRep, (rep, ns) ->
         rep.withNamespace(ns.getPrefix(), toCurieHref(ns))
       );
-    halRep = resource.allRelations()
+    halRep = result.allRelations()
       .foldLeft(halRep, (rep, lr) ->
         rep.withRel(toRel(lr))
       );
-    halRep = resource.links()
+    halRep = result.links()
       .foldLeft(halRep, (rep, link) ->
         rep.withLink(toRel(link.rel()).rel(), link.target().toString())
       );

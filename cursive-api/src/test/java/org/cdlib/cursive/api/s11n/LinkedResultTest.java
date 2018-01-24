@@ -9,21 +9,21 @@ import java.net.URISyntaxException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.cdlib.cursive.api.s11n.Cursive.*;
 
-class ResourceSerializationTest {
+class LinkedResultTest {
 
   @Nested
   class Constructor {
     @Test
     void defaultsToEmpty() {
-      assertThat(new ResourceSerialization("/").links()).isEmpty();
+      assertThat(new LinkedResult("/").links()).isEmpty();
     }
 
     @Test
     void acceptsVarargs() {
       Link l1 = new Link(WORKSPACES, "workspaces");
       Link l2 = new Link(COLLECTIONS, "collections");
-      ResourceSerialization rs = new ResourceSerialization("/", l1, l2);
-      assertThat(rs.links()).containsOnly(l1, l2);
+      LinkedResult res = new LinkedResult("/", l1, l2);
+      assertThat(res.links()).containsOnly(l1, l2);
     }
   }
 
@@ -31,30 +31,30 @@ class ResourceSerializationTest {
   class WithLink {
     @Test
     void appendsALink() {
-      ResourceSerialization rs0 = new ResourceSerialization("/");
+      LinkedResult res0 = new LinkedResult("/");
       Link link = new Link(WORKSPACES, "workspaces");
-      ResourceSerialization rs1 = rs0.withLink(link);
-      assertThat(rs1).isNotSameAs(rs0);
-      assertThat(rs1.links()).containsOnly(link);
+      LinkedResult res1 = res0.withLink(link);
+      assertThat(res1).isNotSameAs(res0);
+      assertThat(res1.links()).containsOnly(link);
     }
 
     @Test
     void constructsAndAppendsALinkGivenAStringTarget() {
-      ResourceSerialization rs0 = new ResourceSerialization("/");
-      ResourceSerialization rs1 = rs0.withLink(WORKSPACES, "workspaces");
-      assertThat(rs1).isNotSameAs(rs0);
+      LinkedResult res0 = new LinkedResult("/");
+      LinkedResult res1 = res0.withLink(WORKSPACES, "workspaces");
+      assertThat(res1).isNotSameAs(res0);
       Link expected = new Link(WORKSPACES, "workspaces");
-      assertThat(rs1.links()).containsOnly(expected);
+      assertThat(res1.links()).containsOnly(expected);
     }
 
     @Test
     void constructsAndAppendsALinkGivenAUriTarget() throws URISyntaxException {
       URI target = new URI("workspaces");
-      ResourceSerialization rs0 = new ResourceSerialization("/");
-      ResourceSerialization rs1 = rs0.withLink(WORKSPACES, target);
-      assertThat(rs1).isNotSameAs(rs0);
+      LinkedResult res0 = new LinkedResult("/");
+      LinkedResult res1 = res0.withLink(WORKSPACES, target);
+      assertThat(res1).isNotSameAs(res0);
       Link expected = new Link(WORKSPACES, target);
-      assertThat(rs1.links()).containsOnly(expected);
+      assertThat(res1.links()).containsOnly(expected);
     }
   }
 
@@ -62,15 +62,15 @@ class ResourceSerializationTest {
   class AllRelations {
     @Test
     void defaultsToEmpty() {
-      assertThat(new ResourceSerialization("/").allRelations()).isEmpty();
+      assertThat(new LinkedResult("/").allRelations()).isEmpty();
     }
 
     @Test
     void findsAllRelations() {
       Link l1 = new Link(WORKSPACES, "workspaces");
       Link l2 = new Link(COLLECTIONS, "collections");
-      ResourceSerialization rs = new ResourceSerialization("/", l1, l2);
-      assertThat(rs.allRelations()).containsOnly(WORKSPACES, COLLECTIONS);
+      LinkedResult res = new LinkedResult("/", l1, l2);
+      assertThat(res.allRelations()).containsOnly(WORKSPACES, COLLECTIONS);
     }
   }
 
@@ -78,15 +78,15 @@ class ResourceSerializationTest {
   class AllNamespaces {
     @Test
     void defaultsToEmpty() {
-      assertThat(new ResourceSerialization("/").allNamespaces()).isEmpty();
+      assertThat(new LinkedResult("/").allNamespaces()).isEmpty();
     }
 
     @Test
     void findsAllNamespaces() {
       Link l1 = new Link(WORKSPACES, "workspaces");
       Link l2 = new Link(COLLECTIONS, "collections");
-      ResourceSerialization rs = new ResourceSerialization("/", l1, l2);
-      assertThat(rs.allNamespaces()).containsOnly(CURSIVE);
+      LinkedResult res = new LinkedResult("/", l1, l2);
+      assertThat(res.allNamespaces()).containsOnly(CURSIVE);
     }
   }
 
@@ -94,58 +94,58 @@ class ResourceSerializationTest {
   class Equality {
     @Test
     void equalToSelf() {
-      ResourceSerialization rs0 = new ResourceSerialization("/");
-      assertThat(rs0).isEqualTo(rs0);
+      LinkedResult res0 = new LinkedResult("/");
+      assertThat(res0).isEqualTo(res0);
     }
 
     @Test
     void equalToIdentical() {
-      ResourceSerialization rs0 = new ResourceSerialization("/");
-      ResourceSerialization rs1 = new ResourceSerialization("/");
-      assertThat(rs0).isEqualTo(rs1);
-      assertThat(rs1).isEqualTo(rs0);
+      LinkedResult res0 = new LinkedResult("/");
+      LinkedResult res1 = new LinkedResult("/");
+      assertThat(res0).isEqualTo(res1);
+      assertThat(res1).isEqualTo(res0);
     }
 
     @Test
     void equalToSameLinks() {
-      ResourceSerialization rs0 = new ResourceSerialization("/")
+      LinkedResult res0 = new LinkedResult("/")
         .withLink(new Link(WORKSPACES, "workspaces"))
         .withLink(new Link(OBJECTS, "objects"));
 
-      ResourceSerialization rs1 = new ResourceSerialization("/")
+      LinkedResult res1 = new LinkedResult("/")
         .withLink(new Link(WORKSPACES, "workspaces"))
         .withLink(new Link(OBJECTS, "objects"));
 
-      assertThat(rs0).isEqualTo(rs1);
-      assertThat(rs1).isEqualTo(rs0);
+      assertThat(res0).isEqualTo(res1);
+      assertThat(res1).isEqualTo(res0);
     }
 
     @Test
     void notEqualToDifferentLinks() {
-      ResourceSerialization rs0 = new ResourceSerialization("/")
+      LinkedResult res0 = new LinkedResult("/")
         .withLink(new Link(WORKSPACES, "workspaces"))
         .withLink(new Link(OBJECTS, "objects"));
 
-      ResourceSerialization rs1 = new ResourceSerialization("/")
+      LinkedResult res1 = new LinkedResult("/")
         .withLink(new Link(WORKSPACES, "workspaces"))
         .withLink(new Link(FILES, "files"));
 
-      assertThat(rs0).isNotEqualTo(rs1);
-      assertThat(rs1).isNotEqualTo(rs0);
+      assertThat(res0).isNotEqualTo(res1);
+      assertThat(res1).isNotEqualTo(res0);
     }
 
     @Test
     void notEqualToDifferentSelfLink() {
-      ResourceSerialization rs0 = new ResourceSerialization("/0")
+      LinkedResult res0 = new LinkedResult("/0")
         .withLink(new Link(WORKSPACES, "workspaces"))
         .withLink(new Link(OBJECTS, "objects"));
 
-      ResourceSerialization rs1 = new ResourceSerialization("/1")
+      LinkedResult res1 = new LinkedResult("/1")
         .withLink(new Link(WORKSPACES, "workspaces"))
         .withLink(new Link(OBJECTS, "objects"));
 
-      assertThat(rs0).isNotEqualTo(rs1);
-      assertThat(rs1).isNotEqualTo(rs0);
+      assertThat(res0).isNotEqualTo(res1);
+      assertThat(res1).isNotEqualTo(res0);
     }
   }
 }

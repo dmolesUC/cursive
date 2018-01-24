@@ -8,7 +8,7 @@ import io.vavr.collection.Set;
 
 import java.net.URI;
 
-public class ResourceSerialization {
+public class LinkedResult {
 
   // ------------------------------------------------------------
   // Fields
@@ -17,23 +17,24 @@ public class ResourceSerialization {
   private final Set<Link> links;
   private final Lazy<Set<LinkRelation>> allRelations = Lazy.of(this::findAllRelations);
   private final Lazy<Set<Namespace>> allNamespaces = Lazy.of(this::findAllNamespaces);
+  private final Lazy<String> stringForm = Lazy.of(this::mkString);
 
   // ------------------------------------------------------------
   // Constructors
 
-  public ResourceSerialization(String selfPath) {
+  public LinkedResult(String selfPath) {
     this(selfPath, LinkedHashSet.empty());
   }
 
-  public ResourceSerialization(String selfPath, Link... links) {
+  public LinkedResult(String selfPath, Link... links) {
     this(selfPath, Array.of(links));
   }
 
-  public ResourceSerialization(String selfPath, Value<Link> links) {
+  public LinkedResult(String selfPath, Value<Link> links) {
     this(selfPath, links.toLinkedSet());
   }
 
-  public ResourceSerialization(String selfPath, Set<Link> links) {
+  public LinkedResult(String selfPath, Set<Link> links) {
     this.selfPath = selfPath;
     this.links = links.toLinkedSet();
   }
@@ -41,15 +42,15 @@ public class ResourceSerialization {
   // ------------------------------------------------------------
   // Builders
 
-  public ResourceSerialization withLink(Link link) {
-    return new ResourceSerialization(selfPath, links.add(link));
+  public LinkedResult withLink(Link link) {
+    return new LinkedResult(selfPath, links.add(link));
   }
 
-  public ResourceSerialization withLink(LinkRelation rel, String target) {
+  public LinkedResult withLink(LinkRelation rel, String target) {
     return withLink(new Link(rel, target));
   }
 
-  public ResourceSerialization withLink(LinkRelation rel, URI target) {
+  public LinkedResult withLink(LinkRelation rel, URI target) {
     return withLink(new Link(rel, target));
   }
 
@@ -88,7 +89,11 @@ public class ResourceSerialization {
 
   @Override
   public String toString() {
-    return "ResourceSerialization(" + selfPath + ", " + links.mkString("(", ", ", ")") + ")";
+    return stringForm.get();
+  }
+
+  private String mkString() {
+    return getClass().getSimpleName() + "(" + selfPath + ", " + links.mkString("(", ", ", ")") + ")";
   }
 
 
@@ -104,7 +109,7 @@ public class ResourceSerialization {
       return false;
     }
 
-    ResourceSerialization that = (ResourceSerialization) o;
+    LinkedResult that = (LinkedResult) o;
 
     if (!selfPath.equals(that.selfPath)) {
       return false;

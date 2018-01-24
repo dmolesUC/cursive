@@ -16,17 +16,17 @@ public class JsonLdSerializer implements Serializer {
   public static final Map<String, String> LINK_REL_PROPERTIES = Collections.unmodifiableMap(Collections.singletonMap("@type", "@id"));
 
   @Override
-  public String toString(ResourceSerialization resource) {
-    String selfPath = resource.selfPath();
+  public String toString(LinkedResult result) {
+    String selfPath = result.selfPath();
 
     Map<String, Object> context = new LinkedHashMap<>();
-    context = resource.allNamespaces()
+    context = result.allNamespaces()
       .foldLeft(context, (ctx, ns) -> {
           ctx.put(ns.getPrefix(), ns.getUriBase().toString());
           return ctx;
         }
       );
-    context = resource.allRelations()
+    context = result.allRelations()
       .foldLeft(context, (ctx, rel) -> {
           ctx.put(rel.prefixedForm(), LINK_REL_PROPERTIES);
           return ctx;
@@ -35,7 +35,7 @@ public class JsonLdSerializer implements Serializer {
 
     Map<String, Object> object = new LinkedHashMap<>();
     object.put("@id", selfPath);
-    object = resource.links().foldLeft(object, (obj, link) -> {
+    object = result.links().foldLeft(object, (obj, link) -> {
       obj.put(link.rel().prefixedForm(), link.target().toString());
       return obj;
     });

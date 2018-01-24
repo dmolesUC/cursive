@@ -4,7 +4,7 @@ import io.vavr.collection.Array;
 import io.vavr.control.Option;
 import org.cdlib.cursive.api.s11n.HalSerializer;
 import org.cdlib.cursive.api.s11n.JsonLdSerializer;
-import org.cdlib.cursive.api.s11n.ResourceSerialization;
+import org.cdlib.cursive.api.s11n.LinkedResult;
 import org.cdlib.cursive.api.s11n.Serializer;
 import org.cdlib.cursive.core.async.AsyncStore;
 
@@ -32,7 +32,7 @@ public enum Format {
   }
 
   public String format(AsyncStore store) {
-    return serializer.toString(serialize(store));
+    return serializer.toString(toResult(store));
   }
 
   public static Array<Format> all() {
@@ -43,8 +43,8 @@ public enum Format {
     return all().find(ct -> Objects.equals(ct.contentType, contentType));
   }
 
-  private static ResourceSerialization serialize(AsyncStore s) {
-    return new ResourceSerialization("/")
+  private static LinkedResult toResult(AsyncStore s) {
+    return new LinkedResult("/")
       .withLink(WORKSPACES, "workspaces");
   }
 
