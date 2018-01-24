@@ -28,6 +28,13 @@ public class AsyncStoreAdapter<S extends Store> implements AsyncStore {
   }
 
   // ------------------------------
+  // Factory methods
+
+  public static <S extends Store> AsyncStoreAdapter<S> toAsync(S store) {
+    return new AsyncStoreAdapter<>(store);
+  }
+
+  // ------------------------------
   // AsyncStore
 
   @Override
