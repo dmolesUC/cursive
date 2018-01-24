@@ -7,6 +7,7 @@ import com.github.jsonldjava.utils.JsonUtils;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.net.URI;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -17,7 +18,8 @@ public class JsonLdSerializer implements Serializer {
 
   @Override
   public String toString(LinkedResult result) {
-    String selfPath = result.selfPath();
+    URI selfPath = result.selfPath();
+    String selfPathStr = selfPath.toString();
 
     Map<String, Object> context = new LinkedHashMap<>();
     context = result.allNamespaces()
@@ -34,7 +36,7 @@ public class JsonLdSerializer implements Serializer {
       );
 
     Map<String, Object> object = new LinkedHashMap<>();
-    object.put("@id", selfPath);
+    object.put("@id", selfPathStr);
     object = result.links().foldLeft(object, (obj, link) -> {
       obj.put(link.rel().prefixedForm(), link.target().toString());
       return obj;

@@ -6,6 +6,7 @@ import com.theoryinpractise.halbuilder5.ResourceRepresentation;
 import com.theoryinpractise.halbuilder5.json.JsonRepresentationWriter;
 
 import java.io.StringWriter;
+import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
 
@@ -38,10 +39,12 @@ public class HalSerializer implements Serializer {
 
   @Override
   public String toString(LinkedResult result) {
-    String selfPath = result.selfPath();
+    URI selfPath = result.selfPath();
+    String selfPathStr = selfPath.toString();
+
     Map<String, Object> properties = Collections.emptyMap();
 
-    ResourceRepresentation<Map<String, Object>> halRep = ResourceRepresentation.create(selfPath, properties);
+    ResourceRepresentation<Map<String, Object>> halRep = ResourceRepresentation.create(selfPathStr, properties);
     halRep = result.allNamespaces()
       .filter((ns) -> !IANA.equals(ns))
       .foldLeft(halRep, (rep, ns) ->

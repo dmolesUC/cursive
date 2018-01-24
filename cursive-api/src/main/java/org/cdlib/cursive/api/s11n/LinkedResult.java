@@ -13,7 +13,7 @@ public class LinkedResult {
   // ------------------------------------------------------------
   // Fields
 
-  private final String selfPath;
+  private final URI selfPath;
   private final Set<Link> links;
   private final Lazy<Set<LinkRelation>> allRelations = Lazy.of(this::findAllRelations);
   private final Lazy<Set<Namespace>> allNamespaces = Lazy.of(this::findAllNamespaces);
@@ -35,10 +35,13 @@ public class LinkedResult {
   }
 
   public LinkedResult(String selfPath, Set<Link> links) {
+    this(URI.create(selfPath), links);
+  }
+
+  public LinkedResult(URI selfPath, Set<Link> links) {
     this.selfPath = selfPath;
     this.links = links.toLinkedSet();
   }
-
   // ------------------------------------------------------------
   // Builders
 
@@ -57,7 +60,7 @@ public class LinkedResult {
   // ------------------------------------------------------------
   // Accessors
 
-  public String selfPath() {
+  public URI selfPath() {
     return selfPath;
   }
 
