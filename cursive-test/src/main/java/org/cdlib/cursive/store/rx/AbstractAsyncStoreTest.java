@@ -2,7 +2,8 @@ package org.cdlib.cursive.store.rx;
 
 import io.reactivex.observers.TestObserver;
 import io.vavr.collection.List;
-import org.cdlib.cursive.core.async.*;
+import org.cdlib.cursive.core.async.AsyncStore;
+import org.cdlib.cursive.core.async.AsyncWorkspace;
 import org.cdlib.cursive.pcdm.async.AsyncPcdmCollection;
 import org.cdlib.cursive.pcdm.async.AsyncPcdmFile;
 import org.cdlib.cursive.pcdm.async.AsyncPcdmObject;
@@ -11,9 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static org.cdlib.cursive.util.RxAssertions.valueEmittedBy;
-import static org.cdlib.cursive.util.RxAssertions.valuesEmittedBy;
-import static org.cdlib.cursive.util.RxAssertions.assertThat;
+import static org.cdlib.cursive.util.RxAssertions.*;
 
 public abstract class AbstractAsyncStoreTest<S extends AsyncStore> {
   // ------------------------------------------------------------
@@ -228,4 +227,5 @@ public abstract class AbstractAsyncStoreTest<S extends AsyncStore> {
     void findFindsNothing() {
       assertThat(store.find("I am not a valid identifier").test()).observedNothing();
     }
-  }}
+  }
+}
