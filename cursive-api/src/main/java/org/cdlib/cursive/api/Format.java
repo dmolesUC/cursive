@@ -48,39 +48,4 @@ public enum Format {
       .withLink(WORKSPACES, "workspaces");
   }
 
-//  private static String toHal(AsyncStore s) {
-//    Map<String, Object> properties = Collections.emptyMap();
-//    Rel workspacesRel = Rels.singleton("cursive:workspaces");
-//    ResourceRepresentation<Map<String, Object>> rep = ResourceRepresentation.create("/", properties)
-//      .withNamespace("cursive", "https://github.com/dmolesUC3/cursive/blob/master/RELATIONS.md#{rel}")
-//      .withRel(workspacesRel)
-//      .withLink(workspacesRel.rel(), "workspaces");
-//
-//    JsonRepresentationWriter writer = JsonRepresentationWriter.create();
-//    StringWriter out = new StringWriter();
-//    writer.write(rep, out);
-//    return out.toString();
-//  }
-//
-//  private static String toJsonLd(AsyncStore s) {
-//    Map<String, Object> context = new LinkedHashMap<>();
-//    context.put("cursive", "https://github.com/dmolesUC3/cursive/blob/master/RELATIONS.md#");
-//    context.put("cursive:workspaces", new HashMap<String, String>(){{
-//      put("@type", "@id");
-//    }});
-//
-//    Map<String, Object> object = new LinkedHashMap<>();
-//    object.put("@id", "/");
-//    object.put("cursive:workspaces", "workspaces");
-//
-//    JsonLdOptions options = new JsonLdOptions();
-//    try {
-//      Map<String, Object> compact = JsonLdProcessor.compact(object, context, options);
-//      return JsonUtils.toPrettyString(compact);
-//    } catch (JsonLdError jsonLdError) {
-//      throw new IllegalStateException(jsonLdError);
-//    } catch (IOException e) {
-//      throw new UncheckedIOException(e);
-//    }
-//  }
 }
