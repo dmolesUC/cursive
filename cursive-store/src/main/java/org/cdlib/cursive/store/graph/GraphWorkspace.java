@@ -13,10 +13,10 @@ class GraphWorkspace extends AbstractGraphResource implements Workspace {
   }
 
   public Traversable<PcdmCollection> memberCollections() {
-    return GraphResourceUtils.memberCollections(store(), this.vertex());
+    return store().memberCollections(vertex());
   }
 
   public GraphCollection createCollection() {
-    return GraphResourceUtils.createCollection(store(), this.vertex());
+    return store().createCollection(vertex());
   }
 }

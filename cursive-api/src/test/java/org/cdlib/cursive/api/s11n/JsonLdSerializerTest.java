@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
 import static org.cdlib.cursive.util.TestUtils.getResourceAsString;
 
-public class JsonLdSerializerTest {
+class JsonLdSerializerTest {
   @Test
   void writesContext() {
     Namespace schemaDotOrg = new Namespace("schema.org", "http://schema.org/");

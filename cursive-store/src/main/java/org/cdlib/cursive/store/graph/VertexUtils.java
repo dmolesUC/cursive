@@ -40,7 +40,7 @@ class VertexUtils {
       .repeat(out(PARENT_CHILD))
       .emit()
       .hasLabel(label);
-    StreamSupport.stream(((Iterable<Vertex>)() -> traversal).spliterator(), false);
+    StreamSupport.stream(((Iterable<Vertex>) () -> traversal).spliterator(), false);
     return Stream.ofAll(() -> traversal);
   }
 

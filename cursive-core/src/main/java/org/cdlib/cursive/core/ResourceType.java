@@ -4,6 +4,6 @@ public enum ResourceType {
   WORKSPACE,
   COLLECTION,
   OBJECT,
-  FILE;
+  FILE
 
 }

@@ -8,12 +8,15 @@ import org.cdlib.cursive.core.Workspace;
 
 public interface PcdmCollection extends Resource {
   Option<Workspace> parentWorkspace();
+
   Option<PcdmCollection> parentCollection();
 
   Traversable<PcdmObject> memberObjects();
+
   PcdmObject createObject();
 
   Traversable<PcdmCollection> memberCollections();
+
   PcdmCollection createCollection();
 
   @Override

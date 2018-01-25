@@ -6,9 +6,13 @@ import io.vavr.collection.Map;
 import io.vavr.collection.Traversable;
 import io.vavr.collection.Vector;
 import io.vavr.control.Option;
-import org.cdlib.cursive.core.*;
+import org.cdlib.cursive.core.Resource;
 import org.cdlib.cursive.core.Store;
-import org.cdlib.cursive.pcdm.*;
+import org.cdlib.cursive.core.Workspace;
+import org.cdlib.cursive.pcdm.PcdmCollection;
+import org.cdlib.cursive.pcdm.PcdmFile;
+import org.cdlib.cursive.pcdm.PcdmObject;
+import org.cdlib.cursive.pcdm.PcdmRelation;
 import org.cdlib.cursive.store.Identifiers;
 
 import java.util.UUID;

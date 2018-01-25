@@ -5,7 +5,7 @@ import org.cdlib.cursive.store.AbstractStoreTest;
 
 public class TinkerGraphStoreTest extends AbstractStoreTest<GraphStore> {
   @Override
-  protected GraphStore newStore() {
+  GraphStore newStore() {
     return new GraphStore(TinkerGraph.open());
   }
 }

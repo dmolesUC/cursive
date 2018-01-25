@@ -89,21 +89,5 @@ abstract class AsyncResourceImpl<R extends Resource> implements AsyncResource {
 
   private static class Adapters {
 
-    private static AsyncWorkspaceAdapter toCWorkspace(Resource r) {
-      return new AsyncWorkspaceAdapter((Workspace) r);
-    }
-
-    private static AsyncPcdmCollectionAdapter toCCollection(Resource r) {
-      return new AsyncPcdmCollectionAdapter((PcdmCollection) r);
-    }
-
-    private static AsyncPcdmFileAdapter toCFile(Resource r) {
-      return new AsyncPcdmFileAdapter((PcdmFile) r);
-    }
-
-    private static AsyncPcdmObjectAdapter toCObject(Resource r) {
-      return new AsyncPcdmObjectAdapter((PcdmObject) r);
-    }
-
   }
 }

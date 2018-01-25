@@ -42,8 +42,7 @@ public class TestObserverAssert<T> extends AbstractAssert<TestObserverAssert<T>,
 
   @SuppressWarnings("UnusedReturnValue")
   public TestObserverAssert<T> observedNothing() {
-    return this
-      .observedNoValues()
+    return observedNoValues()
       .observedNoErrors()
       ;
   }
@@ -136,7 +135,7 @@ public class TestObserverAssert<T> extends AbstractAssert<TestObserverAssert<T>,
     return this;
   }
 
-  public TestObserverAssert<T> observedNoValues() {
+  TestObserverAssert<T> observedNoValues() {
     if (actual == null) {
       failWithMessage("Expected TestObserver, but found null instead");
     } else {

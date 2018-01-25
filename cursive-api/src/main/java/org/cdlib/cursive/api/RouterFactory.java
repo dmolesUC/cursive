@@ -14,7 +14,7 @@ import java.util.List;
 import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
 import static io.vavr.API.Some;
 
-public class RouterFactory {
+class RouterFactory {
 
   private final AsyncStore store;
 

@@ -1,6 +1,6 @@
 include 'cursive-util', 'cursive-core', 'cursive-api', 'cursive-store', 'cursive-test'
 
-    rootProject.children.each { project ->
-      print project
-      project.buildFileName = "${project.name}.gradle"
+rootProject.children.each { project ->
+  print project
+  project.buildFileName = "${project.name}.gradle"
 }

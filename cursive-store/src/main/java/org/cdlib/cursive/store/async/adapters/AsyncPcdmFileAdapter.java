@@ -13,6 +13,6 @@ class AsyncPcdmFileAdapter extends AsyncResourceImpl<PcdmFile> implements AsyncP
 
   @Override
   public Single<AsyncPcdmObject> parentObject() {
-    return Single.just(this.delegate.parentObject()).map(AsyncPcdmObjectAdapter::new);
+    return Single.just(delegate.parentObject()).map(AsyncPcdmObjectAdapter::new);
   }
 }

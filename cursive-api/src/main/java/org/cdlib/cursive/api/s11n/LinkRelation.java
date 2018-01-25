@@ -16,8 +16,8 @@ public class LinkRelation {
     Strings.requireNotBlank(term);
     this.namespace = namespace;
     this.term = term;
-    this.uri = URI.create(namespace.getUriBase() + term);
-    this.prefixedForm = namespace.prefix(term);
+    uri = URI.create(namespace.getUriBase() + term);
+    prefixedForm = namespace.prefix(term);
   }
 
   public Namespace namespace() {

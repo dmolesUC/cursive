@@ -9,12 +9,15 @@ import org.cdlib.cursive.core.async.AsyncWorkspace;
 
 public interface AsyncPcdmCollection extends AsyncResource {
   Maybe<AsyncWorkspace> parentWorkspace();
+
   Maybe<AsyncPcdmCollection> parentCollection();
 
   Observable<AsyncPcdmObject> memberObjects();
+
   Single<AsyncPcdmObject> createObject();
 
   Observable<AsyncPcdmCollection> memberCollections();
+
   Single<AsyncPcdmCollection> createCollection();
 
   @Override

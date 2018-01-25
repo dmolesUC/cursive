@@ -9,24 +9,28 @@ import org.cdlib.cursive.core.async.AsyncStore;
 
 public interface AsyncPcdmObject extends AsyncResource {
   Maybe<AsyncPcdmObject> parentObject();
+
   Maybe<AsyncPcdmCollection> parentCollection();
 
   Observable<AsyncPcdmFile> memberFiles();
+
   Single<AsyncPcdmFile> createFile();
 
   Observable<AsyncPcdmObject> memberObjects();
+
   Single<AsyncPcdmObject> createObject();
 
   Observable<AsyncPcdmObject> relatedObjects();
 
   /**
-   * @throws NullPointerException if {@code toObject} is null
+   * @throws NullPointerException     if {@code toObject} is null
    * @throws IllegalArgumentException if {@code toObject} belongs to
-   *   a different {@link AsyncStore} than this object
+   *                                  a different {@link AsyncStore} than this object
    */
   Single<AsyncPcdmRelation> relateTo(AsyncPcdmObject toObject);
 
   Observable<AsyncPcdmRelation> outgoingRelations();
+
   Observable<AsyncPcdmRelation> incomingRelations();
 
   @Override

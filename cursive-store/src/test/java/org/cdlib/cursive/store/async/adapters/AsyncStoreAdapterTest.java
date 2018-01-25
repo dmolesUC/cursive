@@ -15,7 +15,7 @@ import static org.cdlib.cursive.util.RxAssertions.errorEmittedBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class AsyncStoreAdapterTest {
+class AsyncStoreAdapterTest {
   @Test
   void findErrorsOnUnsupportedTypes() {
     UUID identifier = Identifiers.mintIdentifier();

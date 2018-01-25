@@ -8,24 +8,28 @@ import org.cdlib.cursive.core.Store;
 
 public interface PcdmObject extends Resource {
   Option<PcdmObject> parentObject();
+
   Option<PcdmCollection> parentCollection();
 
   Traversable<PcdmFile> memberFiles();
+
   PcdmFile createFile();
 
   Traversable<PcdmObject> memberObjects();
+
   PcdmObject createObject();
 
   Traversable<PcdmObject> relatedObjects();
 
   /**
-   * @throws NullPointerException if {@code toObject} is null
+   * @throws NullPointerException     if {@code toObject} is null
    * @throws IllegalArgumentException if {@code toObject} belongs to
-   *   a different {@link Store} than this object
+   *                                  a different {@link Store} than this object
    */
   PcdmRelation relateTo(PcdmObject toObject);
 
   Traversable<PcdmRelation> outgoingRelations();
+
   Traversable<PcdmRelation> incomingRelations();
 
   @Override

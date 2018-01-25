@@ -1,8 +1,8 @@
 package org.cdlib.cursive.api.s11n;
 
-public class Iana extends Namespace {
+class Iana extends Namespace {
 
-  public static Namespace IANA = new Iana();
+  public static final Namespace IANA = new Iana();
   public static LinkRelation SELF = new LinkRelation(IANA, "self");
 
   private Iana() {

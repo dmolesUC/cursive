@@ -40,7 +40,7 @@ subprojects {
       // Make sure Vert.x and TinkerPop don't import incompatible versions
       // of different parts of the Netty stack
       if (details.requested.group == 'io.netty') {
-        details.useVersion nettyVersion
+        details.useVersion(nettyVersion)
       }
     }
   }

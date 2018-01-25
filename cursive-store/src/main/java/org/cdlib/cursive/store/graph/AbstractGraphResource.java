@@ -31,17 +31,17 @@ abstract class AbstractGraphResource implements Resource {
     requireTypeLabel(resourceType, vertex);
     this.vertex = vertex;
     this.store = store;
-    this.id = store.getId(vertex);
+    id = store.getId(vertex);
   }
 
   // ------------------------------------------------------
   // Public methods
 
-  public Vertex vertex() {
+  Vertex vertex() {
     return vertex;
   }
 
-  protected GraphStore store() {
+  GraphStore store() {
     return store;
   }
 
@@ -63,10 +63,10 @@ abstract class AbstractGraphResource implements Resource {
     }
 
     AbstractGraphResource that = (AbstractGraphResource) o;
-    if (this.type() != that.type()) {
+    if (type() != that.type()) {
       return false;
     }
-    return Objects.equals(this.vertex().id(), that.vertex().id());
+    return Objects.equals(vertex().id(), that.vertex().id());
   }
 
   // ------------------------------------------------------
@@ -91,11 +91,11 @@ abstract class AbstractGraphResource implements Resource {
   // Instance methods
 
   Stream<Vertex> parents() {
-    return VertexUtils.parentsOf(this.vertex());
+    return VertexUtils.parentsOf(vertex());
   }
 
   Stream<Vertex> children() {
-    return VertexUtils.childrenOf(this.vertex());
+    return VertexUtils.childrenOf(vertex());
   }
 
   // ------------------------------------------------------
@@ -108,8 +108,8 @@ abstract class AbstractGraphResource implements Resource {
       String actualLabel = vertex.label();
 
       String msg = actualLabel == null
-        ? String.format("Expected vertex labelFor <%s>, was null", expectedLabel)
-        : String.format("Expected vertex labelFor <%s>, was <%s>", expectedLabel, actualLabel);
+        ? String.format("Expected vertex label <%s>, was null", expectedLabel)
+        : String.format("Expected vertex label <%s>, was <%s>", expectedLabel, actualLabel);
 
       throw new IllegalArgumentException(msg);
     }

@@ -123,7 +123,7 @@ class MemoryObject extends ResourceImpl implements PcdmObject {
       throw new IllegalArgumentException(String.format("Related object <%s> must be from the same store as <%s>", toObject, this));
     }
     MemoryObject toObj = (MemoryObject) toObject;
-    if (!this.store.equals(toObj.store)) {
+    if (!store.equals(toObj.store)) {
       throw new IllegalArgumentException(String.format("Related object <%s> must be from the same store as <%s>", toObject, this));
     }
 
@@ -136,7 +136,7 @@ class MemoryObject extends ResourceImpl implements PcdmObject {
   }
 
   private void addIncomingRelation(MemoryRelation relation) {
-    if (!this.equals(relation.toObject())) {
+    if (!equals(relation.toObject())) {
       throw new IllegalArgumentException(String.format("Incoming relation points to wrong object: expected %s, was %s", this, relation.toObject()));
     }
     incomingRelations.updateAndGet(v -> v.append(relation));

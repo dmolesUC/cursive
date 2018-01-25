@@ -9,9 +9,9 @@ import io.vertx.core.http.impl.headers.VertxHttpHeaders;
 import static org.cdlib.cursive.util.VertxAssertions.TIMEOUT_MILLIS;
 
 public class RequestBuilder {
-  public static final String DEFAULT_HOST = "localhost";
-  public static final int DEFAULT_PORT = 8080;
-  public static final String DEFAULT_PATH = "/";
+  private static final String DEFAULT_HOST = "localhost";
+  private static final int DEFAULT_PORT = 8080;
+  private static final String DEFAULT_PATH = "/";
 
   private final HttpClient client;
   private final RequestOptions requestOptions;

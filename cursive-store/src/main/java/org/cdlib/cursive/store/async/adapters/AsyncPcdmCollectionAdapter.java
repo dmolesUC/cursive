@@ -3,10 +3,10 @@ package org.cdlib.cursive.store.async.adapters;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import org.cdlib.cursive.core.async.AsyncWorkspace;
 import org.cdlib.cursive.pcdm.PcdmCollection;
 import org.cdlib.cursive.pcdm.async.AsyncPcdmCollection;
 import org.cdlib.cursive.pcdm.async.AsyncPcdmObject;
-import org.cdlib.cursive.core.async.AsyncWorkspace;
 import org.cdlib.cursive.store.util.RxUtils;
 
 class AsyncPcdmCollectionAdapter extends AsyncResourceImpl<PcdmCollection> implements AsyncPcdmCollection {

@@ -3,8 +3,8 @@ package org.cdlib.cursive.store.async.adapters;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import org.cdlib.cursive.core.Workspace;
-import org.cdlib.cursive.pcdm.async.AsyncPcdmCollection;
 import org.cdlib.cursive.core.async.AsyncWorkspace;
+import org.cdlib.cursive.pcdm.async.AsyncPcdmCollection;
 
 class AsyncWorkspaceAdapter extends AsyncResourceImpl<Workspace> implements AsyncWorkspace {
 

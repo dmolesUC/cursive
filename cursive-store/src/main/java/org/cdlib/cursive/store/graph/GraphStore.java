@@ -16,6 +16,7 @@ import org.cdlib.cursive.pcdm.PcdmRelation;
 
 import java.util.UUID;
 
+import static org.cdlib.cursive.store.graph.Labels.PARENT_CHILD;
 import static org.cdlib.cursive.store.graph.VertexUtils.childrenOf;
 import static org.cdlib.cursive.store.graph.VertexUtils.descendantsOf;
 
@@ -33,27 +34,77 @@ public class GraphStore implements Store {
 
   public GraphStore(Graph graph) {
     this.graph = graph;
-    this.root = graph.addVertex(Labels.STORE);
-    this.rootId = (long) root.id();
+    root = graph.addVertex(Labels.STORE);
+    rootId = (long) root.id();
   }
 
   // ------------------------------------------------------
-  // Public
+  // Creator methods
 
-  Vertex root() {
-    return root;
+  GraphFile createFile(Vertex parent) {
+    Vertex v = createChild(parent, ResourceType.FILE);
+    return new GraphFile(this, v);
   }
 
-  // TODO inline this
-  GraphStore store() {
-    return this;
+  GraphCollection createCollection(Vertex parent) {
+    Vertex v = createChild(parent, ResourceType.COLLECTION);
+    return new GraphCollection(this, v);
   }
+
+  GraphObject createObject(Vertex parent) {
+    Vertex v = createChild(parent, ResourceType.OBJECT);
+    return new GraphObject(this, v);
+  }
+
+  private Vertex createChild(Vertex parent, ResourceType type) {
+    Graph graph = parent.graph();
+    Vertex child = graph.addVertex(Labels.labelFor(type));
+    parent.addEdge(PARENT_CHILD, child);
+    return child;
+  }
+
+  // ------------------------------------------------------
+  // Finder methods
+
+  Stream<PcdmObject> findObjects(Stream<Vertex> vertices) {
+    return vertices.filter(GraphResourceUtils::isObject).map((Vertex v) -> new GraphObject(this, v));
+  }
+
+  Option<PcdmObject> findFirstObject(Stream<Vertex> vertices) {
+    return vertices.find(GraphResourceUtils::isObject).map((Vertex v) -> new GraphObject(this, v));
+  }
+
+  Option<PcdmCollection> findFirstCollection(Stream<Vertex> vertices) {
+    return vertices.find(GraphResourceUtils::isCollection).map((Vertex v) -> new GraphCollection(this, v));
+  }
+
+  Option<Workspace> findFirstWorkspace(Stream<Vertex> vertices) {
+    return vertices.find(GraphResourceUtils::isWorkspace).map((Vertex v) -> new GraphWorkspace(this, v));
+  }
+
+  Stream<PcdmFile> findFiles(Stream<Vertex> vertices) {
+    return vertices.filter(GraphResourceUtils::isFile).map((Vertex v) -> new GraphFile(this, v));
+  }
+
+  Traversable<PcdmCollection> memberCollections(Vertex parent) {
+    return childrenOf(parent, Labels.labelFor(ResourceType.COLLECTION))
+      .map((Vertex v) -> new GraphCollection(this, v));
+  }
+
+  Traversable<PcdmObject> memberObjects(Vertex parent) {
+    return childrenOf(parent, Labels.labelFor(ResourceType.OBJECT))
+      .map((Vertex v) -> new GraphObject(this, v));
+  }
+
+  // ------------------------------------------------------
+  // UUIDs
 
   /**
    * Hack to convert long IDs to fake UUIDs.
+   *
    * @param vertex The vertex
    * @return A "UUID" where the least significant bits are the ID of the root vertex, and the most
-   *   significant bits are the ID of the specified vertex.
+   * significant bits are the ID of the specified vertex.
    */
   UUID getId(Vertex vertex) {
     // TODO: use native UUID IDs if the graph implementation supports them
@@ -79,7 +130,7 @@ public class GraphStore implements Store {
 
   @Override
   public GraphWorkspace createWorkspace() {
-    Vertex v = GraphResourceUtils.createChild(root, ResourceType.WORKSPACE);
+    Vertex v = createChild(root, ResourceType.WORKSPACE);
     return new GraphWorkspace(this, v);
   }
 
@@ -93,7 +144,7 @@ public class GraphStore implements Store {
 
   @Override
   public GraphCollection createCollection() {
-    return GraphResourceUtils.createCollection(this, root);
+    return createCollection(root);
   }
 
   // ------------------------------------------------------
@@ -106,7 +157,7 @@ public class GraphStore implements Store {
 
   @Override
   public GraphObject createObject() {
-    return GraphResourceUtils.createObject(this, root);
+    return createObject(root);
   }
 
   // ------------------------------------------------------
@@ -114,7 +165,7 @@ public class GraphStore implements Store {
 
   @Override
   public Traversable<PcdmFile> allFiles() {
-    return GraphResourceUtils.findFiles(store(), descendantsOf(root));
+    return findFiles(descendantsOf(root));
   }
 
   // ------------------------------------------------------
@@ -139,9 +190,5 @@ public class GraphStore implements Store {
 
   // ------------------------------------------------------
   // Private methods
-
-  private Stream<Vertex> children() {
-    return childrenOf(root);
-  }
 
 }

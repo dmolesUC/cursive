@@ -4,9 +4,9 @@ import io.vavr.Lazy;
 import io.vavr.collection.Traversable;
 import io.vavr.collection.Vector;
 import io.vavr.control.Option;
+import org.cdlib.cursive.core.Workspace;
 import org.cdlib.cursive.pcdm.PcdmCollection;
 import org.cdlib.cursive.pcdm.PcdmObject;
-import org.cdlib.cursive.core.Workspace;
 
 import java.util.Objects;
 import java.util.UUID;

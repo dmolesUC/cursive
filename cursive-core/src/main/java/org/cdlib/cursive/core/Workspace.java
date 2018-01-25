@@ -5,6 +5,7 @@ import org.cdlib.cursive.pcdm.PcdmCollection;
 
 public interface Workspace extends Resource {
   Traversable<PcdmCollection> memberCollections();
+
   PcdmCollection createCollection();
 
   @Override

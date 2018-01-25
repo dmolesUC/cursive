@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-public class NamespaceTest {
+class NamespaceTest {
   @Test
   void validUriBaseIsValid() {
     Namespace ns = new Namespace("cursive", "https://github.com/dmolesUC3/cursive/blob/master/RELATIONS.md#");

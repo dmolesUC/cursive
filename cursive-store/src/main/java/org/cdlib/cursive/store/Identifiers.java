@@ -11,7 +11,7 @@ public class Identifiers {
   /**
    * Separate SecureRandom instance per thread to avoid contention
    */
-  private static ThreadLocal<NoArgGenerator> generator = ThreadLocal.withInitial(
+  private static final ThreadLocal<NoArgGenerator> generator = ThreadLocal.withInitial(
     () -> Generators.randomBasedGenerator(new SecureRandom())
   );
 

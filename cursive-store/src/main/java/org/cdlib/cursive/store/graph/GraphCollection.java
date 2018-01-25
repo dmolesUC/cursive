@@ -16,30 +16,30 @@ class GraphCollection extends AbstractGraphResource implements PcdmCollection {
 
   @Override
   public Option<Workspace> parentWorkspace() {
-    return GraphResourceUtils.findFirstWorkspace(store(), parents());
+    return store().findFirstWorkspace(parents());
   }
 
   @Override
   public Option<PcdmCollection> parentCollection() {
-    return GraphResourceUtils.findFirstCollection(parents(), store());
+    return store().findFirstCollection(parents());
   }
 
   public Traversable<PcdmObject> memberObjects() {
-    return GraphResourceUtils.memberObjects(store(), this.vertex());
+    return store().memberObjects(vertex());
   }
 
   public GraphObject createObject() {
-    return GraphResourceUtils.createObject(store(), this.vertex());
+    return store().createObject(vertex());
   }
 
   @Override
   public Traversable<PcdmCollection> memberCollections() {
-    return GraphResourceUtils.memberCollections(store(), this.vertex());
+    return store().memberCollections(vertex());
   }
 
   @Override
   public GraphCollection createCollection() {
-    return GraphResourceUtils.createCollection(store(), this.vertex());
+    return store().createCollection(vertex());
   }
 }
 

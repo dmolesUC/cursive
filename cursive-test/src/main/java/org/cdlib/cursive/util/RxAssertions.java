@@ -27,14 +27,14 @@ public class RxAssertions extends Assertions {
     return errorObservedBy(maybe.test());
   }
 
-  public static Throwable errorObservedBy(TestObserver<?> observer) {
+  private static Throwable errorObservedBy(TestObserver<?> observer) {
     assertThat(observer).isNotNull();
     assertThat(observer.errorCount()).isEqualTo(1);
     List<Throwable> errors = List.ofAll(observer.errors());
     return errors.head();
   }
 
-  public static <T> T valueObservedBy(TestObserver<T> observer) {
+  private static <T> T valueObservedBy(TestObserver<T> observer) {
     assertThat(observer).isNotNull();
     assertThat(observer).observedNoErrors();
     assertThat(observer).hasValueCount(1);
@@ -45,13 +45,13 @@ public class RxAssertions extends Assertions {
     return valuesObservedBy(observable.test());
   }
 
-  public static <T> List<T> valuesObservedBy(TestObserver<T> observer) {
+  private static <T> List<T> valuesObservedBy(TestObserver<T> observer) {
     assertThat(observer).isNotNull();
     assertThat(observer).observedNoErrors();
     return List.ofAll(observer.values());
   }
 
-  public static <T> T firstValueObservedBy(TestObserver<T> observer) {
+  private static <T> T firstValueObservedBy(TestObserver<T> observer) {
     assertThat(observer).isNotNull();
     assertThat(observer).observedNoErrors();
     return valuesObservedBy(observer).head();

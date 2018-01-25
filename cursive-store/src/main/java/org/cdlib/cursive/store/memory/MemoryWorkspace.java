@@ -3,8 +3,8 @@ package org.cdlib.cursive.store.memory;
 import io.vavr.Lazy;
 import io.vavr.collection.Traversable;
 import io.vavr.collection.Vector;
-import org.cdlib.cursive.pcdm.PcdmCollection;
 import org.cdlib.cursive.core.Workspace;
+import org.cdlib.cursive.pcdm.PcdmCollection;
 
 import java.util.Objects;
 import java.util.UUID;

@@ -8,11 +8,11 @@ import org.cdlib.cursive.core.ResourceType;
 
 class Labels {
 
-  static String STORE = "STORE";
-  static String PARENT_CHILD = "PARENT_CHILD";
-  static String RELATION = "RELATION";
+  static final String STORE = "STORE";
+  static final String PARENT_CHILD = "PARENT_CHILD";
+  static final String RELATION = "RELATION";
 
-  private static Map<String, ResourceType> directory = Stream.of(ResourceType.values()).toMap(t -> Tuple.of(labelFor(t), t));
+  private static final Map<String, ResourceType> directory = Stream.of(ResourceType.values()).toMap(t -> Tuple.of(labelFor(t), t));
 
   private Labels() {
     // private to prevent instantiation

@@ -30,15 +30,15 @@ public class LinkedResult {
     this(selfPath, Array.of(links));
   }
 
-  public LinkedResult(String selfPath, Value<Link> links) {
+  private LinkedResult(String selfPath, Value<Link> links) {
     this(selfPath, links.toLinkedSet());
   }
 
-  public LinkedResult(String selfPath, Set<Link> links) {
+  private LinkedResult(String selfPath, Set<Link> links) {
     this(URI.create(selfPath), links);
   }
 
-  public LinkedResult(URI selfPath, Set<Link> links) {
+  private LinkedResult(URI selfPath, Set<Link> links) {
     this.selfPath = selfPath;
     this.links = links.toLinkedSet();
   }

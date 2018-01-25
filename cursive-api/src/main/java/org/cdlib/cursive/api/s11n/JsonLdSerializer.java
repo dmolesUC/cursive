@@ -14,7 +14,7 @@ import java.util.Map;
 
 public class JsonLdSerializer implements Serializer {
 
-  public static final Map<String, String> LINK_REL_PROPERTIES = Collections.unmodifiableMap(Collections.singletonMap("@type", "@id"));
+  private static final Map<String, String> LINK_REL_PROPERTIES = Collections.unmodifiableMap(Collections.singletonMap("@type", "@id"));
 
   @Override
   public String toString(LinkedResult result) {

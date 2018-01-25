@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
 import static org.cdlib.cursive.util.TestUtils.getResourceAsString;
 
-public class HalSerializerTest {
+class HalSerializerTest {
 
   @Test
   void writesCuries() {

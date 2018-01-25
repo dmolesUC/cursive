@@ -15,7 +15,7 @@ import java.net.URI;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.cdlib.cursive.util.RxAssertions.valueEmittedBy;
 
-public class ResultFactoryTest {
+class ResultFactoryTest {
 
   private AsyncStore store;
   private ResultFactory factory;

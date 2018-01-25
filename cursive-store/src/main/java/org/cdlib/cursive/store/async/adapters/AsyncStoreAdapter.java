@@ -3,10 +3,14 @@ package org.cdlib.cursive.store.async.adapters;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
-import org.cdlib.cursive.core.async.*;
 import org.cdlib.cursive.core.Store;
+import org.cdlib.cursive.core.async.AsyncResource;
 import org.cdlib.cursive.core.async.AsyncStore;
-import org.cdlib.cursive.pcdm.async.*;
+import org.cdlib.cursive.core.async.AsyncWorkspace;
+import org.cdlib.cursive.pcdm.async.AsyncPcdmCollection;
+import org.cdlib.cursive.pcdm.async.AsyncPcdmFile;
+import org.cdlib.cursive.pcdm.async.AsyncPcdmObject;
+import org.cdlib.cursive.pcdm.async.AsyncPcdmRelation;
 import org.cdlib.cursive.store.util.RxUtils;
 
 import java.util.Objects;

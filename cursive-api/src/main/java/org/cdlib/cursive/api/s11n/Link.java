@@ -4,7 +4,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Objects;
 
-public class Link {
+class Link {
 
   private final LinkRelation rel;
   private final URI target;
