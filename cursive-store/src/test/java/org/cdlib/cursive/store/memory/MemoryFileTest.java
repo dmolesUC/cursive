@@ -2,6 +2,7 @@ package org.cdlib.cursive.store.memory;
 
 import org.cdlib.cursive.pcdm.PcdmObject;
 import org.cdlib.cursive.store.Identifiers;
+import org.cdlib.cursive.util.TestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +22,7 @@ class MemoryFileTest {
 
   @Test
   void fileMustHaveAParent() {
-    assertThatThrownBy(() -> new MemoryFile(null, new UUID(Long.MAX_VALUE, Long.MAX_VALUE)))
+    assertThatThrownBy(() -> new MemoryFile(null, TestUtils.badUUID()))
       .isInstanceOf(NullPointerException.class)
       .withFailMessage("%s must have a parent", MemoryFile.class.getSimpleName());
   }

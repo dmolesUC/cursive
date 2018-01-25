@@ -35,7 +35,7 @@ abstract class AbstractGraphResource implements Resource {
   }
 
   // ------------------------------------------------------
-  // Public methods
+  // Package-local methods
 
   Vertex vertex() {
     return vertex;
@@ -80,11 +80,6 @@ abstract class AbstractGraphResource implements Resource {
   @Override
   public UUID id() {
     return id;
-  }
-
-  @Override
-  public String path() {
-    throw new NotImplementedException();
   }
 
   // ------------------------------------------------------

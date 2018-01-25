@@ -8,11 +8,10 @@ import org.cdlib.cursive.pcdm.async.AsyncPcdmCollection;
 import org.cdlib.cursive.pcdm.async.AsyncPcdmFile;
 import org.cdlib.cursive.pcdm.async.AsyncPcdmObject;
 import org.cdlib.cursive.pcdm.async.AsyncPcdmRelation;
+import org.cdlib.cursive.util.TestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import java.util.UUID;
 
 import static org.cdlib.cursive.util.RxAssertions.*;
 
@@ -227,7 +226,7 @@ public abstract class AbstractAsyncStoreTest<S extends AsyncStore> {
 
     @Test
     void findFindsNothing() {
-      assertThat(store.find(new UUID(Long.MAX_VALUE, Long.MAX_VALUE)).test()).observedNothing();
+      assertThat(store.find(TestUtils.badUUID()).test()).observedNothing();
     }
   }
 }

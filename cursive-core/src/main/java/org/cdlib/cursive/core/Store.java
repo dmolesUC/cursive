@@ -27,4 +27,8 @@ public interface Store {
   Traversable<PcdmRelation> allRelations();
 
   Option<Resource> find(UUID id);
+
+  default String path() {
+    return "/";
+  }
 }

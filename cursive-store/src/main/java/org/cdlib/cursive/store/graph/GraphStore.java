@@ -13,6 +13,8 @@ import org.cdlib.cursive.pcdm.PcdmCollection;
 import org.cdlib.cursive.pcdm.PcdmFile;
 import org.cdlib.cursive.pcdm.PcdmObject;
 import org.cdlib.cursive.pcdm.PcdmRelation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.UUID;
 
@@ -21,6 +23,11 @@ import static org.cdlib.cursive.store.graph.VertexUtils.childrenOf;
 import static org.cdlib.cursive.store.graph.VertexUtils.descendantsOf;
 
 public class GraphStore implements Store {
+
+  // ------------------------------------------------------
+  // Constants
+
+  private static final Logger log = LoggerFactory.getLogger(GraphStore.class);
 
   // ------------------------------------------------------
   // Fields
@@ -113,10 +120,14 @@ public class GraphStore implements Store {
   }
 
   private long toVertexId(UUID uuid) {
-    if (uuid.getLeastSignificantBits() != rootId) {
+    if (invalid(uuid)) {
       throw new IllegalArgumentException("UUID " + uuid + " does not appear to belong to this graph");
     }
     return uuid.getMostSignificantBits();
+  }
+
+  private boolean invalid(UUID uuid) {
+    return uuid.getLeastSignificantBits() != rootId;
   }
 
   // ------------------------------------------------------
@@ -182,13 +193,14 @@ public class GraphStore implements Store {
 
   @Override
   public Option<Resource> find(UUID id) {
+    if (invalid(id)) {
+      log.warn("ID {} does not appear to belong to this graph", id);
+      return Option.none();
+    }
     long vertexId = toVertexId(id);
     Stream<Vertex> vertices = Stream.ofAll(() -> graph.vertices(vertexId));
     return vertices.headOption()
       .flatMap(v -> GraphResourceUtils.toResource(this, v));
   }
-
-  // ------------------------------------------------------
-  // Private methods
 
 }

@@ -12,4 +12,9 @@ public interface Workspace extends Resource {
   default ResourceType type() {
     return ResourceType.WORKSPACE;
   }
+
+  @Override
+  default String parentPath() {
+    return "/";
+  }
 }

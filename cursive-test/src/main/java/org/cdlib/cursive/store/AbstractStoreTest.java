@@ -8,11 +8,10 @@ import org.cdlib.cursive.pcdm.PcdmCollection;
 import org.cdlib.cursive.pcdm.PcdmFile;
 import org.cdlib.cursive.pcdm.PcdmObject;
 import org.cdlib.cursive.pcdm.PcdmRelation;
+import org.cdlib.cursive.util.TestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -241,7 +240,8 @@ public abstract class AbstractStoreTest<S extends Store> {
 
     @Test
     void findFindsNothing() {
-      assertThat(store.find(new UUID(Long.MIN_VALUE, Long.MAX_VALUE))).isEmpty();
+      assertThat(store.find(TestUtils.badUUID())).isEmpty();
     }
   }
+
 }

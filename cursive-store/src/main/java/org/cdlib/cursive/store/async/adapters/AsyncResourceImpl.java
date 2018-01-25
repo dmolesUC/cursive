@@ -67,6 +67,11 @@ abstract class AsyncResourceImpl<R extends Resource> implements AsyncResource {
   }
 
   @Override
+  public String parentPath() {
+    return delegate.parentPath();
+  }
+
+  @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;

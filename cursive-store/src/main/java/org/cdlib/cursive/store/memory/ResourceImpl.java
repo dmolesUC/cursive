@@ -21,11 +21,6 @@ abstract class ResourceImpl implements Resource {
   }
 
   @Override
-  public String path() {
-    throw new NotImplementedException();
-  }
-
-  @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;

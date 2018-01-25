@@ -10,4 +10,9 @@ public interface PcdmFile extends Resource {
   default ResourceType type() {
     return ResourceType.FILE;
   }
+
+  @Override
+  default String parentPath() {
+    return parentObject().path();
+  }
 }

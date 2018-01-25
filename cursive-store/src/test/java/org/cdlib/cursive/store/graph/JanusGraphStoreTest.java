@@ -7,8 +7,9 @@ import org.junit.jupiter.api.Disabled;
 
 @Disabled("JanusGraphStoreTest disabled pending fix for https://github.com/JanusGraph/janusgraph/issues/867")
 public class JanusGraphStoreTest extends AbstractStoreTest<GraphStore> {
+
   @Override
-  GraphStore newStore() {
+  protected GraphStore newStore() {
     JanusGraph graph = JanusGraphFactory.build().set("storage.backend", "inmemory").open();
     return new GraphStore(graph);
   }
