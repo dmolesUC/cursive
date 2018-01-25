@@ -5,8 +5,8 @@ import org.cdlib.cursive.pcdm.async.AsyncPcdmFile;
 
 class ResultFactory {
   public Single<LinkedResult> toResult(AsyncPcdmFile file) {
-    String path = "";
+    String path = file.path();
     return file.parentObject().map(parentObj ->
-      new LinkedResult(path).withLink(Pcdm.FILE_OF, ""));
+      new LinkedResult(path).withLink(Pcdm.FILE_OF, parentObj.path()));
   }
 }

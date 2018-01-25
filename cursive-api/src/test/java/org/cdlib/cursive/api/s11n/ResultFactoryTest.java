@@ -45,16 +45,14 @@ class ResultFactoryTest {
 
     @Test
     void includesSelfLink() {
-      // TODO: figure out how resource URIs are created & who's responsible
-      URI expected = URI.create("/path/to/some/file");
+      URI expected = URI.create(file.path());
       LinkedResult result = valueEmittedBy(factory.toResult(file));
       assertThat(result.selfPath()).isEqualTo(expected);
     }
 
     @Test
     void includesParentLink() {
-      // TODO: figure out how resource URIs are created & who's responsible
-      URI expected = URI.create("/path/to/some/object");
+      URI expected = URI.create(parentObj.path());
       LinkedResult result = valueEmittedBy(factory.toResult(file));
       Option<Link> parentLink = result.links().find(l -> Pcdm.FILE_OF.equals(l.rel()));
       assertThat(parentLink).isNotEmpty();

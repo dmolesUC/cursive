@@ -1,5 +1,7 @@
 package org.cdlib.cursive.core;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.UUID;
 
 public interface Resource {
@@ -14,6 +16,10 @@ public interface Resource {
   }
 
   default String path() {
-    return parentPath() + "/" + type().collectivePath() + "/" + slug();
+    return StringUtils.removeEnd(parentPath(), "/")
+      + "/"
+      + type().collectivePath()
+      + "/"
+      + slug();
   }
 }
