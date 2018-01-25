@@ -12,6 +12,12 @@ public interface AsyncPcdmObject extends AsyncResource {
 
   Maybe<AsyncPcdmCollection> parentCollection();
 
+  @SuppressWarnings("unchecked")
+  default Maybe<AsyncResource> parent() {
+    // TODO: figure out why this doesn't work
+    return Maybe.ambArray(parentCollection(), parentObject());
+  }
+
   Observable<AsyncPcdmFile> memberFiles();
 
   Single<AsyncPcdmFile> createFile();
