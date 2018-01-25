@@ -7,6 +7,7 @@ import org.cdlib.cursive.pcdm.PcdmCollection;
 import org.cdlib.cursive.core.Workspace;
 
 import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 class MemoryWorkspace extends ResourceImpl implements Workspace {
@@ -21,7 +22,7 @@ class MemoryWorkspace extends ResourceImpl implements Workspace {
   // --------------------
   // Constructors
 
-  MemoryWorkspace(MemoryStore store, String identifier) {
+  MemoryWorkspace(MemoryStore store, UUID identifier) {
     super(identifier);
     Objects.requireNonNull(store, () -> String.format("%s must have a Store", getClass().getSimpleName()));
     this.store = store;

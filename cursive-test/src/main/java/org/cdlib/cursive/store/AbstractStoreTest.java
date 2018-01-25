@@ -12,6 +12,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public abstract class AbstractStoreTest<S extends Store> {
@@ -216,30 +218,30 @@ public abstract class AbstractStoreTest<S extends Store> {
     @Test
     void findFindsAWorkspace() {
       Workspace workspace = store.createWorkspace();
-      assertThat(store.find(workspace.identifier())).contains(workspace);
+      assertThat(store.find(workspace.id())).contains(workspace);
     }
 
     @Test
     void findFindsACollection() {
       PcdmCollection collection = store.createCollection();
-      assertThat(store.find(collection.identifier())).contains(collection);
+      assertThat(store.find(collection.id())).contains(collection);
     }
 
     @Test
     void findFindsAnObject() {
       PcdmObject object = store.createObject();
-      assertThat(store.find(object.identifier())).contains(object);
+      assertThat(store.find(object.id())).contains(object);
     }
 
     @Test
     void findFindsAFile() {
       PcdmFile file = store.createObject().createFile();
-      assertThat(store.find(file.identifier())).contains(file);
+      assertThat(store.find(file.id())).contains(file);
     }
 
     @Test
     void findFindsNothing() {
-      assertThat(store.find("I am not a valid identifier")).isEmpty();
+      assertThat(store.find(new UUID(Long.MIN_VALUE, Long.MAX_VALUE))).isEmpty();
     }
   }
 }

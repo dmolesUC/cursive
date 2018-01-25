@@ -1,11 +1,12 @@
-package org.cdlib.cursive.store.memory;
+package org.cdlib.cursive.store;
 
 import com.fasterxml.uuid.Generators;
 import com.fasterxml.uuid.NoArgGenerator;
 
 import java.security.SecureRandom;
+import java.util.UUID;
 
-class Identifiers {
+public class Identifiers {
 
   /**
    * Separate SecureRandom instance per thread to avoid contention
@@ -14,7 +15,7 @@ class Identifiers {
     () -> Generators.randomBasedGenerator(new SecureRandom())
   );
 
-  static String mintIdentifier() {
-    return generator.get().generate().toString();
+  public static UUID mintIdentifier() {
+    return generator.get().generate();
   }
 }

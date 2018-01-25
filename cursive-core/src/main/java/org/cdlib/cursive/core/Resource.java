@@ -1,10 +1,13 @@
 package org.cdlib.cursive.core;
 
+import java.util.UUID;
+
 public interface Resource {
-  String identifier();
+  String path();
+  UUID id();
   ResourceType type();
 
   static String toString(Resource r) {
-    return r.getClass().getName() + "<" + r.identifier() + ">";
+    return r.getClass().getName() + "<" + r.id() + " (" + r.path() + ")>";
   }
 }

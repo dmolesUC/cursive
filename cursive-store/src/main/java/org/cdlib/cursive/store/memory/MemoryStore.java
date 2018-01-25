@@ -9,9 +9,12 @@ import io.vavr.control.Option;
 import org.cdlib.cursive.core.*;
 import org.cdlib.cursive.core.Store;
 import org.cdlib.cursive.pcdm.*;
+import org.cdlib.cursive.store.Identifiers;
 
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
+// TODO: compare performance with mutable fastutil collections
 public class MemoryStore implements Store {
 
   // ------------------------------------------------------------
@@ -23,25 +26,25 @@ public class MemoryStore implements Store {
   private final AtomicReference<Vector<PcdmFile>> files = new AtomicReference<>(Vector.empty());
   private final AtomicReference<Vector<PcdmRelation>> relations = new AtomicReference<>(Vector.empty());
 
-  private final AtomicReference<Map<String, Resource>> identifiers = new AtomicReference<>(HashMap.empty());
+  private final AtomicReference<Map<UUID, Resource>> identifiers = new AtomicReference<>(HashMap.empty());
 
   // ------------------------------------------------------------
   // Store
 
-  private String mintIdentifier() {
+  private UUID mintIdentifier() {
     return Identifiers.mintIdentifier();
   }
 
   private <T extends Resource> void register(AtomicReference<Vector<T>> registry, Lazy<T> lazyValue) {
     registry.updateAndGet(v -> v.append(lazyValue.get()));
     T value = lazyValue.get();
-    String identifier = value.identifier();
+    UUID identifier = value.id();
     identifiers.updateAndGet(m -> m.put(identifier, value));
   }
 
   @Override
-  public Option<Resource> find(String identifier) {
-    return identifiers.get().get(identifier);
+  public Option<Resource> find(UUID id) {
+    return identifiers.get().get(id);
   }
 
   // --------------------

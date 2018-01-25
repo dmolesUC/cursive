@@ -9,6 +9,7 @@ import org.cdlib.cursive.pcdm.PcdmObject;
 import org.cdlib.cursive.core.Workspace;
 
 import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 class MemoryCollection extends ResourceImpl implements PcdmCollection {
@@ -27,19 +28,19 @@ class MemoryCollection extends ResourceImpl implements PcdmCollection {
   // --------------------
   // Constructors
 
-  MemoryCollection(MemoryStore store, String identifier) {
+  MemoryCollection(MemoryStore store, UUID identifier) {
     this(store, identifier, null, null);
   }
 
-  MemoryCollection(MemoryStore store, String identifier, MemoryWorkspace parentWorkspace) {
+  MemoryCollection(MemoryStore store, UUID identifier, MemoryWorkspace parentWorkspace) {
     this(store, identifier, parentWorkspace, null);
   }
 
-  MemoryCollection(MemoryStore store, String identifier, MemoryCollection parentCollection) {
+  MemoryCollection(MemoryStore store, UUID identifier, MemoryCollection parentCollection) {
     this(store, identifier, null, parentCollection);
   }
 
-  private MemoryCollection(MemoryStore store, String identifier, MemoryWorkspace parentWorkspace, MemoryCollection parentCollection) {
+  private MemoryCollection(MemoryStore store, UUID identifier, MemoryWorkspace parentWorkspace, MemoryCollection parentCollection) {
     super(identifier);
     Objects.requireNonNull(store, () -> String.format("%s must have a Store", getClass().getSimpleName()));
     if (parentWorkspace != null && parentCollection != null) {

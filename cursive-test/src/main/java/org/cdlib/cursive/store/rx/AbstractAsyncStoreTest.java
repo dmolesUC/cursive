@@ -12,6 +12,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.UUID;
+
 import static org.cdlib.cursive.util.RxAssertions.*;
 
 public abstract class AbstractAsyncStoreTest<S extends AsyncStore> {
@@ -201,31 +203,31 @@ public abstract class AbstractAsyncStoreTest<S extends AsyncStore> {
     @Test
     void findFindsAWorkspace() {
       AsyncWorkspace workspace = valueEmittedBy(store.createWorkspace());
-      assertThat(store.find(workspace.identifier()).test()).observedExactly(workspace);
+      assertThat(store.find(workspace.id()).test()).observedExactly(workspace);
     }
 
     @Test
     void findFindsACollection() {
       AsyncPcdmCollection collection = valueEmittedBy(store.createCollection());
-      assertThat(store.find(collection.identifier()).test()).observedExactly(collection);
+      assertThat(store.find(collection.id()).test()).observedExactly(collection);
     }
 
     @Test
     void findFindsAnObject() {
       AsyncPcdmObject object = valueEmittedBy(store.createObject());
-      assertThat(store.find(object.identifier()).test()).observedExactly(object);
+      assertThat(store.find(object.id()).test()).observedExactly(object);
     }
 
     @Test
     void findFindsAFile() {
       AsyncPcdmObject parent = valueEmittedBy(store.createObject());
       AsyncPcdmFile file = valueEmittedBy(parent.createFile());
-      assertThat(store.find(file.identifier()).test()).observedExactly(file);
+      assertThat(store.find(file.id()).test()).observedExactly(file);
     }
 
     @Test
     void findFindsNothing() {
-      assertThat(store.find("I am not a valid identifier").test()).observedNothing();
+      assertThat(store.find(new UUID(Long.MAX_VALUE, Long.MAX_VALUE)).test()).observedNothing();
     }
   }
 }

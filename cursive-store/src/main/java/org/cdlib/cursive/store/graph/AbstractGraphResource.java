@@ -3,11 +3,13 @@ package org.cdlib.cursive.store.graph;
 import io.vavr.Lazy;
 import io.vavr.collection.Stream;
 import io.vavr.control.Option;
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.cdlib.cursive.core.Resource;
 import org.cdlib.cursive.core.ResourceType;
 
 import java.util.Objects;
+import java.util.UUID;
 
 abstract class AbstractGraphResource implements Resource {
 
@@ -15,16 +17,21 @@ abstract class AbstractGraphResource implements Resource {
   // Instance fields
 
   private final Vertex vertex;
-  private final Lazy<String> stringVal = Lazy.of(() -> getClass().getName() + "<" + identifier() + ">");
+  private final Lazy<String> stringVal = Lazy.of(() -> getClass().getName() + "<" + id() + ">");
+  private final UUID id;
+  private final GraphStore store;
 
   // ------------------------------------------------------
   // Constructors
 
-  AbstractGraphResource(ResourceType resourceType, Vertex vertex) {
+  AbstractGraphResource(ResourceType resourceType, GraphStore store, Vertex vertex) {
     Objects.requireNonNull(resourceType);
+    Objects.requireNonNull(store);
     Objects.requireNonNull(vertex);
     requireTypeLabel(resourceType, vertex);
     this.vertex = vertex;
+    this.store = store;
+    this.id = store.getId(vertex);
   }
 
   // ------------------------------------------------------
@@ -32,6 +39,10 @@ abstract class AbstractGraphResource implements Resource {
 
   public Vertex vertex() {
     return vertex;
+  }
+
+  protected GraphStore store() {
+    return store;
   }
 
   // ------------------------------------------------------
@@ -67,8 +78,13 @@ abstract class AbstractGraphResource implements Resource {
   }
 
   @Override
-  public String identifier() {
-    return vertex().id().toString();
+  public UUID id() {
+    return id;
+  }
+
+  @Override
+  public String path() {
+    throw new NotImplementedException();
   }
 
   // ------------------------------------------------------

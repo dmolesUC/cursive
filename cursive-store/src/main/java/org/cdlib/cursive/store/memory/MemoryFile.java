@@ -4,6 +4,7 @@ import org.cdlib.cursive.pcdm.PcdmFile;
 import org.cdlib.cursive.pcdm.PcdmObject;
 
 import java.util.Objects;
+import java.util.UUID;
 
 class MemoryFile extends ResourceImpl implements PcdmFile {
 
@@ -15,7 +16,7 @@ class MemoryFile extends ResourceImpl implements PcdmFile {
   // --------------------
   // Constructors
 
-  MemoryFile(PcdmObject parentObject, String identifier) {
+  MemoryFile(PcdmObject parentObject, UUID identifier) {
     super(identifier);
     Objects.requireNonNull(parentObject, () -> String.format("%s must have a parent", getClass().getSimpleName()));
     this.parentObject = parentObject;

@@ -10,36 +10,36 @@ import org.cdlib.cursive.pcdm.PcdmObject;
 
 class GraphCollection extends AbstractGraphResource implements PcdmCollection {
 
-  GraphCollection(Vertex vertex) {
-    super(ResourceType.COLLECTION, vertex);
+  GraphCollection(GraphStore store, Vertex vertex) {
+    super(ResourceType.COLLECTION, store, vertex);
   }
 
   @Override
   public Option<Workspace> parentWorkspace() {
-    return GraphResourceUtils.findFirstWorkspace(parents());
+    return GraphResourceUtils.findFirstWorkspace(store(), parents());
   }
 
   @Override
   public Option<PcdmCollection> parentCollection() {
-    return GraphResourceUtils.findFirstCollection(parents());
+    return GraphResourceUtils.findFirstCollection(parents(), store());
   }
 
   public Traversable<PcdmObject> memberObjects() {
-    return GraphResourceUtils.memberObjects(this.vertex());
+    return GraphResourceUtils.memberObjects(store(), this.vertex());
   }
 
   public GraphObject createObject() {
-    return GraphResourceUtils.createObject(this.vertex());
+    return GraphResourceUtils.createObject(store(), this.vertex());
   }
 
   @Override
   public Traversable<PcdmCollection> memberCollections() {
-    return GraphResourceUtils.memberCollections(this.vertex());
+    return GraphResourceUtils.memberCollections(store(), this.vertex());
   }
 
   @Override
   public GraphCollection createCollection() {
-    return GraphResourceUtils.createCollection(this.vertex());
+    return GraphResourceUtils.createCollection(store(), this.vertex());
   }
 }
 

@@ -8,15 +8,15 @@ import org.cdlib.cursive.pcdm.PcdmCollection;
 
 class GraphWorkspace extends AbstractGraphResource implements Workspace {
 
-  GraphWorkspace(Vertex vertex) {
-    super(ResourceType.WORKSPACE, vertex);
+  GraphWorkspace(GraphStore store, Vertex vertex) {
+    super(ResourceType.WORKSPACE, store, vertex);
   }
 
   public Traversable<PcdmCollection> memberCollections() {
-    return GraphResourceUtils.memberCollections(this.vertex());
+    return GraphResourceUtils.memberCollections(store(), this.vertex());
   }
 
   public GraphCollection createCollection() {
-    return GraphResourceUtils.createCollection(this.vertex());
+    return GraphResourceUtils.createCollection(store(), this.vertex());
   }
 }

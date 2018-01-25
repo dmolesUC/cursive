@@ -5,6 +5,8 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import org.cdlib.cursive.pcdm.async.*;
 
+import java.util.UUID;
+
 public interface AsyncStore {
   Observable<AsyncWorkspace> workspaces();
   Single<AsyncWorkspace> createWorkspace();
@@ -18,5 +20,5 @@ public interface AsyncStore {
   Observable<AsyncPcdmFile> files();
   Observable<AsyncPcdmRelation> relations();
 
-  Maybe<AsyncResource> find(String identifier);
+  Maybe<AsyncResource> find(UUID identifier);
 }

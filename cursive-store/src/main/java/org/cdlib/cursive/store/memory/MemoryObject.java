@@ -10,6 +10,7 @@ import org.cdlib.cursive.pcdm.PcdmObject;
 import org.cdlib.cursive.pcdm.PcdmRelation;
 
 import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 class MemoryObject extends ResourceImpl implements PcdmObject {
@@ -31,19 +32,19 @@ class MemoryObject extends ResourceImpl implements PcdmObject {
   // --------------------
   // Constructors
 
-  MemoryObject(MemoryStore store, String identifier) {
+  MemoryObject(MemoryStore store, UUID identifier) {
     this(store, identifier, null, null);
   }
 
-  MemoryObject(MemoryStore store, String identifier, MemoryCollection parentCollection) {
+  MemoryObject(MemoryStore store, UUID identifier, MemoryCollection parentCollection) {
     this(store, identifier, parentCollection, null);
   }
 
-  MemoryObject(MemoryStore store, String identifier, MemoryObject parentObject) {
+  MemoryObject(MemoryStore store, UUID identifier, MemoryObject parentObject) {
     this(store, identifier, null, parentObject);
   }
 
-  private MemoryObject(MemoryStore store, String identifier, MemoryCollection parentCollection, MemoryObject parentObject) {
+  private MemoryObject(MemoryStore store, UUID identifier, MemoryCollection parentCollection, MemoryObject parentObject) {
     super(identifier);
     Objects.requireNonNull(store, () -> String.format("%s must have a Store", getClass().getSimpleName()));
     if (parentCollection != null && parentObject != null) {

@@ -12,6 +12,7 @@ import org.cdlib.cursive.pcdm.PcdmFile;
 import org.cdlib.cursive.pcdm.PcdmObject;
 
 import java.util.Objects;
+import java.util.UUID;
 import java.util.function.Function;
 
 abstract class AsyncResourceImpl<R extends Resource> implements AsyncResource {
@@ -56,8 +57,13 @@ abstract class AsyncResourceImpl<R extends Resource> implements AsyncResource {
   // AsyncPcdmResource
 
   @Override
-  public String identifier() {
-    return delegate.identifier();
+  public UUID id() {
+    return delegate.id();
+  }
+
+  @Override
+  public String path() {
+    return delegate.path();
   }
 
   @Override

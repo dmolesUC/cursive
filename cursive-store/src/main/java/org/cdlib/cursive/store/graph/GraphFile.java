@@ -9,12 +9,12 @@ import static org.cdlib.cursive.store.graph.GraphResourceUtils.findFirstObject;
 
 class GraphFile extends AbstractGraphResource implements PcdmFile {
 
-  GraphFile(Vertex vertex) {
-    super(ResourceType.FILE, vertex);
+  GraphFile(GraphStore store, Vertex vertex) {
+    super(ResourceType.FILE, store, vertex);
   }
 
   @Override
   public PcdmObject parentObject() {
-    return findFirstObject(parents()).getOrElseThrow(() -> new IllegalStateException("Can't find parent object for file " + identifier()));
+    return findFirstObject(parents(), store()).getOrElseThrow(() -> new IllegalStateException("Can't find parent object for file " + id()));
   }
 }

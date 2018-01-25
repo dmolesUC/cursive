@@ -19,8 +19,8 @@ class GraphObject extends AbstractGraphResource implements PcdmObject {
   // ------------------------------------------------------
   // Constructors
 
-  GraphObject(Vertex vertex) {
-    super(ResourceType.OBJECT, vertex);
+  GraphObject(GraphStore store, Vertex vertex) {
+    super(ResourceType.OBJECT, store, vertex);
   }
 
   // ------------------------------------------------------
@@ -28,12 +28,12 @@ class GraphObject extends AbstractGraphResource implements PcdmObject {
 
   @Override
   public Option<PcdmObject> parentObject() {
-    return GraphResourceUtils.findFirstObject(parents());
+    return GraphResourceUtils.findFirstObject(parents(), store());
   }
 
   @Override
   public Option<PcdmCollection> parentCollection() {
-    return GraphResourceUtils.findFirstCollection(parents());
+    return GraphResourceUtils.findFirstCollection(parents(), store());
   }
 
   // ------------------------------------------------------
@@ -41,12 +41,12 @@ class GraphObject extends AbstractGraphResource implements PcdmObject {
 
   @Override
   public Traversable<PcdmObject> memberObjects() {
-    return GraphResourceUtils.memberObjects(vertex());
+    return GraphResourceUtils.memberObjects(store(), vertex());
   }
 
   @Override
   public GraphObject createObject() {
-    return GraphResourceUtils.createObject(vertex());
+    return GraphResourceUtils.createObject(store(), vertex());
   }
 
   // ------------------------------------------------------
@@ -54,13 +54,13 @@ class GraphObject extends AbstractGraphResource implements PcdmObject {
 
   @Override
   public Traversable<PcdmFile> memberFiles() {
-    return GraphResourceUtils.findFiles(children());
+    return GraphResourceUtils.findFiles(store(), children());
   }
 
   @Override
   public GraphFile createFile() {
     Vertex v = GraphResourceUtils.createChild(vertex(), ResourceType.FILE);
-    return new GraphFile(v);
+    return new GraphFile(this.store(), v);
   }
 
   // ------------------------------------------------------
@@ -69,7 +69,7 @@ class GraphObject extends AbstractGraphResource implements PcdmObject {
   @Override
   public Traversable<PcdmObject> relatedObjects() {
     Iterator<Edge> edges = vertex().edges(Direction.OUT, Labels.RELATION);
-    return Stream.ofAll(() -> edges).map(Edge::inVertex).map(GraphObject::new);
+    return Stream.ofAll(() -> edges).map(Edge::inVertex).map(v -> new GraphObject(this.store(), v));
   }
 
   @Override
@@ -78,18 +78,18 @@ class GraphObject extends AbstractGraphResource implements PcdmObject {
     Vertex fromVertex = vertex();
     Vertex toVertex = ((GraphObject) toObject).vertex();
     Edge edge = fromVertex.addEdge(Labels.RELATION, toVertex);
-    return new GraphRelation(edge);
+    return new GraphRelation(store(), edge);
   }
 
   @Override
   public Traversable<PcdmRelation> outgoingRelations() {
     Iterator<Edge> edges = vertex().edges(Direction.OUT, Labels.RELATION);
-    return Stream.ofAll(() -> edges).map(GraphRelation::new);
+    return Stream.ofAll(() -> edges).map(edge -> new GraphRelation(store(), edge));
   }
 
   @Override
   public Traversable<PcdmRelation> incomingRelations() {
     Iterator<Edge> edges = vertex().edges(Direction.IN, Labels.RELATION);
-    return Stream.ofAll(() -> edges).map(GraphRelation::new);
+    return Stream.ofAll(() -> edges).map(edge -> new GraphRelation(store(), edge));
   }
 }

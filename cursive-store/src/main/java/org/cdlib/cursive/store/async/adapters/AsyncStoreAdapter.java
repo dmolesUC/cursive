@@ -10,6 +10,7 @@ import org.cdlib.cursive.pcdm.async.*;
 import org.cdlib.cursive.store.util.RxUtils;
 
 import java.util.Objects;
+import java.util.UUID;
 
 // TODO: Figure out where the work should happen for each call, & what combination of observeOn()/subscribeOn() makes sense
 public class AsyncStoreAdapter<S extends Store> implements AsyncStore {
@@ -78,7 +79,7 @@ public class AsyncStoreAdapter<S extends Store> implements AsyncStore {
   }
 
   @Override
-  public Maybe<AsyncResource> find(String identifier) {
+  public Maybe<AsyncResource> find(UUID identifier) {
     return store.find(identifier)
       .map(AsyncResourceImpl::from)
       .map(RxUtils::toMaybe)

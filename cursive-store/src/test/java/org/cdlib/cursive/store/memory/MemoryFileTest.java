@@ -1,8 +1,11 @@
 package org.cdlib.cursive.store.memory;
 
 import org.cdlib.cursive.pcdm.PcdmObject;
+import org.cdlib.cursive.store.Identifiers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -18,7 +21,7 @@ class MemoryFileTest {
 
   @Test
   void fileMustHaveAParent() {
-    assertThatThrownBy(() -> new MemoryFile(null, "Elvis"))
+    assertThatThrownBy(() -> new MemoryFile(null, new UUID(Long.MAX_VALUE, Long.MAX_VALUE)))
       .isInstanceOf(NullPointerException.class)
       .withFailMessage("%s must have a parent", MemoryFile.class.getSimpleName());
   }
@@ -33,15 +36,15 @@ class MemoryFileTest {
 
   @Test
   void constructorSetsIdentifier() {
-    String identifier = "Elvis";
+    UUID identifier = Identifiers.mintIdentifier();
     PcdmObject parent = store.createObject();
     MemoryFile file = new MemoryFile(parent, identifier);
-    assertThat(file.identifier()).isEqualTo(identifier);
+    assertThat(file.id()).isEqualTo(identifier);
   }
 
   @Test
   void filesWithSameIdentifierAreEqual() {
-    String identifier = "Elvis";
+    UUID identifier = Identifiers.mintIdentifier();
     PcdmObject parent = store.createObject();
     MemoryFile file1 = new MemoryFile(parent, identifier);
     MemoryFile file2 = new MemoryFile(parent, identifier);
@@ -53,11 +56,11 @@ class MemoryFileTest {
 
   @Test
   void toStringIncludesTypeAndIdentifier() {
-    String identifier = "Elvis";
+    UUID identifier = Identifiers.mintIdentifier();
     PcdmObject parent = store.createObject();
     MemoryFile file = new MemoryFile(parent, identifier);
     assertThat(file.toString())
       .contains(MemoryFile.class.getSimpleName())
-      .contains(identifier);
+      .contains(identifier.toString());
   }
 }

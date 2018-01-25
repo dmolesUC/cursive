@@ -9,20 +9,22 @@ import java.util.Objects;
 class GraphRelation implements PcdmRelation {
 
   private final Edge edge;
+  private final GraphStore store;
 
-  GraphRelation(Edge edge) {
+  GraphRelation(GraphStore store, Edge edge) {
+    this.store = store;
     Objects.requireNonNull(edge);
     this.edge = edge;
   }
 
   @Override
   public PcdmObject fromObject() {
-    return new GraphObject(edge.outVertex());
+    return new GraphObject(store, edge.outVertex());
   }
 
   @Override
   public PcdmObject toObject() {
-    return new GraphObject(edge.inVertex());
+    return new GraphObject(store, edge.inVertex());
   }
 
   @Override

@@ -4,6 +4,8 @@ import io.vavr.collection.Traversable;
 import io.vavr.control.Option;
 import org.cdlib.cursive.pcdm.*;
 
+import java.util.UUID;
+
 public interface Store {
   Traversable<Workspace> workspaces();
   Workspace createWorkspace();
@@ -17,5 +19,5 @@ public interface Store {
   Traversable<PcdmFile> allFiles();
   Traversable<PcdmRelation> allRelations();
 
-  Option<Resource> find(String identifier);
+  Option<Resource> find(UUID id);
 }

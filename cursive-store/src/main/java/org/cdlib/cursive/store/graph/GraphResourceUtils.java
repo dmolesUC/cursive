@@ -13,7 +13,7 @@ import org.cdlib.cursive.pcdm.PcdmCollection;
 import org.cdlib.cursive.pcdm.PcdmFile;
 import org.cdlib.cursive.pcdm.PcdmObject;
 
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 import static org.cdlib.cursive.store.graph.Labels.PARENT_CHILD;
 
@@ -22,7 +22,7 @@ class GraphResourceUtils {
   // ------------------------------------------------------
   // Class fields
 
-  private static final Map<ResourceType, Function<Vertex, AbstractGraphResource>> adapters = HashMap.of(
+  private static final Map<ResourceType, BiFunction<GraphStore, Vertex, AbstractGraphResource>> adapters = HashMap.of(
     ResourceType.WORKSPACE, GraphWorkspace::new,
     ResourceType.COLLECTION, GraphCollection::new,
     ResourceType.OBJECT, GraphObject::new,
@@ -32,52 +32,52 @@ class GraphResourceUtils {
   // ------------------------------------------------------
   // Finder methods
 
-  static Stream<PcdmObject> findObjects(Stream<Vertex> vertices) {
-    return vertices.filter(GraphResourceUtils::isObject).map(GraphObject::new);
+  static Stream<PcdmObject> findObjects(GraphStore store, Stream<Vertex> vertices) {
+    return vertices.filter(GraphResourceUtils::isObject).map((Vertex v) -> new GraphObject(store, v));
   }
 
-  static Stream<PcdmFile> findFiles(Stream<Vertex> vertices) {
-    return vertices.filter(GraphResourceUtils::isFile).map(GraphFile::new);
+  static Stream<PcdmFile> findFiles(GraphStore store, Stream<Vertex> vertices) {
+    return vertices.filter(GraphResourceUtils::isFile).map((Vertex v) -> new GraphFile(store, v));
   }
 
-  static Option<Workspace> findFirstWorkspace(Stream<Vertex> vertices) {
-    return vertices.find(GraphResourceUtils::isWorkspace).map(GraphWorkspace::new);
+  static Option<Workspace> findFirstWorkspace(GraphStore store, Stream<Vertex> vertices) {
+    return vertices.find(GraphResourceUtils::isWorkspace).map((Vertex v) -> new GraphWorkspace(store, v));
   }
 
-  static Option<PcdmCollection> findFirstCollection(Stream<Vertex> vertices) {
-    return vertices.find(GraphResourceUtils::isCollection).map(GraphCollection::new);
+  static Option<PcdmCollection> findFirstCollection(Stream<Vertex> vertices, GraphStore store) {
+    return vertices.find(GraphResourceUtils::isCollection).map((Vertex v) -> new GraphCollection(store, v));
   }
 
-  static Option<PcdmObject> findFirstObject(Stream<Vertex> vertices) {
-    return vertices.find(GraphResourceUtils::isObject).map(GraphObject::new);
+  static Option<PcdmObject> findFirstObject(Stream<Vertex> vertices, GraphStore store) {
+    return vertices.find(GraphResourceUtils::isObject).map((Vertex v) -> new GraphObject(store, v));
   }
 
   // ------------------------------------------------------
   // Member methods
 
-  static Traversable<PcdmObject> memberObjects(Vertex parent) {
+  static Traversable<PcdmObject> memberObjects(GraphStore store, Vertex parent) {
     return VertexUtils
       .childrenOf(parent, Labels.labelFor(ResourceType.OBJECT))
-      .map(GraphObject::new);
+      .map((Vertex v) -> new GraphObject(store, v));
   }
 
-  static Traversable<PcdmCollection> memberCollections(Vertex parent) {
+  static Traversable<PcdmCollection> memberCollections(GraphStore store, Vertex parent) {
     return VertexUtils
       .childrenOf(parent, Labels.labelFor(ResourceType.COLLECTION))
-      .map(GraphCollection::new);
+      .map((Vertex v) -> new GraphCollection(store, v));
   }
 
   // ------------------------------------------------------
   // Creator methods
 
-  static GraphObject createObject(Vertex parent) {
+  static GraphObject createObject(GraphStore store, Vertex parent) {
     Vertex v = createChild(parent, ResourceType.OBJECT);
-    return new GraphObject(v);
+    return new GraphObject(store, v);
   }
 
-  static GraphCollection createCollection(Vertex parent) {
+  static GraphCollection createCollection(GraphStore store, Vertex parent) {
     Vertex v = createChild(parent, ResourceType.COLLECTION);
-    return new GraphCollection(v);
+    return new GraphCollection(store, v);
   }
 
   static Vertex createChild(Vertex parent, ResourceType type) {
@@ -95,8 +95,8 @@ class GraphResourceUtils {
     return Labels.resourceTypeOf(vertex.label());
   }
 
-  static Option<AbstractGraphResource> toResource(Vertex v) {
-    return typeOf(v).flatMap(adapters::get).map(f -> f.apply(v));
+  static Option<AbstractGraphResource> toResource(GraphStore store, Vertex v) {
+    return typeOf(v).flatMap(adapters::get).map(f -> f.apply(store, v));
   }
 
   // ------------------------------------------------------
