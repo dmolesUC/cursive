@@ -8,6 +8,8 @@ import org.cdlib.cursive.core.ResourceType;
 import org.cdlib.cursive.core.async.AsyncResource;
 import org.cdlib.cursive.core.async.AsyncStore;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 public interface AsyncPcdmObject extends AsyncResource {
   Maybe<AsyncPcdmObject> parentObject();
 
@@ -15,11 +17,9 @@ public interface AsyncPcdmObject extends AsyncResource {
 
   @SuppressWarnings("unchecked")
   default Maybe<AsyncResource> parent() {
-    // TODO: figure out why this doesn't work
-
-    Flowable<AsyncResource> f = Maybe.mergeArray(parentCollection(), parentObject());
-
-    return Maybe.ambArray(parentObject(), parentCollection());
+    Maybe<AsyncPcdmCollection> parentCol = parentCollection();
+    Maybe<AsyncPcdmObject> parentObj = parentObject();
+    return Maybe.mergeArray(parentCol, parentObj).firstElement();
   }
 
   Observable<AsyncPcdmFile> memberFiles();

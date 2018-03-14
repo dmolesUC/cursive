@@ -1,5 +1,6 @@
 package org.cdlib.cursive.api.s11n;
 
+import io.reactivex.Maybe;
 import io.vavr.collection.List;
 import io.vavr.collection.Set;
 import io.vavr.control.Option;
@@ -15,9 +16,8 @@ import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.cdlib.cursive.api.s11n.Pcdm.*;
-import static org.cdlib.cursive.util.RxAssertions.valueEmittedBy;
+import static org.cdlib.cursive.util.RxAssertions.*;
 
 class ResultFactoryTest {
 
@@ -116,10 +116,33 @@ class ResultFactoryTest {
 
       @Test
       void includesParentLink() {
-        URI expected = URI.create(parent.path());
-        Option<Link> parentLink = result.links().find(l -> MEMBER_OF.equals(l.rel()));
-        assertThat(parentLink).isNotEmpty();
-        parentLink.forEach(l -> assertThat(l.target()).isEqualTo(expected));
+        assertThat(valueEmittedBy(object.parent())).isEqualTo(parent); // just to be sure
+
+        Link expected = new Link(MEMBER_OF, URI.create(parent.path()));
+        Set<Link> links = result.links();
+        assertThat(links).contains(expected);
+      }
+    }
+
+    @Nested
+    class Maybes {
+      @SuppressWarnings("unchecked")
+      final <A> Maybe<A> combine(Maybe<A> m1, Maybe<A> m2) {
+        return Maybe.mergeArray(m1, m2).firstElement();
+      }
+
+      @Test
+      void combine() {
+        String a = "a";
+        String b = "b";
+        Maybe<String> xa = combine(Maybe.just(a), Maybe.empty());
+        assertThat(valueEmittedBy(xa)).isEqualTo(a);
+
+        Maybe<String> xb = combine(Maybe.empty(), Maybe.just(b));
+        assertThat(valueEmittedBy(xb)).isEqualTo(b);
+
+        Maybe<?> xn = combine(Maybe.empty(), Maybe.empty());
+        assertThat(xn.test()).observedNothing();
       }
     }
 
