@@ -38,7 +38,7 @@ class Link {
 
   @Override
   public String toString() {
-    return "Link(" + rel + ", " + target + ")";
+    return rel + " -> " + target;
   }
 
   @Override

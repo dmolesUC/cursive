@@ -13,11 +13,9 @@ class ResultFactory {
 
   @SuppressWarnings("unchecked")
   public Single<LinkedResult> toResult(AsyncPcdmObject object) {
-    return Observable.ambArray(
-      object.parent().map(p -> new Link(Pcdm.MEMBER_OF, p.path())).toObservable(),
-      // TODO: figure out why this doesn't work
+    return Observable.mergeArray(
+      object.parent().toObservable().map(p -> new Link(Pcdm.MEMBER_OF, p.path())),
       object.memberFiles().map(f -> new Link(Pcdm.HAS_FILE, f.path())),
-      // TODO: figure out why this doesn't work
       object.memberObjects().map(o -> new Link(Pcdm.HAS_MEMBER, o.path())),
       object.relatedObjects().map(o1 -> new Link(Pcdm.HAS_RELATED_OBJECT, o1.path())),
       object.incomingRelations().flatMap(r -> r.fromObject().toObservable()).map(o2 -> new Link(Pcdm.RELATED_OBJECT_OF, o2.path()))

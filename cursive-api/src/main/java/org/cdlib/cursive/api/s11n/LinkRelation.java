@@ -38,7 +38,7 @@ public class LinkRelation {
 
   @Override
   public String toString() {
-    return "LinkRelation(" + namespace + ", " + term + ")";
+    return namespace +":" + term;
   }
 
   @Override

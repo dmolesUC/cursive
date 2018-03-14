@@ -1,5 +1,6 @@
 package org.cdlib.cursive.pcdm.async;
 
+import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -15,7 +16,10 @@ public interface AsyncPcdmObject extends AsyncResource {
   @SuppressWarnings("unchecked")
   default Maybe<AsyncResource> parent() {
     // TODO: figure out why this doesn't work
-    return Maybe.ambArray(parentCollection(), parentObject());
+
+    Flowable<AsyncResource> f = Maybe.mergeArray(parentCollection(), parentObject());
+
+    return Maybe.ambArray(parentObject(), parentCollection());
   }
 
   Observable<AsyncPcdmFile> memberFiles();

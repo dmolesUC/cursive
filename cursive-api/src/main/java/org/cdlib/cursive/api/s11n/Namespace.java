@@ -31,7 +31,7 @@ public class Namespace {
 
   @Override
   public String toString() {
-    return "Namespace(" + prefix + ", " + uriBase + ")";
+    return prefix + "(" + uriBase +")";
   }
 
   @Override

@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import java.net.URI;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.cdlib.cursive.api.s11n.Pcdm.*;
 import static org.cdlib.cursive.util.RxAssertions.valueEmittedBy;
 
 class ResultFactoryTest {
@@ -56,7 +57,7 @@ class ResultFactoryTest {
     @Test
     void includesParentLink() {
       URI expected = URI.create(parent.path());
-      Option<Link> parentLink = result.links().find(l -> Pcdm.FILE_OF.equals(l.rel()));
+      Option<Link> parentLink = result.links().find(l -> FILE_OF.equals(l.rel()));
       assertThat(parentLink).isNotEmpty();
       parentLink.forEach(l -> assertThat(l.target()).isEqualTo(expected));
     }
@@ -116,7 +117,7 @@ class ResultFactoryTest {
       @Test
       void includesParentLink() {
         URI expected = URI.create(parent.path());
-        Option<Link> parentLink = result.links().find(l -> Pcdm.MEMBER_OF.equals(l.rel()));
+        Option<Link> parentLink = result.links().find(l -> MEMBER_OF.equals(l.rel()));
         assertThat(parentLink).isNotEmpty();
         parentLink.forEach(l -> assertThat(l.target()).isEqualTo(expected));
       }
@@ -135,10 +136,11 @@ class ResultFactoryTest {
 
       @Test
       void includesParentLink() {
-        URI expected = URI.create(parent.path());
-        Option<Link> parentLink = result.links().find(l -> Pcdm.MEMBER_OF.equals(l.rel()));
-        assertThat(parentLink).isNotEmpty();
-        parentLink.forEach(l -> assertThat(l.target()).isEqualTo(expected));
+        assertThat(valueEmittedBy(object.parent())).isEqualTo(parent); // just to be sure
+
+        Link expected = new Link(MEMBER_OF, URI.create(parent.path()));
+        Set<Link> links = result.links();
+        assertThat(links).contains(expected);
       }
     }
 
@@ -154,12 +156,12 @@ class ResultFactoryTest {
         childFiles = List.fill(3, () -> valueEmittedBy(object.createFile()));
         result = valueEmittedBy(factory.toResult(object));
       }
-      
+
       @Test
       void includesChildObjects() {
         Set<Link> links = result.links();
         for (AsyncPcdmObject childObject : childObjects) {
-          assertThat(links).contains(new Link(Pcdm.HAS_MEMBER, childObject.path()));
+          assertThat(links).contains(new Link(HAS_MEMBER, childObject.path()));
         }
       }
 
@@ -167,7 +169,7 @@ class ResultFactoryTest {
       void includesChildFiles() {
         Set<Link> links = result.links();
         for (AsyncPcdmFile childFile : childFiles) {
-          assertThat(links).contains(new Link(Pcdm.HAS_MEMBER, childFile.path()));
+          assertThat(links).contains(new Link(HAS_FILE, childFile.path()));
         }
       }
     }

@@ -110,6 +110,7 @@ public abstract class AbstractAsyncStoreTest<S extends AsyncStore> {
       assertThat(memberObjectsObserver).observedExactly(child);
 
       assertThat(valueEmittedBy(child.parentCollection())).isEqualTo(parent);
+      assertThat(valueEmittedBy(child.parent())).isEqualTo(parent);
 
       TestObserver<AsyncPcdmObject> allObjectsObserver = store.objects().test();
       assertThat(allObjectsObserver).observed(child);
@@ -140,6 +141,7 @@ public abstract class AbstractAsyncStoreTest<S extends AsyncStore> {
       assertThat(memberObjectsObserver).observedExactly(child);
 
       assertThat(valueEmittedBy(child.parentObject())).isEqualTo(parent);
+      assertThat(valueEmittedBy(child.parent())).isEqualTo(parent);
 
       TestObserver<AsyncPcdmObject> allObjectsObserver = store.objects().test();
       assertThat(allObjectsObserver).observed(parent, child);
