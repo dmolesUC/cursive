@@ -3,7 +3,7 @@ apply plugin: 'application'
 mainClassName = 'io.vertx.core.Launcher'
 
 ext {
-  vertxVersion = '3.5.0'
+  vertxVersion = '3.5.1'
 }
 
 dependencies {
@@ -14,7 +14,7 @@ dependencies {
 
   compile 'javax.ws.rs:javax.ws.rs-api:2.1'
 
-  compile 'com.theoryinpractise:halbuilder5:5.1.2'
+  compile 'com.theoryinpractise:halbuilder5:5.1.3'
   compileOnly 'org.derive4j:derive4j-annotation:0.12.3' // avoid HalBuilder-related compile warnings
 
   compile 'com.github.jsonld-java:jsonld-java:0.11.1'
@@ -22,7 +22,7 @@ dependencies {
   testCompile project(':cursive-test')
 
   testCompile "io.vertx:vertx-unit:${vertxVersion}"
-  testCompile 'net.javacrumbs.json-unit:json-unit:1.25.1'
+  testCompile 'net.javacrumbs.json-unit:json-unit:1.28.2'
 }
 
 test {

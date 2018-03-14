@@ -3,12 +3,12 @@ buildscript {
     jcenter()
   }
   dependencies {
-    classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.0'
+    classpath 'org.junit.platform:junit-platform-gradle-plugin:1.1.0'
   }
 }
 
 task wrapper(type: Wrapper) {
-  gradleVersion = '4.2.1'
+  gradleVersion = '4.6'
 }
 
 subprojects {
@@ -26,11 +26,10 @@ subprojects {
 
     slf4jVersion = '1.7.25'
 
-    junitJupiterVersion = '5.0.2'
-    junitVintageVersion = '4.12.2'
+    junitVersion = '5.1.0'
 
-    mockitoVersion = '2.13.0'
-    assertJVersion = '3.8.0'
+    mockitoVersion = '2.16.0'
+    assertJVersion = '3.9.1'
 
     nettyVersion = "4.1.19.Final"
   }
@@ -67,10 +66,10 @@ subprojects {
     // ------------------------------------------------------------
     // Testing
 
-    testCompile "org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion"
-    testCompile "org.junit.jupiter:junit-jupiter-params:$junitJupiterVersion"
-    testRuntime "org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion"
-    testCompile "org.junit.vintage:junit-vintage-engine:$junitVintageVersion"
+    testCompile "org.junit.jupiter:junit-jupiter-api:$junitVersion"
+    testCompile "org.junit.jupiter:junit-jupiter-params:$junitVersion"
+    testRuntime "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
+    testCompile "org.junit.vintage:junit-vintage-engine:$junitVersion"
 
     // TODO: when JUnit 5.1.0 ships, remove apiguardian dependency
     // https://github.com/junit-team/junit5/issues/1104
