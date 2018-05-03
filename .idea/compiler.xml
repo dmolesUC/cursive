@@ -12,6 +12,8 @@
       <module name="cursive-test_test" target="1.10" />
       <module name="cursive-util_main" target="1.10" />
       <module name="cursive-util_test" target="1.10" />
+      <module name="kufi_main" target="1.10" />
+      <module name="kufi_test" target="1.10" />
     </bytecodeTargetLevel>
   </component>
 </project>
