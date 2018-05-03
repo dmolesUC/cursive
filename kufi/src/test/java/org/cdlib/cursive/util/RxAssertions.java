@@ -1,5 +1,6 @@
 package org.cdlib.cursive.util;
 
+import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -11,6 +12,19 @@ public class RxAssertions extends Assertions {
 
   public static <T> TestObserverAssert<T> assertThat(TestObserver<T> actual) {
     return TestObserverAssert.assertThat(actual);
+  }
+
+  public static boolean completed(Completable c) {
+    assertThat(c).isNotNull();
+    var observer = c.test();
+    observer.awaitTerminalEvent();
+    assertThat(observer).observedNoErrors();
+    return true;
+  }
+
+  public static Throwable errorEmittedBy(Completable c) {
+    assertThat(c).isNotNull();
+    return errorObservedBy(c.test());
   }
 
   public static <T> T valueEmittedBy(Single<T> single) {
@@ -28,15 +42,22 @@ public class RxAssertions extends Assertions {
     return errorObservedBy(maybe.test());
   }
 
+  public static Throwable errorEmittedBy(Single<?> single) {
+    assertThat(single).isNotNull();
+    return errorObservedBy(single.test());
+  }
+
   private static Throwable errorObservedBy(TestObserver<?> observer) {
     assertThat(observer).isNotNull();
+    observer.awaitTerminalEvent();
     assertThat(observer.errorCount()).isEqualTo(1);
-    List<Throwable> errors = List.ofAll(observer.errors());
+    var errors = List.ofAll(observer.errors());
     return errors.head();
   }
 
   private static <T> T valueObservedBy(TestObserver<T> observer) {
     assertThat(observer).isNotNull();
+    observer.awaitTerminalEvent();
     assertThat(observer).observedNoErrors();
     assertThat(observer).hasValueCount(1);
     return firstValueObservedBy(observer);
@@ -48,13 +69,12 @@ public class RxAssertions extends Assertions {
 
   private static <T> List<T> valuesObservedBy(TestObserver<T> observer) {
     assertThat(observer).isNotNull();
+    observer.awaitTerminalEvent();
     assertThat(observer).observedNoErrors();
     return List.ofAll(observer.values());
   }
 
   private static <T> T firstValueObservedBy(TestObserver<T> observer) {
-    assertThat(observer).isNotNull();
-    assertThat(observer).observedNoErrors();
     return valuesObservedBy(observer).head();
   }
 }

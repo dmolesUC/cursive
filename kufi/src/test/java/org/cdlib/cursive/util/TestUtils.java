@@ -14,7 +14,7 @@ public class TestUtils {
   public static final UUID NIL_UUID = new UUID(0, 0);
 
   public static String getResourceAsString(String resource) {
-    URL resourceUrl = Option.of(TestUtils.class.getClassLoader().getResource(resource))
+    var resourceUrl = Option.of(TestUtils.class.getClassLoader().getResource(resource))
       .getOrElseThrow(() -> new IllegalArgumentException("No such resource: " + resource));
 
     try {

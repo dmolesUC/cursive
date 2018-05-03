@@ -74,12 +74,12 @@ class StoreState {
     return childToParent.get(uuid);
   }
 
-  private Traversable<MemoryResource<?>> findChildren(UUID uuid) {
-    return parentToChildren.get(uuid).getOrElse(HashSet.empty());
+  boolean hasChildren(UUID id) {
+    return parentToChildren.containsKey(id);
   }
 
   // ------------------------------
-  // Creators
+  // Creators & Deletors
 
   Result<Workspace> createWorkspace(MemoryStore store) {
     var id = newId();
@@ -101,8 +101,47 @@ class StoreState {
     return Result.of(collection, storeNext);
   }
 
+  StoreState delete(MemoryResource<?> r) {
+    var id = r.id();
+    parentToChildren.get(id).forEach(children -> {
+      throw new IllegalStateException("Can't delete " + r + "; " + children.length() + " children");
+    });
+    var txNext = 1 + tx;
+    var rsNext = resources.remove(id);
+    var p2cNext = childToParent.get(id).map(p -> parentToChildren.remove(p.id(), r)).getOrElse(parentToChildren);
+    var c2pNext = childToParent.remove(id);
+    return new StoreState(txNext, rsNext, p2cNext, c2pNext);
+  }
+
+  StoreState deleteRecursive(MemoryResource<?> r) {
+    var txNext = 1 + tx;
+    return deleteRecursive(r, txNext);
+  }
+
   // ------------------------------------------------------------
   // Private instance methods
+
+  private Traversable<MemoryResource<?>> findChildren(UUID uuid) {
+    return parentToChildren.get(uuid).getOrElse(HashSet.empty());
+  }
+
+  /**
+   * Recursively delete the specified resource and its children without incrementing
+   * the transaction.
+   *
+   * @param r The resource to delete.
+   * @param txNext The final transaction.
+   * @return The final state.
+   */
+  private StoreState deleteRecursive(MemoryResource<?> r, long txNext) {
+    var id = r.id();
+    var rsNext = resources.remove(id);
+    var p2cNext = childToParent.get(id).map(p -> parentToChildren.remove(p.id(), r)).getOrElse(parentToChildren);
+    var c2pNext = childToParent.remove(id);
+    var storeNext = new StoreState(txNext, rsNext, p2cNext, c2pNext);
+    var children = p2cNext.get(id).getOrElse(HashSet.empty());
+    return children.foldLeft(storeNext, (s, c) -> s.deleteRecursive(c, txNext));
+  }
 
   private static UUID newId() {
     return generator.get().generate();

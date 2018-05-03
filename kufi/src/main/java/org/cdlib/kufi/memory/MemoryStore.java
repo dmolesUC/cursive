@@ -1,5 +1,6 @@
 package org.cdlib.kufi.memory;
 
+import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -36,6 +37,23 @@ public class MemoryStore implements Store {
   }
 
   @Override
+  public Completable deleteWorkspace(Workspace ws, boolean recursive) {
+    synchronized (mutex) {
+      if (recursive) {
+        state = state.deleteRecursive((MemoryWorkspace) ws);
+        return Completable.complete();
+      } else {
+        try {
+          state = state.delete((MemoryWorkspace) ws);
+          return Completable.complete();
+        } catch (Exception e) {
+          return Completable.error(e);
+        }
+      }
+    }
+  }
+
+  @Override
   public Single<Collection> createCollection(Workspace parent) {
     synchronized (mutex) {
       var result = state.createCollection(this, (MemoryWorkspace) parent);
@@ -57,9 +75,8 @@ public class MemoryStore implements Store {
     return Observable.fromIterable(children);
   }
 
-  Single<Resource<?>> findParentOf(Resource<?> child) {
-    var parent = state.findParent(child.id())
-      .getOrElseThrow(() -> new NoSuchElementException("No parent found for resource: " + child));
-    return Single.just(parent);
+  Single<? extends Resource<?>> findParentOf(Resource<?> child) {
+    return state.findParent(child.id()).map(Single::just)
+      .getOrElse(() -> Single.error(new NoSuchElementException("No parent found for resource: " + child)));
   }
 }
