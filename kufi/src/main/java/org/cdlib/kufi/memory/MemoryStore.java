@@ -4,6 +4,7 @@ import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import io.vavr.control.Option;
 import org.cdlib.kufi.*;
 
 import java.util.NoSuchElementException;
@@ -23,32 +24,36 @@ public class MemoryStore implements Store {
   // Store
 
   @Override
-  public Single<Long> transaction() {
+  public Single<Transaction> transaction() {
     return just(state.transaction());
   }
 
   @Override
   public Single<Workspace> createWorkspace() {
     synchronized (mutex) {
-      var result = state.createWorkspace(this);
-      state = result.state();
-      return just(result.value());
+      try {
+        var result = state.createWorkspace(this);
+        state = result.stateNext();
+        return just(result.resource());
+      } catch (Exception e) {
+        return Single.error(e);
+      }
     }
   }
 
   @Override
   public Completable deleteWorkspace(Workspace ws, boolean recursive) {
     synchronized (mutex) {
-      if (recursive) {
-        state = state.deleteRecursive((MemoryWorkspace) ws);
-        return Completable.complete();
-      } else {
-        try {
-          state = state.delete((MemoryWorkspace) ws);
+      try {
+        if (recursive) {
+          state = state.deleteRecursive(ws);
           return Completable.complete();
-        } catch (Exception e) {
-          return Completable.error(e);
+        } else {
+          state = state.delete(ws);
+          return Completable.complete();
         }
+      } catch (Exception e) {
+        return Completable.error(e);
       }
     }
   }
@@ -56,15 +61,58 @@ public class MemoryStore implements Store {
   @Override
   public Single<Collection> createCollection(Workspace parent) {
     synchronized (mutex) {
-      var result = state.createCollection(this, (MemoryWorkspace) parent);
-      state = result.state();
-      return just(result.value());
+      try {
+        var result = state.createChild(this, parent, MemoryCollection::new, MemoryWorkspace::new);
+        state = result.stateNext();
+        return just(result.resource());
+      } catch (Exception e) {
+        return Single.error(e);
+      }
+    }
+  }
+
+  @Override
+  public Single<Collection> createCollection(Collection parent) {
+    synchronized (mutex) {
+      try {
+        var result = state.createChild(this, parent, MemoryCollection::new, MemoryCollection::new);
+        state = result.stateNext();
+        return just(result.resource());
+      } catch (Exception e) {
+        return Single.error(e);
+      }
+    }
+  }
+
+  @Override
+  public Completable deleteCollection(Collection ws, boolean recursive) {
+    synchronized (mutex) {
+      try {
+        if (recursive) {
+          state = state.deleteRecursive(ws);
+          return Completable.complete();
+        } else {
+          state = state.delete(ws);
+          return Completable.complete();
+        }
+      } catch (Exception e) {
+        return Completable.error(e);
+      }
     }
   }
 
   @Override
   public <R extends Resource<R>> Maybe<R> find(UUID id, ResourceType<R> type) {
-    return state.find(id).flatMap(resource -> resource.as(type)).map(Maybe::just).getOrElse(Maybe.empty());
+    try {
+      Option<Resource<?>> r = state.find(id);
+      Option<R> r2 = r.flatMap(r1 -> r1.as(type));
+      Option<Maybe<R>> m = r2.map(Maybe::just);
+      Maybe<R> m1 = m.getOrElse(Maybe::empty);
+
+      return m1;
+    } catch (Exception e) {
+      return Maybe.error(e);
+    }
   }
 
   // ------------------------------------------------------------
@@ -76,7 +124,7 @@ public class MemoryStore implements Store {
   }
 
   Single<? extends Resource<?>> findParentOf(Resource<?> child) {
-    return state.findParent(child.id()).map(Single::just)
+    return state.findParent(child).map(Single::just)
       .getOrElse(() -> Single.error(new NoSuchElementException("No parent found for resource: " + child)));
   }
 }

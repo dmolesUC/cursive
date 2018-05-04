@@ -25,4 +25,10 @@ public class SingleAssert<T> extends AbstractAssert<SingleAssert<T>, Single<T>> 
     observer.observedNothing();
     return this;
   }
+
+  public SingleAssert<T> emittedOneError() {
+    observer.observedOneError();
+    return this;
+  }
+
 }

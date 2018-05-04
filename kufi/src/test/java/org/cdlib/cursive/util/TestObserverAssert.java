@@ -118,6 +118,23 @@ public class TestObserverAssert<T> extends AbstractAssert<TestObserverAssert<T>,
     return this;
   }
 
+  public TestObserverAssert<T> observedOneError() {
+    if (actual == null) {
+      failWithMessage("Expected TestObserver, but found null instead");
+    } else {
+      var errorCount = actual.errorCount();
+      if (errorCount != 1) {
+        failWithMessage("Expected 1 error, found <%s>",
+          format(
+            List.ofAll(actual.errors())
+              .map(this::formatException)
+          )
+        );
+      }
+    }
+    return this;
+  }
+
   public TestObserverAssert<T> observedNoErrors() {
     if (actual == null) {
       failWithMessage("Expected TestObserver, but found null instead");

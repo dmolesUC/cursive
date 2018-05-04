@@ -25,4 +25,9 @@ public class MaybeAssert<T> extends AbstractAssert<MaybeAssert<T>, Maybe<T>> {
     observer.observedNothing();
     return this;
   }
+
+  public MaybeAssert<T> emitted(T t) {
+    observer.observed(t);
+    return this;
+  }
 }

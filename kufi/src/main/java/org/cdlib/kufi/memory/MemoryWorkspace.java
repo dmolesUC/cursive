@@ -2,6 +2,8 @@ package org.cdlib.kufi.memory;
 
 import io.reactivex.Observable;
 import org.cdlib.kufi.Collection;
+import org.cdlib.kufi.Transaction;
+import org.cdlib.kufi.Version;
 import org.cdlib.kufi.Workspace;
 
 import java.util.UUID;
@@ -14,7 +16,7 @@ class MemoryWorkspace extends MemoryResource<Workspace> implements Workspace {
   // ------------------------------------------------------------
   // Constructor
 
-  MemoryWorkspace(UUID id, long transaction, long version, MemoryStore store) {
+  MemoryWorkspace(UUID id, Transaction transaction, Version version, MemoryStore store) {
     super(WORKSPACE, id, transaction, version, store);
   }
 

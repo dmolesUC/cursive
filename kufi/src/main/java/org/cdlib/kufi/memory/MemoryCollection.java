@@ -3,9 +3,7 @@ package org.cdlib.kufi.memory;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.vavr.control.Either;
-import org.cdlib.kufi.Collection;
-import org.cdlib.kufi.Resource;
-import org.cdlib.kufi.Workspace;
+import org.cdlib.kufi.*;
 
 import java.util.UUID;
 
@@ -17,7 +15,7 @@ class MemoryCollection extends MemoryResource<Collection> implements Collection 
   // ------------------------------------------------------------
   // Constructor
 
-  MemoryCollection(UUID id, long transaction, long version, MemoryStore store) {
+  MemoryCollection(UUID id, Transaction transaction, Version version, MemoryStore store) {
     super(COLLECTION, id, transaction, version, store);
   }
 

@@ -18,15 +18,15 @@ public class RxAssertions extends Assertions {
     return CompletableAssert.assertThat(actual);
   }
 
-  public static ObservableAssert assertThat(Observable actual) {
+  public static <T> ObservableAssert<T> assertThat(Observable<T> actual) {
     return ObservableAssert.assertThat(actual);
   }
 
-  public static SingleAssert assertThat(Single actual) {
+  public static <T> SingleAssert<T> assertThat(Single<T> actual) {
     return SingleAssert.assertThat(actual);
   }
 
-  public static MaybeAssert assertThat(Maybe actual) {
+  public static <T> MaybeAssert<T> assertThat(Maybe<T> actual) {
     return MaybeAssert.assertThat(actual);
   }
 

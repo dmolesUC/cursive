@@ -10,30 +10,16 @@ import static io.vavr.control.Option.some;
 
 public interface Resource<R extends Resource<R>> {
 
-  // ------------------------------------------------------------
-  // Interface methods
-
   UUID id();
 
-  long transaction();
+  Transaction transaction();
 
-  long version();
+  Version version();
 
   ResourceType<R> type();
 
-  // ------------------------------------------------------------
-  // Class methods
+  <R1 extends Resource<R1>> boolean hasType(ResourceType<R1> type);
 
-  default <R1 extends Resource<R1>> boolean hasType(ResourceType<R1> type) {
-    Objects.requireNonNull(type);
-    return type() == type;
-  }
-
-  default <R1 extends Resource<R1>> Option<R1> as(ResourceType<R1> type) {
-    if (hasType(type)) {
-      return some(type.cast(this));
-    }
-    return none();
-  }
+  <R1 extends Resource<R1>> Option<R1> as(ResourceType<R1> type);
 
 }
