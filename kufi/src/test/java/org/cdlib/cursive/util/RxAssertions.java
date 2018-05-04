@@ -14,10 +14,26 @@ public class RxAssertions extends Assertions {
     return TestObserverAssert.assertThat(actual);
   }
 
+  public static CompletableAssert assertThat(Completable actual) {
+    return CompletableAssert.assertThat(actual);
+  }
+
+  public static ObservableAssert assertThat(Observable actual) {
+    return ObservableAssert.assertThat(actual);
+  }
+
+  public static SingleAssert assertThat(Single actual) {
+    return SingleAssert.assertThat(actual);
+  }
+
+  public static MaybeAssert assertThat(Maybe actual) {
+    return MaybeAssert.assertThat(actual);
+  }
+
   public static boolean completed(Completable c) {
     assertThat(c).isNotNull();
     var observer = c.test();
-    observer.awaitTerminalEvent();
+    assertThat(observer.isTerminated()).isTrue();
     assertThat(observer).observedNoErrors();
     return true;
   }

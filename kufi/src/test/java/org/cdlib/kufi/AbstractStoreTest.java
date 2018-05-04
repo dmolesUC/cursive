@@ -49,12 +49,12 @@ public abstract class AbstractStoreTest<S extends Store> {
       var tx = ws.transaction();
 
       var result = store.deleteWorkspace(ws);
-      assertThat(completed(result)).isTrue(); // TODO: clean this up
+      assertThat(result).isComplete();
 
       var newTx = valueEmittedBy(store.transaction());
       assertThat(newTx).isEqualTo(tx + 1);
 
-      assertThat(store.find(ws.id(), WORKSPACE).test()).observedNothing(); // TODO: clean this up
+      assertThat(store.find(ws.id(), WORKSPACE)).emittedNothing();
     }
 
     @Test
@@ -87,13 +87,13 @@ public abstract class AbstractStoreTest<S extends Store> {
       var tx = valueEmittedBy(store.transaction());
 
       var result = store.deleteWorkspace(ws, true);
-      assertThat(completed(result)).isTrue(); // TODO: clean this up
+      assertThat(result).isComplete();
 
       var newTx = valueEmittedBy(store.transaction());
       assertThat(newTx).isEqualTo(tx + 1);
 
-      assertThat(store.find(ws.id(), WORKSPACE).test()).observedNothing(); // TODO: clean this up
-      assertThat(store.find(coll.id(), COLLECTION).test()).observedNothing(); // TODO: clean this up
+      assertThat(store.find(ws.id(), WORKSPACE)).emittedNothing();
+      assertThat(store.find(coll.id(), COLLECTION)).emittedNothing();
 
       assertThat(ws.childCollections().test()).observedNothing();
 
