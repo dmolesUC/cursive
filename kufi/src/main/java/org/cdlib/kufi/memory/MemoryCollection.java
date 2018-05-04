@@ -38,7 +38,7 @@ class MemoryCollection extends MemoryResource<Collection> implements Collection 
   // Class methods
 
   private static Either<Workspace, Collection> toParent(Resource<?> r) {
-    return COLLECTION.cast(r).toEither(() -> WORKSPACE.as(r));
+    return r.as(COLLECTION).toEither(() -> WORKSPACE.cast(r));
   }
 
 }

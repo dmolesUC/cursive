@@ -64,7 +64,7 @@ public class MemoryStore implements Store {
 
   @Override
   public <R extends Resource<R>> Maybe<R> find(UUID id, ResourceType<R> type) {
-    return state.find(id).flatMap(type::cast).map(Maybe::just).getOrElse(Maybe.empty());
+    return state.find(id).flatMap(resource -> resource.as(type)).map(Maybe::just).getOrElse(Maybe.empty());
   }
 
   // ------------------------------------------------------------

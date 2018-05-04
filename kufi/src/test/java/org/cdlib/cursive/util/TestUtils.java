@@ -5,7 +5,6 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 

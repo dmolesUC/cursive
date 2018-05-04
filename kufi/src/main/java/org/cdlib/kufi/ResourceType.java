@@ -2,12 +2,6 @@ package org.cdlib.kufi;
 
 import io.vavr.collection.LinkedHashMap;
 import io.vavr.collection.Map;
-import io.vavr.control.Option;
-
-import java.util.Objects;
-
-import static io.vavr.control.Option.none;
-import static io.vavr.control.Option.some;
 
 /**
  * Enumerated list of resource types. Should be an enum, but
@@ -44,30 +38,16 @@ public final class ResourceType<R extends Resource<R>> {
     return implType;
   }
 
-  public Option<R> cast(Resource<?> resource) {
-    if (is(resource)) {
-      return some(implType.cast(resource));
-    }
-    return none();
+  @Override
+  public String toString() {
+    return implType().getSimpleName();
   }
 
-  // TODO: move to Resource
-  public R as(Resource<?> resource) {
-    if (!is(resource)) {
+  public R cast(Resource<?> resource) {
+    if (!resource.hasType(this)) {
       throw new IllegalArgumentException(String.format("Expected %s, was %s", this, resource.type()));
     }
     return implType.cast(resource);
-  }
-
-  // TODO: move to Resource
-  public boolean is(Resource<?> resource) {
-    Objects.requireNonNull(resource);
-    return resource.type() == this;
-  }
-
-  @Override
-  public String toString() {
-    return implType.getSimpleName();
   }
 
   // ------------------------------------------------------------
@@ -77,7 +57,7 @@ public final class ResourceType<R extends Resource<R>> {
     private static Map<Class<?>, ResourceType<?>> registry = LinkedHashMap.empty();
 
     private static void register(ResourceType<?> rt) {
-      Class<?> implType = rt.implType;
+      Class<?> implType = rt.implType();
       registry.get(implType).forEach(existing -> {
         var msg = String.format("A %s for %s already exists: %s", ResourceType.class.getSimpleName(), implType.getSimpleName(), existing);
         throw new IllegalStateException(msg);

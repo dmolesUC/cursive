@@ -67,7 +67,7 @@ class StoreState {
   }
 
   <R extends Resource<R>> Traversable<R> findChildrenOfType(UUID uuid, ResourceType<R> type) {
-    return findChildren(uuid).filter(type::is).map(type.implType()::cast);
+    return findChildren(uuid).filter(resource -> resource.hasType(type)).map(obj -> type.implType().cast(obj));
   }
 
   Option<MemoryResource<?>> findParent(UUID uuid) {
