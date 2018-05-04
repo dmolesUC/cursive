@@ -3,6 +3,7 @@ package org.cdlib.kufi.memory;
 import com.fasterxml.uuid.Generators;
 import com.fasterxml.uuid.NoArgGenerator;
 import io.vavr.Tuple;
+import io.vavr.Tuple7;
 import io.vavr.collection.*;
 import io.vavr.control.Option;
 import org.cdlib.kufi.*;
@@ -34,7 +35,7 @@ class StoreState {
   private final Transaction tx;
 
   private final Map<UUID, Resource<?>> liveResources;
-  private final Map<UUID, Tombstone> deadResources;
+  private final Map<UUID, Tombstone<?>> deadResources;
 
   private final Multimap<UUID, Link> linksBySource;
   private final Multimap<UUID, Link> linksByTarget;
@@ -46,13 +47,14 @@ class StoreState {
     this(initTransaction(), HashMap.empty(), HashMap.empty(), HashMultimap.withSet().empty(), HashMultimap.withSet().empty());
   }
 
-  private StoreState(Transaction tx, Map<UUID, Resource<?>> liveResources, Map<UUID, Tombstone> deadResources, Multimap<UUID, Link> linksBySource, Multimap<UUID, Link> linksByTarget) {
+  private StoreState(Transaction tx, Map<UUID, Resource<?>> liveResources, Map<UUID, Tombstone<?>> deadResources, Multimap<UUID, Link> linksBySource, Multimap<UUID, Link> linksByTarget) {
     this.tx = tx;
     this.liveResources = liveResources;
     this.deadResources = deadResources;
     this.linksBySource = linksBySource;
     this.linksByTarget = linksByTarget;
   }
+
 
   // ------------------------------------------------------------
   // Package-private instance methods
@@ -66,6 +68,10 @@ class StoreState {
 
   Option<Resource<?>> find(UUID id) {
     return liveResources.get(id);
+  }
+
+  Option<Tombstone<?>> findTombstone(UUID id) {
+    return deadResources.get(id);
   }
 
   <R extends Resource<R>> Traversable<R> findChildrenOfType(UUID id, ResourceType<R> type) {

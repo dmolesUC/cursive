@@ -47,7 +47,13 @@ public abstract class AbstractStoreTest<S extends Store> {
     }
 
     @Test
-    void findOnlyFindsCorrectType() {
+    void findFindsWorkspace() {
+      var ws = valueEmittedBy(store.createWorkspace());
+      assertThat(store.find(ws.id())).emitted(ws);
+    }
+
+    @Test
+    void findWithTypeOnlyFindsCorrectType() {
       var ws = valueEmittedBy(store.createWorkspace());
       for (var type : ResourceType.values()) {
         var actual = store.find(ws.id(), type);
@@ -56,7 +62,7 @@ public abstract class AbstractStoreTest<S extends Store> {
           var wsActual = (Maybe<Workspace>) actual;
           assertThat(wsActual).emitted(ws);
         } else {
-          assertThat(actual).emittedNothing();
+          assertThat(actual).wasEmpty();
         }
       }
     }
@@ -72,7 +78,7 @@ public abstract class AbstractStoreTest<S extends Store> {
       var newTx = valueEmittedBy(store.transaction());
       assertThat(newTx.txid()).isEqualTo(tx + 1);
 
-      assertThat(store.find(ws.id(), WORKSPACE)).emittedNothing();
+      assertThat(store.find(ws.id(), WORKSPACE)).wasEmpty();
     }
 
     @Test
@@ -115,9 +121,9 @@ public abstract class AbstractStoreTest<S extends Store> {
       var newTx = valueEmittedBy(store.transaction());
       assertThat(newTx.txid()).isEqualTo(tx + 1);
 
-      assertThat(store.find(parent.id(), WORKSPACE)).emittedNothing();
-      assertThat(store.find(child.id(), COLLECTION)).emittedNothing();
-      assertThat(store.find(grandchild.id(), COLLECTION)).emittedNothing();
+      assertThat(store.find(parent.id(), WORKSPACE)).wasEmpty();
+      assertThat(store.find(child.id(), COLLECTION)).wasEmpty();
+      assertThat(store.find(grandchild.id(), COLLECTION)).wasEmpty();
 
       assertThat(parent.childCollections().test()).observedNothing();
       assertThat(child.childCollections().test()).observedNothing();
@@ -143,6 +149,12 @@ public abstract class AbstractStoreTest<S extends Store> {
       store.createCollection(ws);
       var newTx = valueEmittedBy(store.transaction());
       assertThat(newTx.txid()).isEqualTo(tx + 1);
+    }
+
+    @Test
+    void findFindsCollection() {
+      var coll = valueEmittedBy(store.createCollection(ws));
+      assertThat(store.find(coll.id())).emitted(coll);
     }
 
     @Test
@@ -201,6 +213,9 @@ public abstract class AbstractStoreTest<S extends Store> {
       var error = errorEmittedBy(result);
       assertThat(error).isNotNull();
 
+      assertThat(store.findDeleted(parent.id())).wasEmpty();
+      assertThat(store.findDeleted(parent.id(), COLLECTION)).wasEmpty();
+
       var newTx = valueEmittedBy(store.transaction());
       assertThat(newTx).isEqualTo(tx);
 
@@ -226,12 +241,15 @@ public abstract class AbstractStoreTest<S extends Store> {
       var result = store.deleteCollection(parent, true);
       assertThat(result).isComplete();
 
+      assertThat(store.findDeleted(parent.id())).wasEmpty();
+      assertThat(store.findDeleted(parent.id(), COLLECTION)).wasEmpty();
+
       var newTx = valueEmittedBy(store.transaction());
       assertThat(newTx.txid()).isEqualTo(tx + 1);
 
-      assertThat(store.find(parent.id(), WORKSPACE)).emittedNothing();
-      assertThat(store.find(child.id(), COLLECTION)).emittedNothing();
-      assertThat(store.find(grandchild.id(), COLLECTION)).emittedNothing();
+      assertThat(store.find(parent.id(), WORKSPACE)).wasEmpty();
+      assertThat(store.find(child.id(), COLLECTION)).wasEmpty();
+      assertThat(store.find(grandchild.id(), COLLECTION)).wasEmpty();
 
       assertThat(parent.childCollections().test()).observedNothing();
       assertThat(child.childCollections().test()).observedNothing();

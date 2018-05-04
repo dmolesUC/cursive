@@ -2,18 +2,18 @@ package org.cdlib.kufi;
 
 import java.util.Objects;
 
-public final class Tombstone {
+public final class Tombstone<R extends Resource<R>> {
 
   // ------------------------------------------------------------
   // Fields
 
   private final Transaction tx;
-  private final Resource<?> resource;
+  private final Resource<R> resource;
 
   // ------------------------------------------------------------
   // Constructor
 
-  public Tombstone(Transaction tx, Resource<?> resource) {
+  public Tombstone(Transaction tx, Resource<R> resource) {
     this.tx = Objects.requireNonNull(tx);
     this.resource = Objects.requireNonNull(resource);
   }
@@ -25,7 +25,7 @@ public final class Tombstone {
     return tx;
   }
 
-  public Resource<?> resource() {
+  public Resource<R> resource() {
     return resource;
   }
 

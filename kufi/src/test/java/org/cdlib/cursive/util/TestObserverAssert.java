@@ -4,7 +4,10 @@ import io.reactivex.observers.TestObserver;
 import io.vavr.collection.Array;
 import io.vavr.collection.List;
 import io.vavr.collection.Traversable;
+import io.vavr.control.Option;
 import org.assertj.core.api.AbstractAssert;
+
+import java.util.function.Predicate;
 
 public class TestObserverAssert<T> extends AbstractAssert<TestObserverAssert<T>, TestObserver<T>> {
 
@@ -92,6 +95,25 @@ public class TestObserverAssert<T> extends AbstractAssert<TestObserverAssert<T>,
         var values = List.ofAll(actual.values());
         if (!values.containsAll(expected)) {
           failWithMessage("Expected values <%s> not found; values: <%s>", expected, format(values));
+        }
+      }
+    }
+    return this;
+  }
+
+  public TestObserverAssert<T> observed(Predicate<? super T> predicate) {
+    if (actual == null) {
+      failWithMessage("Expected TestObserver, but found null instead");
+    } else {
+      var values = List.ofAll(actual.values());
+      var valueCount = actual.valueCount();
+      if (valueCount == 0) {
+        failWithMessage("Expected value, found nothing");
+      } else {
+        Option<T> found = values.find(predicate);
+
+        if (!values.contains(expectedValue)) {
+          failWithMessage("Expected value <%s> not found; values: <%s>", expectedValue, format(values));
         }
       }
     }

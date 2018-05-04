@@ -3,6 +3,8 @@ package org.cdlib.cursive.util;
 import io.reactivex.Maybe;
 import org.assertj.core.api.AbstractAssert;
 
+import java.util.function.Predicate;
+
 public class MaybeAssert<T> extends AbstractAssert<MaybeAssert<T>, Maybe<T>> {
 
   private final TestObserverAssert<T> observer;
@@ -21,13 +23,18 @@ public class MaybeAssert<T> extends AbstractAssert<MaybeAssert<T>, Maybe<T>> {
     return this;
   }
 
-  public MaybeAssert<T> emittedNothing() {
+  public MaybeAssert<T> wasEmpty() {
     observer.observedNothing();
     return this;
   }
 
   public MaybeAssert<T> emitted(T t) {
     observer.observed(t);
+    return this;
+  }
+
+  public MaybeAssert<T> emitted(Predicate<? super T> predicate) {
+    observer.observed(predicate);
     return this;
   }
 }

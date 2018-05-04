@@ -8,7 +8,13 @@ import java.util.UUID;
 
 public interface Store {
 
+  // ------------------------------------------------------------
+  // State
+
   Single<Transaction> transaction();
+
+  // ------------------------------------------------------------
+  // Workspaces
 
   Single<Workspace> createWorkspace();
 
@@ -17,6 +23,9 @@ public interface Store {
   }
 
   Completable deleteWorkspace(Workspace ws, boolean recursive);
+
+  // ------------------------------------------------------------
+  // Collections
 
   Single<Collection> createCollection(Workspace parent);
 
@@ -28,5 +37,16 @@ public interface Store {
 
   Completable deleteCollection(Collection ws, boolean recursive);
 
+  // ------------------------------------------------------------
+  // Finders
+
+  Maybe<Resource<?>> find(UUID id);
+
+  Maybe<Tombstone<?>> findTombstone(UUID id);
+
   <R extends Resource<R>> Maybe<R> find(UUID id, ResourceType<R> type);
+
+  Maybe<Tombstone<?>> findDeleted(UUID id);
+
+  <R extends Resource<R>> Maybe<Tombstone<R>> findDeleted(UUID id, ResourceType<R> type);
 }
