@@ -4,7 +4,6 @@ import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
-import io.vavr.control.Option;
 import org.cdlib.kufi.*;
 
 import java.util.NoSuchElementException;
@@ -62,7 +61,7 @@ public class MemoryStore implements Store {
   public Single<Collection> createCollection(Workspace parent) {
     synchronized (mutex) {
       try {
-        var result = state.createChild(this, parent, MemoryCollection::new, MemoryWorkspace::new);
+        var result = state.createChild(this, parent, (id, version, store) -> new MemoryCollection(id, version, store), (id, version, store) -> new MemoryWorkspace(id, version, store));
         state = result.stateNext();
         return just(result.resource());
       } catch (Exception e) {
@@ -75,7 +74,7 @@ public class MemoryStore implements Store {
   public Single<Collection> createCollection(Collection parent) {
     synchronized (mutex) {
       try {
-        var result = state.createChild(this, parent, MemoryCollection::new, MemoryCollection::new);
+        var result = state.createChild(this, parent, (id, version, store) -> new MemoryCollection(id, version, store), (id, version, store) -> new MemoryCollection(id, version, store));
         state = result.stateNext();
         return just(result.resource());
       } catch (Exception e) {

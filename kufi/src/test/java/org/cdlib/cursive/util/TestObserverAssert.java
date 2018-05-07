@@ -4,7 +4,6 @@ import io.reactivex.observers.TestObserver;
 import io.vavr.collection.Array;
 import io.vavr.collection.List;
 import io.vavr.collection.Traversable;
-import io.vavr.control.Option;
 import org.assertj.core.api.AbstractAssert;
 
 import java.util.function.Predicate;

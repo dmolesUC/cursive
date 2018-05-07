@@ -3,7 +3,6 @@ package org.cdlib.kufi;
 import org.cdlib.kufi.util.TimeUtil;
 
 import java.time.ZonedDateTime;
-import java.util.Objects;
 
 import static org.cdlib.kufi.util.TimeUtil.utcNow;
 

@@ -1,6 +1,5 @@
 package org.cdlib.cursive.util;
 
-import io.reactivex.Completable;
 import io.reactivex.Observable;
 import org.assertj.core.api.AbstractAssert;
 

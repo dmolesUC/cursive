@@ -3,7 +3,6 @@ package org.cdlib.kufi.memory;
 import com.fasterxml.uuid.Generators;
 import com.fasterxml.uuid.NoArgGenerator;
 import io.vavr.Tuple;
-import io.vavr.Tuple7;
 import io.vavr.collection.*;
 import io.vavr.control.Option;
 import org.cdlib.kufi.*;
@@ -93,7 +92,7 @@ class StoreState {
   CreateResult<Workspace> createWorkspace(MemoryStore store) {
     var id = newId();
     var txNext = tx.next();
-    var ws = new MemoryWorkspace(id, txNext, initVersion(), store);
+    var ws = new MemoryWorkspace(id, initVersion(txNext), store);
     var lrNext = liveResources.put(id, ws);
 
     var storeNext = new StoreState(txNext, lrNext, deadResources, linksBySource, linksByTarget);
@@ -108,8 +107,8 @@ class StoreState {
     var childId = newId();
     var txNext = tx.next();
 
-    var child = builder.build(childId, txNext, initVersion(), store);
-    var parentNext = pBuilder.build(parentId, txNext, parentVersionCurrent.next(), store);
+    var child = builder.build(childId, initVersion(txNext), store);
+    var parentNext = pBuilder.build(parentId, parentVersionCurrent.next(txNext), store);
 
     var p2c = Link.create(parent, PARENT_OF, child, txNext);
     var c2p = Link.create(child, CHILD_OF, parent, txNext);
@@ -185,7 +184,7 @@ class StoreState {
   private <R extends Resource<R>> R findAs(UUID id, ResourceType<R> type) {
     return liveResources.get(id).flatMap(r -> r.as(type)).getOrElseThrow(() -> new ResourceNotFoundException(id, type));
   }
-  
+
   private Resource<?> current(Resource<?> resource) {
     var id = resource.id();
     var type = resource.type();

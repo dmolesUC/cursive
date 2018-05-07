@@ -15,16 +15,14 @@ public abstract class AbstractResource<R extends Resource<R>> implements Resourc
 
   private final ResourceType<R> type;
   private final UUID id;
-  private final Transaction transaction;
   private final Version version;
 
   // ------------------------------------------------------------
   // Constructor
 
-  public AbstractResource(ResourceType<R> type, UUID id, Transaction transaction, Version version) {
+  public AbstractResource(ResourceType<R> type, UUID id, Version version) {
     this.type = Objects.requireNonNull(type);
     this.id = Objects.requireNonNull(id);
-    this.transaction = Objects.requireNonNull(transaction);
     this.version = Objects.requireNonNull(version);
   }
 
@@ -34,11 +32,6 @@ public abstract class AbstractResource<R extends Resource<R>> implements Resourc
   @Override
   public final UUID id() {
     return id;
-  }
-
-  @Override
-  public final Transaction transaction() {
-    return transaction;
   }
 
   @Override
@@ -74,9 +67,6 @@ public abstract class AbstractResource<R extends Resource<R>> implements Resourc
     }
 
     var that = (AbstractResource<?>) o;
-    if (!transaction.equals(that.transaction)) {
-      return false;
-    }
     if (!version.equals(that.version)) {
       return false;
     }
@@ -90,7 +80,6 @@ public abstract class AbstractResource<R extends Resource<R>> implements Resourc
   public int hashCode() {
     var result = type.hashCode();
     result = 31 * result + id.hashCode();
-    result = 31 * result + transaction.hashCode();
     result = 31 * result + version.hashCode();
     return result;
   }

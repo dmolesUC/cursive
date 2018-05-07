@@ -1,10 +1,6 @@
 package org.cdlib.kufi;
 
-import org.cdlib.kufi.util.TimeUtil;
-
-import java.time.ZonedDateTime;
-
-import static org.cdlib.kufi.util.TimeUtil.utcNow;
+import java.util.Objects;
 
 public final class Version implements Comparable<Version> {
 
@@ -12,18 +8,18 @@ public final class Version implements Comparable<Version> {
   // Fields
 
   private final long vid;
-  private final ZonedDateTime timestamp;
+  private final Transaction transaction;
 
   // ------------------------------------------------------------
   // Constructor
 
-  public static Version initVersion() {
-    return new Version(0L, utcNow());
+  public static Version initVersion(Transaction txNext) {
+    return new Version(0L, txNext);
   }
 
-  public Version(long vid, ZonedDateTime timestamp) {
+  public Version(long vid, Transaction transaction) {
     this.vid = vid;
-    this.timestamp = TimeUtil.requireUTC(timestamp);
+    this.transaction = Objects.requireNonNull(transaction);
   }
 
   // ------------------------------------------------------------
@@ -33,12 +29,12 @@ public final class Version implements Comparable<Version> {
     return vid;
   }
 
-  public ZonedDateTime timestamp() {
-    return timestamp;
+  public Transaction transaction() {
+    return transaction;
   }
 
-  public Version next() {
-    return new Version(vid + 1, utcNow());
+  public Version next(Transaction txNext) {
+    return new Version(vid + 1, txNext);
   }
 
   // ------------------------------------------------------------
@@ -53,7 +49,7 @@ public final class Version implements Comparable<Version> {
     if (order != 0) {
       return order;
     }
-    return timestamp.compareTo(o.timestamp);
+    return transaction.compareTo(o.transaction);
   }
 
   // ------------------------------------------------------------
@@ -72,18 +68,18 @@ public final class Version implements Comparable<Version> {
     if (vid != that.vid) {
       return false;
     }
-    return timestamp.equals(that.timestamp);
+    return transaction.equals(that.transaction);
   }
 
   @Override
   public int hashCode() {
     var result = (int) (vid ^ (vid >>> 32));
-    result = 31 * result + timestamp.hashCode();
+    result = 31 * result + transaction.hashCode();
     return result;
   }
 
   @Override
   public String toString() {
-    return "Version(" + vid + ", " + timestamp + ")";
+    return "Version(" + vid + ", " + transaction + ")";
   }
 }
