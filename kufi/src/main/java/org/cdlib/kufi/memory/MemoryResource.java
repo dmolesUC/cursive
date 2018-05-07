@@ -1,5 +1,6 @@
 package org.cdlib.kufi.memory;
 
+import io.vavr.collection.Array;
 import org.cdlib.kufi.*;
 
 import java.util.UUID;
@@ -13,4 +14,8 @@ public class MemoryResource<R extends Resource<R>> extends AbstractResource<R> {
     this.store = store;
   }
 
+  @Override
+  public final String toString() {
+    return Array.of(id(), transaction(), version(), store).mkString(getClass().getSimpleName() + "(", ", ", ")");
+  }
 }

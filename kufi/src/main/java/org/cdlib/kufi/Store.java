@@ -46,7 +46,5 @@ public interface Store {
 
   <R extends Resource<R>> Maybe<R> find(UUID id, ResourceType<R> type);
 
-  Maybe<Tombstone<?>> findDeleted(UUID id);
-
-  <R extends Resource<R>> Maybe<Tombstone<R>> findDeleted(UUID id, ResourceType<R> type);
+  <R extends Resource<R>> Maybe<Tombstone<R>> findTombstone(UUID id, ResourceType<R> type);
 }

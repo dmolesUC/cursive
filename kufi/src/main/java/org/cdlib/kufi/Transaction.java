@@ -83,6 +83,11 @@ public final class Transaction implements Comparable<Transaction> {
     return result;
   }
 
+  @Override
+  public String toString() {
+    return "Transaction(" + txid + ", " + timestamp.toInstant() + ")";
+  }
+
   // ------------------------------------------------------------
   // Private class methods
 

@@ -5,6 +5,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.function.Predicate;
+
 import static org.cdlib.cursive.util.RxAssertions.*;
 import static org.cdlib.kufi.ResourceType.COLLECTION;
 import static org.cdlib.kufi.ResourceType.WORKSPACE;
@@ -213,8 +215,8 @@ public abstract class AbstractStoreTest<S extends Store> {
       var error = errorEmittedBy(result);
       assertThat(error).isNotNull();
 
-      assertThat(store.findDeleted(parent.id())).wasEmpty();
-      assertThat(store.findDeleted(parent.id(), COLLECTION)).wasEmpty();
+      assertThat(store.findTombstone(parent.id())).wasEmpty();
+      assertThat(store.findTombstone(parent.id(), COLLECTION)).wasEmpty();
 
       var newTx = valueEmittedBy(store.transaction());
       assertThat(newTx).isEqualTo(tx);
@@ -240,16 +242,21 @@ public abstract class AbstractStoreTest<S extends Store> {
 
       var result = store.deleteCollection(parent, true);
       assertThat(result).isComplete();
-
-      assertThat(store.findDeleted(parent.id())).wasEmpty();
-      assertThat(store.findDeleted(parent.id(), COLLECTION)).wasEmpty();
-
       var newTx = valueEmittedBy(store.transaction());
       assertThat(newTx.txid()).isEqualTo(tx + 1);
+
+      assertThat(store.findTombstone(parent.id())).emitted(tombstoneFor(parent));
+      assertThat(store.findTombstone(parent.id(), COLLECTION)).emitted(tombstoneFor(parent));
 
       assertThat(store.find(parent.id(), WORKSPACE)).wasEmpty();
       assertThat(store.find(child.id(), COLLECTION)).wasEmpty();
       assertThat(store.find(grandchild.id(), COLLECTION)).wasEmpty();
+
+      assertThat(store.findTombstone(child.id())).emitted(tombstoneFor(child));
+      assertThat(store.findTombstone(child.id(), COLLECTION)).emitted(tombstoneFor(child));
+
+      assertThat(store.findTombstone(grandchild.id())).emitted(tombstoneFor(grandchild));
+      assertThat(store.findTombstone(grandchild.id(), COLLECTION)).emitted(tombstoneFor(grandchild));
 
       assertThat(parent.childCollections().test()).observedNothing();
       assertThat(child.childCollections().test()).observedNothing();
@@ -257,5 +264,9 @@ public abstract class AbstractStoreTest<S extends Store> {
       assertThat(child.parent()).emittedOneError();
       assertThat(grandchild.parent()).emittedOneError();
     }
+  }
+
+  private Predicate<Tombstone<?>> tombstoneFor(Resource<?> r) {
+    return (t) -> t.resource().id().equals(r.id());
   }
 }

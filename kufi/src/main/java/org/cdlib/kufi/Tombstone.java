@@ -1,5 +1,7 @@
 package org.cdlib.kufi;
 
+import io.vavr.control.Option;
+
 import java.util.Objects;
 
 public final class Tombstone<R extends Resource<R>> {
@@ -29,6 +31,10 @@ public final class Tombstone<R extends Resource<R>> {
     return resource;
   }
 
+  public <R1 extends Resource<R1>> Option<Tombstone<R1>> as(ResourceType<R1> type) {
+    return resource.as(type).map(r -> new Tombstone<>(tx, r));
+  }
+
   // ------------------------------------------------------------
   // Object
 
@@ -53,5 +59,10 @@ public final class Tombstone<R extends Resource<R>> {
     var result = tx.hashCode();
     result = 31 * result + resource.hashCode();
     return result;
+  }
+
+  @Override
+  public String toString() {
+    return "Tombstone(" + tx + ", " + resource + ")";
   }
 }

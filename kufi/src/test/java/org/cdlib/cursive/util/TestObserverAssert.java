@@ -110,10 +110,8 @@ public class TestObserverAssert<T> extends AbstractAssert<TestObserverAssert<T>,
       if (valueCount == 0) {
         failWithMessage("Expected value, found nothing");
       } else {
-        Option<T> found = values.find(predicate);
-
-        if (!values.contains(expectedValue)) {
-          failWithMessage("Expected value <%s> not found; values: <%s>", expectedValue, format(values));
+        if (!values.find(predicate).isDefined()) {
+          failWithMessage("Expected value matching predicate <%s>; found: <%s>", predicate, format(values));
         }
       }
     }

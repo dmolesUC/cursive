@@ -135,6 +135,18 @@ public class MemoryStore implements Store {
     }
   }
 
+  @Override
+  public <R extends Resource<R>> Maybe<Tombstone<R>> findTombstone(UUID id, ResourceType<R> type) {
+    try {
+      return state.findTombstone(id)
+        .flatMap(r1 -> r1.as(type))
+        .map(Maybe::just)
+        .getOrElse(Maybe::empty);
+    } catch (Exception e) {
+      return Maybe.error(e);
+    }
+  }
+
   // ------------------------------------------------------------
   // Package-private
 
