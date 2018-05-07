@@ -99,19 +99,18 @@ class StoreState {
     return CreateResult.of(ws, storeNext);
   }
 
-  <P extends Resource<P>, C extends Resource<C>> CreateResult<C> createChild(MemoryStore store, P parent, Builder<C> builder, Builder<P> pBuilder) {
+  <P extends Resource<P>, C extends Resource<C>> CreateResult<C> createChild(MemoryStore store, P parent, Builder<C> builder) {
     var parentId = parent.id();
     var parentCurrent = current(parent);
-    var parentVersionCurrent = parentCurrent.currentVersion();
 
     var childId = newId();
     var txNext = tx.next();
 
     var child = builder.build(childId, initVersion(txNext), store);
-    var parentNext = pBuilder.build(parentId, parentVersionCurrent.next(txNext), store);
+    var parentNext = parentCurrent.nextVersion(txNext);
 
-    var p2c = Link.create(parent, PARENT_OF, child, txNext);
-    var c2p = Link.create(child, CHILD_OF, parent, txNext);
+    var p2c = Link.create(parentNext, PARENT_OF, child, txNext);
+    var c2p = Link.create(child, CHILD_OF, parentNext, txNext);
 
     var lrNext = liveResources
       .put(parentId, parentNext)
@@ -162,18 +161,20 @@ class StoreState {
   private StoreState deleteRecursive(Resource<?> r, Transaction txNext) {
     var current = current(r);
     var id = current.id();
+    var tombstone = current.delete(txNext);
 
     var liveBySource = linksBySource(id).filter(Link::isLive);
     var liveByTarget = linksByTarget(id).filter(Link::isLive);
 
-    var liveLinks = List.of(liveBySource, liveByTarget).flatMap(Function.identity());
-    var liveToDead = liveLinks.map(l -> Tuple.of(l, l.deleted(txNext)));
+    var lrNext = liveResources.remove(id);
+    var drNext = deadResources.put(id, tombstone);
+
+    var l2dBySource = liveBySource.map(l -> Tuple.of(l, l.deleted(tombstone, l.target().nextVersion(txNext), txNext)));
+    var l2dByTarget = liveByTarget.map(l -> Tuple.of(l, l.deleted(l.source().nextVersion(txNext), tombstone, txNext)));
+    var liveToDead = List.of(l2dBySource, l2dByTarget).flatMap(Function.identity());
 
     var lbsNext = liveToDead.foldLeft(linksBySource, (lbs, t) -> lbs.replace(t._1.sourceId(), t._1, t._2));
-    var lbtNext = liveToDead.foldLeft(linksByTarget, (lbt, t) -> lbt.replace(t._1.sourceId(), t._1, t._2));
-
-    var lrNext = liveResources.remove(id);
-    var drNext = deadResources.put(id, current.delete(txNext));
+    var lbtNext = liveToDead.foldLeft(linksByTarget, (lbt, t) -> lbt.replace(t._1.targetId(), t._1, t._2));
 
     var stateNext = new StoreState(txNext, lrNext, drNext, lbsNext, lbtNext);
 

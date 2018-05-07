@@ -61,7 +61,7 @@ public class MemoryStore implements Store {
   public Single<Collection> createCollection(Workspace parent) {
     synchronized (mutex) {
       try {
-        var result = state.createChild(this, parent, MemoryCollection::new, MemoryWorkspace::new);
+        var result = state.createChild(this, parent, MemoryCollection::new);
         state = result.stateNext();
         return just(result.resource());
       } catch (Exception e) {
@@ -74,7 +74,7 @@ public class MemoryStore implements Store {
   public Single<Collection> createCollection(Collection parent) {
     synchronized (mutex) {
       try {
-        var result = state.createChild(this, parent, MemoryCollection::new, MemoryCollection::new);
+        var result = state.createChild(this, parent, MemoryCollection::new);
         state = result.stateNext();
         return just(result.resource());
       } catch (Exception e) {

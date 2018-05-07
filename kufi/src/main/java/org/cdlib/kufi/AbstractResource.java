@@ -60,6 +60,11 @@ public abstract class AbstractResource<R extends Resource<R>> implements Resourc
   }
 
   @Override
+  public boolean isLive() {
+    return !isDeleted();
+  }
+
+  @Override
   public final ResourceType<R> type() {
     return type;
   }

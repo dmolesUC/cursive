@@ -91,7 +91,7 @@ public abstract class AbstractStoreTest<S extends Store> {
       var parent = valueEmittedBy(store.createWorkspace());
       var child = valueEmittedBy(store.createCollection(parent));
 
-      var parentVersion = valueEmittedBy(store.find(parent.id(), WORKSPACE)).currentVersion();
+      var parentNext = valueEmittedBy(store.find(parent.id(), WORKSPACE));
       var tx = valueEmittedBy(store.transaction());
 
       var result = store.deleteWorkspace(parent);
@@ -102,15 +102,13 @@ public abstract class AbstractStoreTest<S extends Store> {
       assertThat(newTx).isEqualTo(tx);
 
       var found = valueEmittedBy(store.find(parent.id(), WORKSPACE));
-      assertThat(found.id()).isEqualTo(parent.id());
-      assertThat(found.currentVersion()).isEqualTo(parentVersion);
-      assertThat(found.currentVersion().transaction()).isEqualTo(tx);
+      assertThat(found).isEqualTo(parentNext);
 
-      var children = valuesEmittedBy(parent.childCollections());
+      var children = valuesEmittedBy(parentNext.childCollections());
       assertThat(children).contains(child);
 
       var collections = valueEmittedBy(child.parent());
-      assertThat(collections.left()).contains(parent);
+      assertThat(collections.left()).contains(parentNext);
 
       assertThat(store.findTombstone(parent.id())).wasEmpty();
       assertThat(store.findTombstone(parent.id(), WORKSPACE)).wasEmpty();
@@ -197,6 +195,7 @@ public abstract class AbstractStoreTest<S extends Store> {
 
       var tx = valueEmittedBy(store.transaction());
       assertThat(child.currentVersion().transaction()).isEqualTo(tx);
+      var parentNext = ws.nextVersion(tx);
 
       var id = child.id();
       assertThat(id).isNotNull();
@@ -204,11 +203,11 @@ public abstract class AbstractStoreTest<S extends Store> {
       var found = valueEmittedBy(store.find(id, COLLECTION));
       assertThat(found).isEqualTo(child);
 
-      var children = valuesEmittedBy(ws.childCollections());
+      var children = valuesEmittedBy(parentNext.childCollections());
       assertThat(children).contains(child);
 
-      var collections = valueEmittedBy(child.parent());
-      assertThat(collections.left()).contains(ws);
+      var childParent = valueEmittedBy(child.parent());
+      assertThat(childParent.left()).contains(parentNext);
     }
 
     @Test
@@ -220,6 +219,7 @@ public abstract class AbstractStoreTest<S extends Store> {
 
       var tx = valueEmittedBy(store.transaction());
       assertThat(child.currentVersion().transaction()).isEqualTo(tx);
+      var parentNext = parent.nextVersion(tx);
 
       var id = child.id();
       assertThat(id).isNotNull();
@@ -227,11 +227,11 @@ public abstract class AbstractStoreTest<S extends Store> {
       var found = valueEmittedBy(store.find(id, COLLECTION));
       assertThat(found).isEqualTo(child);
 
-      var children = valuesEmittedBy(parent.childCollections());
+      var children = valuesEmittedBy(parentNext.childCollections());
       assertThat(children).contains(child);
 
-      var collections = valueEmittedBy(child.parent());
-      assertThat(collections.right()).contains(parent);
+      var childParent = valueEmittedBy(child.parent());
+      assertThat(childParent.right()).contains(parentNext);
     }
 
     @Test
@@ -239,7 +239,7 @@ public abstract class AbstractStoreTest<S extends Store> {
       var parent = valueEmittedBy(store.createCollection(ws));
       var child = valueEmittedBy(store.createCollection(parent));
 
-      var parentVersion = valueEmittedBy(store.find(parent.id(), COLLECTION)).currentVersion();
+      var parentNext = valueEmittedBy(store.find(parent.id(), COLLECTION));
       var tx = valueEmittedBy(store.transaction());
 
       var result = store.deleteCollection(parent);
@@ -253,15 +253,13 @@ public abstract class AbstractStoreTest<S extends Store> {
       assertThat(newTx).isEqualTo(tx);
 
       var found = valueEmittedBy(store.find(parent.id(), COLLECTION));
-      assertThat(found.id()).isEqualTo(parent.id());
-      assertThat(found.currentVersion()).isEqualTo(parentVersion);
-      assertThat(found.currentVersion().transaction()).isEqualTo(tx);
+      assertThat(found).isEqualTo(parentNext);
 
-      var children = valuesEmittedBy(parent.childCollections());
+      var children = valuesEmittedBy(parentNext.childCollections());
       assertThat(children).contains(child);
 
       var collections = valueEmittedBy(child.parent());
-      assertThat(collections.right()).contains(parent);
+      assertThat(collections.right()).contains(parentNext);
     }
 
     @Test

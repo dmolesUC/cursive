@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import static org.cdlib.kufi.ResourceType.COLLECTION;
 import static org.cdlib.kufi.ResourceType.WORKSPACE;
+import static org.cdlib.kufi.util.Preconditions.require;
 
 class MemoryCollection extends MemoryResource<Collection> implements Collection {
 
@@ -27,9 +28,15 @@ class MemoryCollection extends MemoryResource<Collection> implements Collection 
   // Resource
 
   @Override
-  public Collection delete(Transaction tx) {
+  public Collection delete(Transaction tx) { // TODO: find a way to pull this up
     var deletedAt = currentVersion().next(tx);
     return new MemoryCollection(id(), deletedAt, deletedAt, store);
+  }
+
+  @Override
+  public Collection nextVersion(Transaction tx) { // TODO: find a way to pull this up
+    require(isLive(), () -> "Can't create new version of deleted resource " + this);
+    return new MemoryCollection(id(), currentVersion().next(tx), store);
   }
 
   // ------------------------------------------------------------

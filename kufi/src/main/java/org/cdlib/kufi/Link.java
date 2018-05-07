@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import static io.vavr.control.Option.none;
 import static io.vavr.control.Option.some;
+import static org.cdlib.kufi.util.Preconditions.checkArgument;
 
 public final class Link {
 
@@ -24,6 +25,10 @@ public final class Link {
 
   public static Link create(Resource<?> source, LinkType type, Resource<?> target, Transaction createdAt) {
     return new Link(source, type, target, createdAt, none());
+  }
+
+  public static Link create(Resource<?> source, LinkType type, Resource<?> target, Transaction createdAt, Transaction deletedAt) {
+    return new Link(source, type, target, createdAt, some(deletedAt));
   }
 
   private Link(Resource<?> source, LinkType type, Resource<?> target, Transaction createdAt, Option<Transaction> deletedAt) {
@@ -49,6 +54,10 @@ public final class Link {
     return source.id();
   }
 
+  public UUID targetId() {
+    return target.id();
+  }
+
   public Resource<?> target() {
     return target;
   }
@@ -69,8 +78,14 @@ public final class Link {
     return deletedAt.isDefined();
   }
 
-  public Link deleted(Transaction deletedAt) {
-    return new Link(source, type, target, createdAt, some(deletedAt));
+  public Link deleted(Resource<?> sourceNext, Resource<?> targetNext, Transaction deletedAt) {
+    return create(
+      checkArgument(sourceNext, (r) -> r.isLaterVersionOf(source), () -> "Expected source to be later version of: " + source + "; got " + sourceNext),
+      type,
+      checkArgument(targetNext, (r) -> r.isLaterVersionOf(target), () -> "Expected target to be later version of: " + target + "; got " + targetNext),
+      createdAt,
+      deletedAt
+    );
   }
 
   // ------------------------------------------------------------

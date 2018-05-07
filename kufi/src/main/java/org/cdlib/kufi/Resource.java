@@ -12,6 +12,8 @@ public interface Resource<R extends Resource<R>> {
 
   Option<Version> deletedAt();
 
+  boolean isLive();
+
   ResourceType<R> type();
 
   <R1 extends Resource<R1>> boolean hasType(ResourceType<R1> type);
@@ -19,6 +21,8 @@ public interface Resource<R extends Resource<R>> {
   <R1 extends Resource<R1>> Option<R1> as(ResourceType<R1> type);
 
   R delete(Transaction tx);
+
+  R nextVersion(Transaction tx);
 
   boolean isDeleted();
 
