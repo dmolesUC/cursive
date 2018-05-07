@@ -2,7 +2,7 @@ package org.cdlib.kufi.memory;
 
 import org.cdlib.kufi.Resource;
 
-class CreateResult<R extends Resource<R>> {
+class StoreUpdate<R extends Resource<R>> {
 
   // ------------------------------------------------------------
   // Instance fields
@@ -13,14 +13,14 @@ class CreateResult<R extends Resource<R>> {
   // ------------------------------------------------------------
   // Factory method
 
-  static <R extends Resource<R>> CreateResult<R> of(R resource, StoreState storeNext) {
-    return new CreateResult<>(resource, storeNext);
+  static <R extends Resource<R>> StoreUpdate<R> of(R resource, StoreState storeNext) {
+    return new StoreUpdate<>(resource, storeNext);
   }
 
   // ------------------------------------------------------------
   // Constructor
 
-  public CreateResult(R resource, StoreState stateNext) {
+  public StoreUpdate(R resource, StoreState stateNext) {
     this.resource = resource;
     this.stateNext = stateNext;
   }

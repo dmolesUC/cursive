@@ -89,17 +89,17 @@ class StoreState {
   // ------------------------------
   // Creators & Deletors
 
-  CreateResult<Workspace> createWorkspace(MemoryStore store) {
+  StoreUpdate<Workspace> createWorkspace(MemoryStore store) {
     var id = newId();
     var txNext = tx.next();
     var ws = MemoryResource.createNew(WORKSPACE, id, txNext, store);
     var lrNext = liveResources.put(id, ws);
 
     var storeNext = new StoreState(txNext, lrNext, deadResources, linksBySource, linksByTarget);
-    return CreateResult.of(ws, storeNext);
+    return StoreUpdate.of(ws, storeNext);
   }
 
-  <P extends Resource<P>, C extends Resource<C>> CreateResult<C> createChild(MemoryStore store, P parent, ResourceType<C> childType) {
+  <P extends Resource<P>, C extends Resource<C>> StoreUpdate<C> createChild(MemoryStore store, P parent, ResourceType<C> childType) {
     var parentId = parent.id();
     var parentCurrent = current(parent);
 
@@ -125,10 +125,10 @@ class StoreState {
       .put(parentId, c2p);
 
     var stateNext = new StoreState(txNext, lrNext, deadResources, lbsNext, lbtNext);
-    return CreateResult.of(child, stateNext);
+    return StoreUpdate.of(child, stateNext);
   }
 
-  <R extends Resource<R>> StoreState delete(R r) {
+  <R extends Resource<R>> StoreUpdate<R> delete(R r) {
     var childCount = countChildren(r.id());
     if (childCount > 0) {
       throw new IllegalStateException("Can't delete " + r + "; " + childCount + " children");
@@ -136,8 +136,9 @@ class StoreState {
     return deleteRecursive(r);
   }
 
-  <R extends Resource<R>> StoreState deleteRecursive(R r) {
-    return deleteRecursive(r, tx.next());
+  <R extends Resource<R>> StoreUpdate<R> deleteRecursive(R r) {
+    var txNext = tx.next();
+    return StoreUpdate.of(r.delete(txNext), deleteRecursive(r, txNext));
   }
 
   // ------------------------------------------------------------

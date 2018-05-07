@@ -43,62 +43,22 @@ public class MemoryStore implements Store {
 
   @Override
   public Completable deleteWorkspace(Workspace ws, boolean recursive) {
-    synchronized (mutex) {
-      try {
-        if (recursive) {
-          state = state.deleteRecursive(ws);
-          return Completable.complete();
-        } else {
-          state = state.delete(ws);
-          return Completable.complete();
-        }
-      } catch (Exception e) {
-        return Completable.error(e);
-      }
-    }
+    return delete(ws, recursive);
   }
 
   @Override
   public Single<Collection> createCollection(Workspace parent) {
-    synchronized (mutex) {
-      try {
-        var result = state.createChild(this, parent, COLLECTION);
-        state = result.stateNext();
-        return just(result.resource());
-      } catch (Exception e) {
-        return Single.error(e);
-      }
-    }
+    return create(parent, COLLECTION);
   }
 
   @Override
   public Single<Collection> createCollection(Collection parent) {
-    synchronized (mutex) {
-      try {
-        var result = state.createChild(this, parent, COLLECTION);
-        state = result.stateNext();
-        return just(result.resource());
-      } catch (Exception e) {
-        return Single.error(e);
-      }
-    }
+    return create(parent, COLLECTION);
   }
 
   @Override
-  public Completable deleteCollection(Collection ws, boolean recursive) {
-    synchronized (mutex) {
-      try {
-        if (recursive) {
-          state = state.deleteRecursive(ws);
-          return Completable.complete();
-        } else {
-          state = state.delete(ws);
-          return Completable.complete();
-        }
-      } catch (Exception e) {
-        return Completable.error(e);
-      }
-    }
+  public Completable deleteCollection(Collection coll, boolean recursive) {
+    return delete(coll, recursive);
   }
 
   @Override
@@ -158,5 +118,31 @@ public class MemoryStore implements Store {
   Single<? extends Resource<?>> findParentOf(Resource<?> child) {
     return state.findParent(child).map(Single::just)
       .getOrElse(() -> Single.error(new NoSuchElementException("No parent found for resource: " + child)));
+  }
+
+  // ------------------------------------------------------------
+  // Private
+
+  private <P extends Resource<P>, C extends Resource<C>> Single<C> create(P parent, ResourceType<C> childType) {
+    synchronized (mutex) {
+      try {
+        var result = state.createChild(this, parent, childType);
+        state = result.stateNext();
+        return just(result.resource());
+      } catch (Exception e) {
+        return Single.error(e);
+      }
+    }
+  }
+  private <R extends Resource<R>> Completable delete(R coll, boolean recursive) {
+    synchronized (mutex) {
+      try {
+        var result = recursive ? state.deleteRecursive(coll) : state.delete(coll);
+        state = result.stateNext();
+        return Completable.complete();
+      } catch (Exception e) {
+        return Completable.error(e);
+      }
+    }
   }
 }
