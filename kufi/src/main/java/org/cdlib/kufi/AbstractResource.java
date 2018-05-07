@@ -55,6 +55,11 @@ public abstract class AbstractResource<R extends Resource<R>> implements Resourc
   }
 
   @Override
+  public boolean isDeleted() {
+    return deletedAt.isDefined();
+  }
+
+  @Override
   public final ResourceType<R> type() {
     return type;
   }

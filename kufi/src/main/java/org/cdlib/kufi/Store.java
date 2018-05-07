@@ -18,7 +18,7 @@ public interface Store {
 
   Single<Workspace> createWorkspace();
 
-  default Completable deleteWorkspace(Workspace ws) {
+  default Completable deleteWorkspace(Workspace ws) { // TODO: replace Completables with tombstones
     return deleteWorkspace(ws, false);
   }
 
@@ -42,9 +42,9 @@ public interface Store {
 
   Maybe<Resource<?>> find(UUID id);
 
-  Maybe<Tombstone<?>> findTombstone(UUID id);
+  Maybe<Resource<?>> findTombstone(UUID id);
 
   <R extends Resource<R>> Maybe<R> find(UUID id, ResourceType<R> type);
 
-  <R extends Resource<R>> Maybe<Tombstone<R>> findTombstone(UUID id, ResourceType<R> type);
+  <R extends Resource<R>> Maybe<R> findTombstone(UUID id, ResourceType<R> type);
 }

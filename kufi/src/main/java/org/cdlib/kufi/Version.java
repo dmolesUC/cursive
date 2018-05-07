@@ -1,8 +1,10 @@
 package org.cdlib.kufi;
 
+import org.cdlib.kufi.util.Ordered;
+
 import java.util.Objects;
 
-public final class Version implements Comparable<Version> {
+public final class Version implements Ordered<Version> {
 
   // ------------------------------------------------------------
   // Fields

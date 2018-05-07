@@ -112,10 +112,10 @@ public class MemoryStore implements Store {
   }
 
   @Override
-  public Maybe<Tombstone<?>> findTombstone(UUID id) {
+  public Maybe<Resource<?>> findTombstone(UUID id) {
     try {
       return state.findTombstone(id)
-        .<Maybe<Tombstone<?>>>map(Maybe::just)
+        .<Maybe<Resource<?>>>map(Maybe::just)
         .getOrElse(Maybe::empty);
     } catch (Exception e) {
       return Maybe.error(e);
@@ -135,7 +135,7 @@ public class MemoryStore implements Store {
   }
 
   @Override
-  public <R extends Resource<R>> Maybe<Tombstone<R>> findTombstone(UUID id, ResourceType<R> type) {
+  public <R extends Resource<R>> Maybe<R> findTombstone(UUID id, ResourceType<R> type) {
     try {
       return state.findTombstone(id)
         .flatMap(r1 -> r1.as(type))

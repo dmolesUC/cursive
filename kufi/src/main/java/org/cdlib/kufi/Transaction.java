@@ -1,12 +1,13 @@
 package org.cdlib.kufi;
 
+import org.cdlib.kufi.util.Ordered;
 import org.cdlib.kufi.util.TimeUtil;
 
 import java.time.ZonedDateTime;
 
 import static org.cdlib.kufi.util.TimeUtil.utcNow;
 
-public final class Transaction implements Comparable<Transaction> {
+public final class Transaction implements Ordered<Transaction> {
 
   // ------------------------------------------------------------
   // Fields

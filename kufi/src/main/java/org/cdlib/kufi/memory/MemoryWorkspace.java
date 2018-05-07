@@ -25,10 +25,9 @@ class MemoryWorkspace extends MemoryResource<Workspace> implements Workspace {
   // Resource
 
   @Override
-  public Tombstone<Workspace> toTombstone(Transaction tx) {
+  public Workspace delete(Transaction tx) {
     var deletedAt = currentVersion().next(tx);
-    var cNext = new MemoryWorkspace(id(), deletedAt, deletedAt, store);
-    return new Tombstone<>(tx, cNext);
+    return new MemoryWorkspace(id(), deletedAt, deletedAt, store);
   }
 
   // ------------------------------------------------------------

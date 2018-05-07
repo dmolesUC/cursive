@@ -16,13 +16,8 @@ public class SingleAssert<T> extends AbstractAssert<SingleAssert<T>, Single<T>> 
     return new SingleAssert<>(actual);
   }
 
-  public SingleAssert<T> isComplete() {
-    observer.isComplete();
-    return this;
-  }
-
-  public SingleAssert<T> emittedNothing() {
-    observer.observedNothing();
+  public SingleAssert<T> emitted(T value) {
+    observer.observed(value);
     return this;
   }
 

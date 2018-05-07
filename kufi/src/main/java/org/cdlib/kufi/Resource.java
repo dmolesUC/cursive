@@ -18,5 +18,15 @@ public interface Resource<R extends Resource<R>> {
 
   <R1 extends Resource<R1>> Option<R1> as(ResourceType<R1> type);
 
-  Tombstone<R> toTombstone(Transaction tx);
+  R delete(Transaction tx);
+
+  boolean isDeleted();
+
+  default boolean isLaterVersionOf(Resource<?> r) {
+    return id().equals(r.id()) && currentVersion().greaterThan(r.currentVersion());
+  }
+
+  default boolean isEarlierVersionOf(Resource<?> r) {
+    return id().equals(r.id()) && currentVersion().lessThan(r.currentVersion());
+  }
 }

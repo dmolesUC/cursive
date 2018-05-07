@@ -27,10 +27,9 @@ class MemoryCollection extends MemoryResource<Collection> implements Collection 
   // Resource
 
   @Override
-  public Tombstone<Collection> toTombstone(Transaction tx) {
+  public Collection delete(Transaction tx) {
     var deletedAt = currentVersion().next(tx);
-    var cNext = new MemoryCollection(id(), deletedAt, deletedAt, store);
-    return new Tombstone<>(tx, cNext);
+    return new MemoryCollection(id(), deletedAt, deletedAt, store);
   }
 
   // ------------------------------------------------------------

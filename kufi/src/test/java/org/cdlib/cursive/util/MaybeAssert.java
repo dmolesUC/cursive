@@ -18,11 +18,6 @@ public class MaybeAssert<T> extends AbstractAssert<MaybeAssert<T>, Maybe<T>> {
     return new MaybeAssert<>(actual);
   }
 
-  public MaybeAssert<T> isComplete() {
-    observer.isComplete();
-    return this;
-  }
-
   public MaybeAssert<T> wasEmpty() {
     observer.observedNothing();
     return this;
@@ -33,7 +28,7 @@ public class MaybeAssert<T> extends AbstractAssert<MaybeAssert<T>, Maybe<T>> {
     return this;
   }
 
-  public MaybeAssert<T> emitted(Predicate<? super T> predicate) {
+  public MaybeAssert<T> emittedValueThat(Predicate<? super T> predicate) {
     observer.observed(predicate);
     return this;
   }

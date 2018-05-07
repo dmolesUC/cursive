@@ -34,7 +34,7 @@ class StoreState {
   private final Transaction tx;
 
   private final Map<UUID, Resource<?>> liveResources;
-  private final Map<UUID, Tombstone<?>> deadResources;
+  private final Map<UUID, Resource<?>> deadResources;
 
   private final Multimap<UUID, Link> linksBySource;
   private final Multimap<UUID, Link> linksByTarget;
@@ -46,7 +46,7 @@ class StoreState {
     this(initTransaction(), HashMap.empty(), HashMap.empty(), HashMultimap.withSet().empty(), HashMultimap.withSet().empty());
   }
 
-  private StoreState(Transaction tx, Map<UUID, Resource<?>> liveResources, Map<UUID, Tombstone<?>> deadResources, Multimap<UUID, Link> linksBySource, Multimap<UUID, Link> linksByTarget) {
+  private StoreState(Transaction tx, Map<UUID, Resource<?>> liveResources, Map<UUID, Resource<?>> deadResources, Multimap<UUID, Link> linksBySource, Multimap<UUID, Link> linksByTarget) {
     this.tx = tx;
     this.liveResources = liveResources;
     this.deadResources = deadResources;
@@ -69,7 +69,7 @@ class StoreState {
     return liveResources.get(id);
   }
 
-  Option<Tombstone<?>> findTombstone(UUID id) {
+  Option<Resource<?>> findTombstone(UUID id) {
     return deadResources.get(id);
   }
 
@@ -173,7 +173,7 @@ class StoreState {
     var lbtNext = liveToDead.foldLeft(linksByTarget, (lbt, t) -> lbt.replace(t._1.sourceId(), t._1, t._2));
 
     var lrNext = liveResources.remove(id);
-    var drNext = deadResources.put(id, current.toTombstone(txNext));
+    var drNext = deadResources.put(id, current.delete(txNext));
 
     var stateNext = new StoreState(txNext, lrNext, drNext, lbsNext, lbtNext);
 

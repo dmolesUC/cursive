@@ -81,6 +81,9 @@ public abstract class AbstractStoreTest<S extends Store> {
       assertThat(newTx.txid()).isEqualTo(tx + 1);
 
       assertThat(store.find(ws.id(), WORKSPACE)).wasEmpty();
+
+      assertThat(store.findTombstone(ws.id())).emittedValueThat(isDeleted(ws));
+      assertThat(store.findTombstone(ws.id(), WORKSPACE)).emittedValueThat(isDeleted(ws));
     }
 
     @Test
@@ -108,6 +111,9 @@ public abstract class AbstractStoreTest<S extends Store> {
 
       var collections = valueEmittedBy(child.parent());
       assertThat(collections.left()).contains(parent);
+
+      assertThat(store.findTombstone(parent.id())).wasEmpty();
+      assertThat(store.findTombstone(parent.id(), WORKSPACE)).wasEmpty();
     }
 
     @Test
@@ -124,8 +130,16 @@ public abstract class AbstractStoreTest<S extends Store> {
       assertThat(newTx.txid()).isEqualTo(tx + 1);
 
       assertThat(store.find(parent.id(), WORKSPACE)).wasEmpty();
+      assertThat(store.findTombstone(parent.id())).emittedValueThat(isDeleted(parent));
+      assertThat(store.findTombstone(parent.id(), WORKSPACE)).emittedValueThat(isDeleted(parent));
+
       assertThat(store.find(child.id(), COLLECTION)).wasEmpty();
+      assertThat(store.findTombstone(child.id())).emittedValueThat(isDeleted(child));
+      assertThat(store.findTombstone(child.id(), COLLECTION)).emittedValueThat(isDeleted(child));
+
       assertThat(store.find(grandchild.id(), COLLECTION)).wasEmpty();
+      assertThat(store.findTombstone(grandchild.id())).emittedValueThat(isDeleted(grandchild));
+      assertThat(store.findTombstone(grandchild.id(), COLLECTION)).emittedValueThat(isDeleted(grandchild));
 
       assertThat(parent.childCollections().test()).observedNothing();
       assertThat(child.childCollections().test()).observedNothing();
@@ -143,6 +157,23 @@ public abstract class AbstractStoreTest<S extends Store> {
     @BeforeEach
     void setUp() {
       ws = valueEmittedBy(store.createWorkspace());
+    }
+
+    @Test
+    void createChildFailsWithTombstonedParentWorkspace() {
+      store.deleteWorkspace(ws);
+      var tx = valueEmittedBy(store.transaction());
+      assertThat(store.createCollection(ws)).emittedOneError();
+      assertThat(store.transaction()).emitted(tx);
+    }
+
+    @Test
+    void createChildFailsWithTombstonedParentCollection() {
+      var coll = valueEmittedBy(store.createCollection(ws));
+      store.deleteCollection(coll);
+      var tx = valueEmittedBy(store.transaction());
+      assertThat(store.createCollection(coll)).emittedOneError();
+      assertThat(store.transaction()).emitted(tx);
     }
 
     @Test
@@ -245,18 +276,17 @@ public abstract class AbstractStoreTest<S extends Store> {
       var newTx = valueEmittedBy(store.transaction());
       assertThat(newTx.txid()).isEqualTo(tx + 1);
 
-      assertThat(store.findTombstone(parent.id())).emitted(tombstoneFor(parent));
-      assertThat(store.findTombstone(parent.id(), COLLECTION)).emitted(tombstoneFor(parent));
-
       assertThat(store.find(parent.id(), WORKSPACE)).wasEmpty();
+      assertThat(store.findTombstone(parent.id())).emittedValueThat(isDeleted(parent));
+      assertThat(store.findTombstone(parent.id(), COLLECTION)).emittedValueThat(isDeleted(parent));
+
       assertThat(store.find(child.id(), COLLECTION)).wasEmpty();
+      assertThat(store.findTombstone(child.id())).emittedValueThat(isDeleted(child));
+      assertThat(store.findTombstone(child.id(), COLLECTION)).emittedValueThat(isDeleted(child));
+
       assertThat(store.find(grandchild.id(), COLLECTION)).wasEmpty();
-
-      assertThat(store.findTombstone(child.id())).emitted(tombstoneFor(child));
-      assertThat(store.findTombstone(child.id(), COLLECTION)).emitted(tombstoneFor(child));
-
-      assertThat(store.findTombstone(grandchild.id())).emitted(tombstoneFor(grandchild));
-      assertThat(store.findTombstone(grandchild.id(), COLLECTION)).emitted(tombstoneFor(grandchild));
+      assertThat(store.findTombstone(grandchild.id())).emittedValueThat(isDeleted(grandchild));
+      assertThat(store.findTombstone(grandchild.id(), COLLECTION)).emittedValueThat(isDeleted(grandchild));
 
       assertThat(parent.childCollections().test()).observedNothing();
       assertThat(child.childCollections().test()).observedNothing();
@@ -266,7 +296,7 @@ public abstract class AbstractStoreTest<S extends Store> {
     }
   }
 
-  private Predicate<Tombstone<?>> tombstoneFor(Resource<?> r) {
-    return (t) -> t.resource().id().equals(r.id());
+  private Predicate<Resource<?>> isDeleted(Resource<?> r) {
+    return (t) -> t.isLaterVersionOf(r) && t.isDeleted();
   }
 }
