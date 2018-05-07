@@ -18,11 +18,11 @@ public interface Store {
 
   Single<Workspace> createWorkspace();
 
-  default Completable deleteWorkspace(Workspace ws) { // TODO: replace Completables with tombstones
+  default Single<Workspace> deleteWorkspace(Workspace ws) { // TODO: replace Completables with tombstones
     return deleteWorkspace(ws, false);
   }
 
-  Completable deleteWorkspace(Workspace ws, boolean recursive);
+  Single<Workspace> deleteWorkspace(Workspace ws, boolean recursive);
 
   // ------------------------------------------------------------
   // Collections
@@ -31,11 +31,11 @@ public interface Store {
 
   Single<Collection> createCollection(Collection parent);
 
-  default Completable deleteCollection(Collection ws) {
+  default Single<Collection> deleteCollection(Collection ws) {
     return deleteCollection(ws, false);
   }
 
-  Completable deleteCollection(Collection ws, boolean recursive);
+  Single<Collection> deleteCollection(Collection ws, boolean recursive);
 
   // ------------------------------------------------------------
   // Finders

@@ -42,7 +42,7 @@ public class MemoryStore implements Store {
   }
 
   @Override
-  public Completable deleteWorkspace(Workspace ws, boolean recursive) {
+  public Single<Workspace> deleteWorkspace(Workspace ws, boolean recursive) {
     return delete(ws, recursive);
   }
 
@@ -57,7 +57,7 @@ public class MemoryStore implements Store {
   }
 
   @Override
-  public Completable deleteCollection(Collection coll, boolean recursive) {
+  public Single<Collection> deleteCollection(Collection coll, boolean recursive) {
     return delete(coll, recursive);
   }
 
@@ -134,14 +134,15 @@ public class MemoryStore implements Store {
       }
     }
   }
-  private <R extends Resource<R>> Completable delete(R coll, boolean recursive) {
+
+  private <R extends Resource<R>> Single<R> delete(R coll, boolean recursive) {
     synchronized (mutex) {
       try {
         var result = recursive ? state.deleteRecursive(coll) : state.delete(coll);
         state = result.stateNext();
-        return Completable.complete();
+        return Single.just(result.resource());
       } catch (Exception e) {
-        return Completable.error(e);
+        return Single.error(e);
       }
     }
   }

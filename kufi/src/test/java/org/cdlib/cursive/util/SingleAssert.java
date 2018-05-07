@@ -3,6 +3,8 @@ package org.cdlib.cursive.util;
 import io.reactivex.Single;
 import org.assertj.core.api.AbstractAssert;
 
+import java.util.function.Predicate;
+
 public class SingleAssert<T> extends AbstractAssert<SingleAssert<T>, Single<T>> {
 
   private final TestObserverAssert<T> observer;
@@ -26,4 +28,8 @@ public class SingleAssert<T> extends AbstractAssert<SingleAssert<T>, Single<T>> 
     return this;
   }
 
+  public SingleAssert<T> emittedValueThat(Predicate<? super T> predicate) {
+    observer.observed(predicate);
+    return this;
+  }
 }

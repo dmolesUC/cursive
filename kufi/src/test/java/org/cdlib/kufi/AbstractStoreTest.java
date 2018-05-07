@@ -74,11 +74,14 @@ public abstract class AbstractStoreTest<S extends Store> {
       var ws = valueEmittedBy(store.createWorkspace());
       var tx = ws.currentVersion().transaction().txid();
 
-      var result = store.deleteWorkspace(ws);
-      assertThat(result).isComplete();
+      var tombstone = valueEmittedBy(store.deleteWorkspace(ws));
+      assertThat(tombstone.isDeleted()).isTrue();
+      var currentVersion = tombstone.currentVersion();
+      assertThat(tombstone.deletedAt()).contains(currentVersion);
 
-      var newTx = valueEmittedBy(store.transaction());
-      assertThat(newTx.txid()).isEqualTo(tx + 1);
+      var txNext = valueEmittedBy(store.transaction());
+      assertThat(txNext.txid()).isEqualTo(tx + 1);
+      assertThat(txNext).isEqualTo(currentVersion.transaction());
 
       assertThat(store.find(ws.id(), WORKSPACE)).wasEmpty();
 
@@ -122,7 +125,7 @@ public abstract class AbstractStoreTest<S extends Store> {
       var tx = valueEmittedBy(store.transaction()).txid();
 
       var result = store.deleteWorkspace(parent, true);
-      assertThat(result).isComplete();
+      assertThat(result).emittedValueThat(isDeleted(parent));
 
       var newTx = valueEmittedBy(store.transaction());
       assertThat(newTx.txid()).isEqualTo(tx + 1);
@@ -270,7 +273,7 @@ public abstract class AbstractStoreTest<S extends Store> {
       var tx = valueEmittedBy(store.transaction()).txid();
 
       var result = store.deleteCollection(parent, true);
-      assertThat(result).isComplete();
+      assertThat(result).emittedValueThat(isDeleted(parent));
       var newTx = valueEmittedBy(store.transaction());
       assertThat(newTx.txid()).isEqualTo(tx + 1);
 
