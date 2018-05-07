@@ -3,10 +3,7 @@ package org.cdlib.kufi.memory;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.vavr.control.Either;
-import org.cdlib.kufi.Collection;
-import org.cdlib.kufi.Resource;
-import org.cdlib.kufi.Version;
-import org.cdlib.kufi.Workspace;
+import org.cdlib.kufi.*;
 
 import java.util.UUID;
 
@@ -18,8 +15,22 @@ class MemoryCollection extends MemoryResource<Collection> implements Collection 
   // ------------------------------------------------------------
   // Constructor
 
-  MemoryCollection(UUID id, Version version, MemoryStore store) {
-    super(COLLECTION, id, version, store);
+  MemoryCollection(UUID id, Version currentVersion, MemoryStore store) {
+    super(COLLECTION, id, currentVersion, store);
+  }
+
+  private MemoryCollection(UUID id, Version currentVersion, Version deletedAt, MemoryStore store) {
+    super(COLLECTION, id, currentVersion, deletedAt, store);
+  }
+
+  // ------------------------------------------------------------
+  // Resource
+
+  @Override
+  public Tombstone<Collection> toTombstone(Transaction tx) {
+    var deletedAt = currentVersion().next(tx);
+    var cNext = new MemoryCollection(id(), deletedAt, deletedAt, store);
+    return new Tombstone<>(tx, cNext);
   }
 
   // ------------------------------------------------------------

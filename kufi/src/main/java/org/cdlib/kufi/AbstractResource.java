@@ -15,15 +15,25 @@ public abstract class AbstractResource<R extends Resource<R>> implements Resourc
 
   private final ResourceType<R> type;
   private final UUID id;
-  private final Version version;
+  private final Version currentVersion;
+  private final Option<Version> deletedAt;
 
   // ------------------------------------------------------------
   // Constructor
 
-  public AbstractResource(ResourceType<R> type, UUID id, Version version) {
-    this.type = Objects.requireNonNull(type);
-    this.id = Objects.requireNonNull(id);
-    this.version = Objects.requireNonNull(version);
+  protected AbstractResource(ResourceType<R> type, UUID id, Version currentVersion) {
+    this(type, id, currentVersion, none());
+  }
+
+  protected AbstractResource(ResourceType<R> type, UUID id, Version currentVersion, Version deletedAt) {
+    this(type, id, currentVersion, some(deletedAt));
+  }
+
+  private AbstractResource(ResourceType<R> type, UUID id, Version currentVersion, Option<Version> deletedAt) {
+    this.type = type;
+    this.id = id;
+    this.currentVersion = currentVersion;
+    this.deletedAt = deletedAt;
   }
 
   // ------------------------------------------------------------
@@ -35,8 +45,13 @@ public abstract class AbstractResource<R extends Resource<R>> implements Resourc
   }
 
   @Override
-  public final Version version() {
-    return version;
+  public final Version currentVersion() {
+    return currentVersion;
+  }
+
+  @Override
+  public Option<Version> deletedAt() {
+    return deletedAt;
   }
 
   @Override
@@ -67,7 +82,7 @@ public abstract class AbstractResource<R extends Resource<R>> implements Resourc
     }
 
     var that = (AbstractResource<?>) o;
-    if (!version.equals(that.version)) {
+    if (!currentVersion.equals(that.currentVersion)) {
       return false;
     }
     if (!type.equals(that.type)) {
@@ -80,7 +95,8 @@ public abstract class AbstractResource<R extends Resource<R>> implements Resourc
   public int hashCode() {
     var result = type.hashCode();
     result = 31 * result + id.hashCode();
-    result = 31 * result + version.hashCode();
+    result = 31 * result + currentVersion.hashCode();
     return result;
   }
+
 }

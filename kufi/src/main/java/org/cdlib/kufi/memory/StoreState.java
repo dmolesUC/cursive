@@ -102,7 +102,7 @@ class StoreState {
   <P extends Resource<P>, C extends Resource<C>> CreateResult<C> createChild(MemoryStore store, P parent, Builder<C> builder, Builder<P> pBuilder) {
     var parentId = parent.id();
     var parentCurrent = current(parent);
-    var parentVersionCurrent = parentCurrent.version();
+    var parentVersionCurrent = parentCurrent.currentVersion();
 
     var childId = newId();
     var txNext = tx.next();
@@ -173,7 +173,7 @@ class StoreState {
     var lbtNext = liveToDead.foldLeft(linksByTarget, (lbt, t) -> lbt.replace(t._1.sourceId(), t._1, t._2));
 
     var lrNext = liveResources.remove(id);
-    var drNext = deadResources.put(id, new Tombstone(txNext, current));
+    var drNext = deadResources.put(id, current.toTombstone(txNext));
 
     var stateNext = new StoreState(txNext, lrNext, drNext, lbsNext, lbtNext);
 

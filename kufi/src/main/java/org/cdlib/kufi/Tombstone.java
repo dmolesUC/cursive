@@ -32,7 +32,7 @@ public final class Tombstone<R extends Resource<R>> {
   }
 
   public <R1 extends Resource<R1>> Option<Tombstone<R1>> as(ResourceType<R1> type) {
-    return resource.as(type).map(r -> new Tombstone<>(tx, r));
+    return resource.as(type).map(r -> r.toTombstone(tx));
   }
 
   // ------------------------------------------------------------
@@ -65,4 +65,5 @@ public final class Tombstone<R extends Resource<R>> {
   public String toString() {
     return "Tombstone(" + tx + ", " + resource + ")";
   }
+
 }
