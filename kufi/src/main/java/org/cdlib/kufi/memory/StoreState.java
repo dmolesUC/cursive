@@ -13,8 +13,8 @@ import java.util.function.Function;
 
 import static org.cdlib.kufi.LinkType.CHILD_OF;
 import static org.cdlib.kufi.LinkType.PARENT_OF;
+import static org.cdlib.kufi.ResourceType.WORKSPACE;
 import static org.cdlib.kufi.Transaction.initTransaction;
-import static org.cdlib.kufi.Version.initVersion;
 
 class StoreState {
 
@@ -92,21 +92,21 @@ class StoreState {
   CreateResult<Workspace> createWorkspace(MemoryStore store) {
     var id = newId();
     var txNext = tx.next();
-    var ws = new MemoryWorkspace(id, initVersion(txNext), store);
+    var ws = MemoryResource.createNew(WORKSPACE, id, txNext, store);
     var lrNext = liveResources.put(id, ws);
 
     var storeNext = new StoreState(txNext, lrNext, deadResources, linksBySource, linksByTarget);
     return CreateResult.of(ws, storeNext);
   }
 
-  <P extends Resource<P>, C extends Resource<C>> CreateResult<C> createChild(MemoryStore store, P parent, Builder<C> builder) {
+  <P extends Resource<P>, C extends Resource<C>> CreateResult<C> createChild(MemoryStore store, P parent, ResourceType<C> childType) {
     var parentId = parent.id();
     var parentCurrent = current(parent);
 
     var childId = newId();
     var txNext = tx.next();
 
-    var child = builder.build(childId, initVersion(txNext), store);
+    var child = MemoryResource.createNew(childType, childId, txNext, store);
     var parentNext = parentCurrent.nextVersion(txNext);
 
     var p2c = Link.create(parentNext, PARENT_OF, child, txNext);

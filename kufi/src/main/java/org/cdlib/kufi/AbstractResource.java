@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import static io.vavr.control.Option.none;
 import static io.vavr.control.Option.some;
+import static org.cdlib.kufi.util.Preconditions.require;
 
 public abstract class AbstractResource<R extends Resource<R>> implements Resource<R> {
 
@@ -21,15 +22,10 @@ public abstract class AbstractResource<R extends Resource<R>> implements Resourc
   // ------------------------------------------------------------
   // Constructor
 
-  protected AbstractResource(ResourceType<R> type, UUID id, Version currentVersion) {
-    this(type, id, currentVersion, none());
-  }
-
-  protected AbstractResource(ResourceType<R> type, UUID id, Version currentVersion, Version deletedAt) {
-    this(type, id, currentVersion, some(deletedAt));
-  }
-
-  private AbstractResource(ResourceType<R> type, UUID id, Version currentVersion, Option<Version> deletedAt) {
+  protected AbstractResource(ResourceType<R> type, UUID id, Version currentVersion, Option<Version> deletedAt) {
+    for (var deletedAtVersion : deletedAt) {
+      require(currentVersion.equals(deletedAtVersion), () -> String.format("Can't delete %s(%s) at version %s without updating current version %s", type, id, deletedAtVersion, currentVersion));
+    }
     this.type = type;
     this.id = id;
     this.currentVersion = currentVersion;

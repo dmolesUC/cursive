@@ -16,7 +16,7 @@ public abstract class AbstractStoreTest<S extends Store> {
 
   private S store;
 
-  // TODO: test tombstones, dead links
+  // TODO: test dead links
 
   @BeforeEach
   void setUp() {

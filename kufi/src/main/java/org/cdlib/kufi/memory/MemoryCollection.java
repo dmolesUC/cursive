@@ -3,40 +3,24 @@ package org.cdlib.kufi.memory;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.vavr.control.Either;
-import org.cdlib.kufi.*;
+import io.vavr.control.Option;
+import org.cdlib.kufi.Collection;
+import org.cdlib.kufi.Resource;
+import org.cdlib.kufi.Version;
+import org.cdlib.kufi.Workspace;
 
 import java.util.UUID;
 
 import static org.cdlib.kufi.ResourceType.COLLECTION;
 import static org.cdlib.kufi.ResourceType.WORKSPACE;
-import static org.cdlib.kufi.util.Preconditions.require;
 
 class MemoryCollection extends MemoryResource<Collection> implements Collection {
 
   // ------------------------------------------------------------
   // Constructor
 
-  MemoryCollection(UUID id, Version currentVersion, MemoryStore store) {
-    super(COLLECTION, id, currentVersion, store);
-  }
-
-  private MemoryCollection(UUID id, Version currentVersion, Version deletedAt, MemoryStore store) {
+  MemoryCollection(UUID id, Version currentVersion, Option<Version> deletedAt, MemoryStore store) {
     super(COLLECTION, id, currentVersion, deletedAt, store);
-  }
-
-  // ------------------------------------------------------------
-  // Resource
-
-  @Override
-  public Collection delete(Transaction tx) { // TODO: find a way to pull this up
-    var deletedAt = currentVersion().next(tx);
-    return new MemoryCollection(id(), deletedAt, deletedAt, store);
-  }
-
-  @Override
-  public Collection nextVersion(Transaction tx) { // TODO: find a way to pull this up
-    require(isLive(), () -> "Can't create new version of deleted resource " + this);
-    return new MemoryCollection(id(), currentVersion().next(tx), store);
   }
 
   // ------------------------------------------------------------

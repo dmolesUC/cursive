@@ -10,6 +10,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import static io.reactivex.Single.just;
+import static org.cdlib.kufi.ResourceType.COLLECTION;
 
 public class MemoryStore implements Store {
 
@@ -61,7 +62,7 @@ public class MemoryStore implements Store {
   public Single<Collection> createCollection(Workspace parent) {
     synchronized (mutex) {
       try {
-        var result = state.createChild(this, parent, MemoryCollection::new);
+        var result = state.createChild(this, parent, COLLECTION);
         state = result.stateNext();
         return just(result.resource());
       } catch (Exception e) {
@@ -74,7 +75,7 @@ public class MemoryStore implements Store {
   public Single<Collection> createCollection(Collection parent) {
     synchronized (mutex) {
       try {
-        var result = state.createChild(this, parent, MemoryCollection::new);
+        var result = state.createChild(this, parent, COLLECTION);
         state = result.stateNext();
         return just(result.resource());
       } catch (Exception e) {
