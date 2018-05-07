@@ -33,8 +33,7 @@ class StoreState {
 
   private final Transaction tx;
 
-  private final Map<UUID, Resource<?>> liveResources;
-  private final Map<UUID, Resource<?>> deadResources;
+  private final Map<UUID, Resource<?>> resources;
 
   private final Multimap<UUID, Link> linksBySource;
   private final Multimap<UUID, Link> linksByTarget;
@@ -43,17 +42,15 @@ class StoreState {
   // Constructors
 
   StoreState() {
-    this(initTransaction(), HashMap.empty(), HashMap.empty(), HashMultimap.withSet().empty(), HashMultimap.withSet().empty());
+    this(initTransaction(), HashMap.empty(), HashMultimap.withSet().empty(), HashMultimap.withSet().empty());
   }
 
-  private StoreState(Transaction tx, Map<UUID, Resource<?>> liveResources, Map<UUID, Resource<?>> deadResources, Multimap<UUID, Link> linksBySource, Multimap<UUID, Link> linksByTarget) {
+  private StoreState(Transaction tx, Map<UUID, Resource<?>> resources, Multimap<UUID, Link> linksBySource, Multimap<UUID, Link> linksByTarget) {
     this.tx = tx;
-    this.liveResources = liveResources;
-    this.deadResources = deadResources;
+    this.resources = resources;
     this.linksBySource = linksBySource;
     this.linksByTarget = linksByTarget;
   }
-
 
   // ------------------------------------------------------------
   // Package-private instance methods
@@ -66,11 +63,11 @@ class StoreState {
   // Finders
 
   Option<Resource<?>> find(UUID id) {
-    return liveResources.get(id);
+    return resources.get(id).filter(Resource::isLive);
   }
 
   Option<Resource<?>> findTombstone(UUID id) {
-    return deadResources.get(id);
+    return resources.get(id).filter(Resource::isDeleted);
   }
 
   <R extends Resource<R>> Traversable<R> findChildrenOfType(UUID id, ResourceType<R> type) {
@@ -93,9 +90,9 @@ class StoreState {
     var id = newId();
     var txNext = tx.next();
     var ws = MemoryResource.createNew(WORKSPACE, id, txNext, store);
-    var lrNext = liveResources.put(id, ws);
+    var lrNext = resources.put(id, ws);
 
-    var storeNext = new StoreState(txNext, lrNext, deadResources, linksBySource, linksByTarget);
+    var storeNext = new StoreState(txNext, lrNext, linksBySource, linksByTarget);
     return StoreUpdate.of(ws, storeNext);
   }
 
@@ -112,7 +109,7 @@ class StoreState {
     var p2c = Link.create(parentNext, PARENT_OF, child, txNext);
     var c2p = Link.create(child, CHILD_OF, parentNext, txNext);
 
-    var lrNext = liveResources
+    var lrNext = resources
       .put(parentId, parentNext)
       .put(childId, child);
 
@@ -124,7 +121,7 @@ class StoreState {
       .put(childId, p2c)
       .put(parentId, c2p);
 
-    var stateNext = new StoreState(txNext, lrNext, deadResources, lbsNext, lbtNext);
+    var stateNext = new StoreState(txNext, lrNext, lbsNext, lbtNext);
     return StoreUpdate.of(child, stateNext);
   }
 
@@ -167,8 +164,7 @@ class StoreState {
     var liveBySource = linksBySource(id).filter(Link::isLive);
     var liveByTarget = linksByTarget(id).filter(Link::isLive);
 
-    var lrNext = liveResources.remove(id);
-    var drNext = deadResources.put(id, tombstone);
+    var rsNext = resources.put(id, tombstone);
 
     var l2dBySource = liveBySource.map(l -> Tuple.of(l, l.deleted(tombstone, l.target().nextVersion(txNext), txNext)));
     var l2dByTarget = liveByTarget.map(l -> Tuple.of(l, l.deleted(l.source().nextVersion(txNext), tombstone, txNext)));
@@ -177,14 +173,14 @@ class StoreState {
     var lbsNext = liveToDead.foldLeft(linksBySource, (lbs, t) -> lbs.replace(t._1.sourceId(), t._1, t._2));
     var lbtNext = liveToDead.foldLeft(linksByTarget, (lbt, t) -> lbt.replace(t._1.targetId(), t._1, t._2));
 
-    var stateNext = new StoreState(txNext, lrNext, drNext, lbsNext, lbtNext);
+    var stateNext = new StoreState(txNext, rsNext, lbsNext, lbtNext);
 
     var children = liveBySource.filter(l -> l.type() == PARENT_OF).map(Link::target);
     return children.foldLeft(stateNext, (storeState, r1) -> storeState.deleteRecursive(r1, txNext));
   }
 
   private <R extends Resource<R>> R findAs(UUID id, ResourceType<R> type) {
-    return liveResources.get(id).flatMap(r -> r.as(type)).getOrElseThrow(() -> new ResourceNotFoundException(id, type));
+    return resources.get(id).flatMap(r -> r.as(type)).getOrElseThrow(() -> new ResourceNotFoundException(id, type));
   }
 
   private Resource<?> current(Resource<?> resource) {

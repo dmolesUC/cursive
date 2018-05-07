@@ -1,6 +1,5 @@
 package org.cdlib.kufi;
 
-import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 
