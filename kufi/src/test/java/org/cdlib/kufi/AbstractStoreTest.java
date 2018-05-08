@@ -1,18 +1,32 @@
 package org.cdlib.kufi;
 
 import io.reactivex.Maybe;
+import io.reactivex.Single;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
-import static org.cdlib.cursive.util.RxAssertions.*;
+import static org.cdlib.cursive.util.RxAssertions.assertThat;
+import static org.cdlib.cursive.util.RxAssertions.valueEmittedBy;
 import static org.cdlib.kufi.ResourceType.COLLECTION;
 import static org.cdlib.kufi.ResourceType.WORKSPACE;
 
 public abstract class AbstractStoreTest<S extends Store> {
+
+  // ------------------------------------------------------------
+  // Abstracts
+
   protected abstract S newStore();
+
+  // ------------------------------------------------------------
+  // Fixture
 
   private S store;
 
@@ -21,6 +35,129 @@ public abstract class AbstractStoreTest<S extends Store> {
   @BeforeEach
   void setUp() {
     store = newStore();
+  }
+
+  private Resource<?> createParent(ResourceType<?> parentType) {
+    var rootWorkspace = valueEmittedBy(store.createWorkspace());
+    if (WORKSPACE == parentType) {
+      return rootWorkspace;
+    } else if (COLLECTION == parentType) {
+      return valueEmittedBy(store.createCollection(rootWorkspace));
+    } else {
+      throw new UnsupportedOperationException("Unknown resource type: " + parentType);
+    }
+  }
+
+  private Single<? extends Resource<?>> create(Resource<?> parent, ResourceType<?> childType) {
+    var createMethodName = "create" + childType;
+    Class<?> implType = parent.type().implType();
+    try {
+      var m = Store.class.getDeclaredMethod(createMethodName, implType);
+      @SuppressWarnings("unchecked")
+      var result = (Single<? extends Resource<?>>) m.invoke(store, parent);
+      return result;
+    } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  private Single<? extends Resource<?>> delete(Resource<?> resource) {
+    var resourceType = resource.type();
+    var deleteMethodName = "delete" + resourceType;
+    Class<?> implType = resourceType.implType();
+    try {
+      var m = Store.class.getDeclaredMethod(deleteMethodName, implType);
+      @SuppressWarnings("unchecked")
+      var result = (Single<? extends Resource<?>>) m.invoke(store, resource);
+      return result;
+    } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  private Single<? extends Resource<?>> deleteRecursive(Resource<?> resource) {
+    var resourceType = resource.type();
+    var deleteMethodName = "delete" + resourceType;
+    Class<?> implType = resourceType.implType();
+    try {
+      var m = Store.class.getDeclaredMethod(deleteMethodName, implType, boolean.class);
+      @SuppressWarnings("unchecked")
+      var result = (Single<? extends Resource<?>>) m.invoke(store, resource, true);
+      return result;
+    } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  @SuppressWarnings("unused")
+  static Stream<Arguments> parentToChildTypes() {
+    return ResourceType.values().flatMap(p -> p.allowableChildren().map(c -> Arguments.of(p, c))).toJavaStream();
+  }
+
+  // ------------------------------------------------------------
+  // Tests
+
+  @Nested
+  @SuppressWarnings("JUnit5MalformedParameterized")
+  class Relations {
+    @ParameterizedTest
+    @MethodSource("org.cdlib.kufi.AbstractStoreTest#parentToChildTypes")
+    void createChild(ResourceType<?> parentType, ResourceType<?> childType) {
+      var parent = createParent(parentType);
+
+      var child = valueEmittedBy(create(parent, childType));
+      assertThat(child.hasType(childType)).isTrue();
+      var tx = child.currentVersion().transaction();
+
+      var parentNext = valueEmittedBy(store.find(parent.id(), parentType));
+      assertThat(parentNext.isLaterVersionOf(parent)).isTrue();
+      assertThat(parentNext.currentVersion().transaction()).isEqualTo(tx);
+
+      assertThat(store.transaction()).emitted(tx);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.cdlib.kufi.AbstractStoreTest#parentToChildTypes")
+    void createChildFailsWithTombstonedParent(ResourceType<?> parentType, ResourceType<?> childType) {
+      var parent = createParent(parentType);
+      var tombstone = valueEmittedBy(delete(parent));
+      var tx = valueEmittedBy(store.transaction());
+      assertThat(tombstone.deletedAtTransaction()).contains(tx);
+
+      assertThat(create(parent, childType)).emittedOneError();
+      assertThat(store.findTombstone(parent.id())).emitted(tombstone);
+      assertThat(store.transaction()).emitted(tx);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.cdlib.kufi.AbstractStoreTest#parentToChildTypes")
+    void deleteParentFailsWithChild(ResourceType<?> parentType, ResourceType<?> childType) {
+      var parent = createParent(parentType);
+      var child = valueEmittedBy(create(parent, childType));
+      var parentNext = valueEmittedBy(store.find(parent.id(), parentType));
+      var tx = valueEmittedBy(store.transaction());
+
+      assertThat(delete(parent)).emittedOneError();
+
+      assertThat(valueEmittedBy(store.find(parent.id(), parentType))).isEqualTo(parentNext);
+      assertThat(valueEmittedBy(store.find(child.id(), childType))).isEqualTo(child);
+      assertThat(store.transaction()).emitted(tx);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.cdlib.kufi.AbstractStoreTest#parentToChildTypes")
+    void deleteParentRecursiveDeletesChild(ResourceType<?> parentType, ResourceType<?> childType) {
+      var parent = createParent(parentType);
+      var child = valueEmittedBy(create(parent, childType));
+      var tx = valueEmittedBy(store.transaction());
+
+      assertThat(deleteRecursive(parent)).emittedValueThat(isTombstoneFor(parent));
+
+      assertThat(store.findTombstone(parent.id())).emittedValueThat(isTombstoneFor(parent));
+      assertThat(store.findTombstone(child.id())).emittedValueThat(isTombstoneFor(child));
+
+      assertThat(store.transaction()).emittedValueThat(tx::lessThan);
+    }
   }
 
   @Nested
@@ -35,269 +172,82 @@ public abstract class AbstractStoreTest<S extends Store> {
 
     @Test
     void createWorkspaceCreatesWorkspace() {
-      var ws = valueEmittedBy(store.createWorkspace());
-      assertThat(ws).isNotNull();
+      var workspace = valueEmittedBy(store.createWorkspace());
+      assertThat(workspace).isNotNull();
 
       var tx = valueEmittedBy(store.transaction());
-      assertThat(ws.currentVersion().transaction()).isEqualTo(tx);
+      assertThat(workspace.currentVersion().transaction()).isEqualTo(tx);
 
-      var id = ws.id();
+      var id = workspace.id();
       assertThat(id).isNotNull();
 
       var found = valueEmittedBy(store.find(id, WORKSPACE));
-      assertThat(found).isEqualTo(ws);
+      assertThat(found).isEqualTo(workspace);
     }
 
     @Test
     void findFindsWorkspace() {
-      var ws = valueEmittedBy(store.createWorkspace());
-      assertThat(store.find(ws.id())).emitted(ws);
+      var workspace = valueEmittedBy(store.createWorkspace());
+      assertThat(store.find(workspace.id())).emitted(workspace);
     }
 
     @Test
     void findWithTypeOnlyFindsCorrectType() {
-      var ws = valueEmittedBy(store.createWorkspace());
+      var workspace = valueEmittedBy(store.createWorkspace());
       for (var type : ResourceType.values()) {
-        var actual = store.find(ws.id(), type);
+        var actual = store.find(workspace.id(), type);
         if (type == ResourceType.WORKSPACE) {
           @SuppressWarnings("unchecked")
           var wsActual = (Maybe<Workspace>) actual;
-          assertThat(wsActual).emitted(ws);
+          assertThat(wsActual).emitted(workspace);
         } else {
           assertThat(actual).wasEmpty();
         }
       }
-    }
-
-    @Test
-    void deleteWorkspaceDeletesEmpty() {
-      var ws = valueEmittedBy(store.createWorkspace());
-      var tx = ws.currentVersion().transaction().txid();
-
-      var tombstone = valueEmittedBy(store.deleteWorkspace(ws));
-      assertThat(tombstone.isDeleted()).isTrue();
-      var currentVersion = tombstone.currentVersion();
-      assertThat(tombstone.deletedAt()).contains(currentVersion);
-
-      var txNext = valueEmittedBy(store.transaction());
-      assertThat(txNext.txid()).isEqualTo(tx + 1);
-      assertThat(txNext).isEqualTo(currentVersion.transaction());
-
-      assertThat(store.find(ws.id(), WORKSPACE)).wasEmpty();
-
-      assertThat(store.findTombstone(ws.id())).emittedValueThat(isDeleted(ws));
-      assertThat(store.findTombstone(ws.id(), WORKSPACE)).emittedValueThat(isDeleted(ws));
-    }
-
-    @Test
-    void deleteWorkspaceFailsWithChildren() {
-      var parent = valueEmittedBy(store.createWorkspace());
-      var child = valueEmittedBy(store.createCollection(parent));
-
-      var parentNext = valueEmittedBy(store.find(parent.id(), WORKSPACE));
-      var tx = valueEmittedBy(store.transaction());
-
-      var result = store.deleteWorkspace(parent);
-      var error = errorEmittedBy(result);
-      assertThat(error).isNotNull();
-
-      var newTx = valueEmittedBy(store.transaction());
-      assertThat(newTx).isEqualTo(tx);
-
-      var found = valueEmittedBy(store.find(parent.id(), WORKSPACE));
-      assertThat(found).isEqualTo(parentNext);
-
-      var children = valuesEmittedBy(parentNext.childCollections());
-      assertThat(children).contains(child);
-
-      var collections = valueEmittedBy(child.parent());
-      assertThat(collections.left()).contains(parentNext);
-
-      assertThat(store.findTombstone(parent.id())).wasEmpty();
-      assertThat(store.findTombstone(parent.id(), WORKSPACE)).wasEmpty();
-    }
-
-    @Test
-    void deleteWorkspaceRecursiveDeletesChildren() {
-      var parent = valueEmittedBy(store.createWorkspace());
-      var child = valueEmittedBy(store.createCollection(parent));
-      var grandchild = valueEmittedBy(store.createCollection(child));
-      var tx = valueEmittedBy(store.transaction()).txid();
-
-      var result = store.deleteWorkspace(parent, true);
-      assertThat(result).emittedValueThat(isDeleted(parent));
-
-      var newTx = valueEmittedBy(store.transaction());
-      assertThat(newTx.txid()).isEqualTo(tx + 1);
-
-      assertThat(store.find(parent.id(), WORKSPACE)).wasEmpty();
-      assertThat(store.findTombstone(parent.id())).emittedValueThat(isDeleted(parent));
-      assertThat(store.findTombstone(parent.id(), WORKSPACE)).emittedValueThat(isDeleted(parent));
-
-      assertThat(store.find(child.id(), COLLECTION)).wasEmpty();
-      assertThat(store.findTombstone(child.id())).emittedValueThat(isDeleted(child));
-      assertThat(store.findTombstone(child.id(), COLLECTION)).emittedValueThat(isDeleted(child));
-
-      assertThat(store.find(grandchild.id(), COLLECTION)).wasEmpty();
-      assertThat(store.findTombstone(grandchild.id())).emittedValueThat(isDeleted(grandchild));
-      assertThat(store.findTombstone(grandchild.id(), COLLECTION)).emittedValueThat(isDeleted(grandchild));
-
-      assertThat(parent.childCollections().test()).observedNothing();
-      assertThat(child.childCollections().test()).observedNothing();
-
-      assertThat(child.parent()).emittedOneError();
-      assertThat(grandchild.parent()).emittedOneError();
     }
   }
 
   @Nested
   class Collections {
 
-    private Workspace ws;
+    private Workspace workspace;
 
     @BeforeEach
     void setUp() {
-      ws = valueEmittedBy(store.createWorkspace());
-    }
-
-    @Test
-    void createChildFailsWithTombstonedParentWorkspace() {
-      store.deleteWorkspace(ws);
-      var tx = valueEmittedBy(store.transaction());
-      assertThat(store.createCollection(ws)).emittedOneError();
-      assertThat(store.transaction()).emitted(tx);
-    }
-
-    @Test
-    void createChildFailsWithTombstonedParentCollection() {
-      var coll = valueEmittedBy(store.createCollection(ws));
-      store.deleteCollection(coll);
-      var tx = valueEmittedBy(store.transaction());
-      assertThat(store.createCollection(coll)).emittedOneError();
-      assertThat(store.transaction()).emitted(tx);
+      workspace = valueEmittedBy(store.createWorkspace());
     }
 
     @Test
     void createCollectionIncrementsTransaction() {
       var tx = valueEmittedBy(store.transaction()).txid();
-      store.createCollection(ws);
+      store.createCollection(workspace);
       var newTx = valueEmittedBy(store.transaction());
       assertThat(newTx.txid()).isEqualTo(tx + 1);
     }
 
     @Test
     void findFindsCollection() {
-      var coll = valueEmittedBy(store.createCollection(ws));
-      assertThat(store.find(coll.id())).emitted(coll);
+      var collection = valueEmittedBy(store.createCollection(workspace));
+      assertThat(store.find(collection.id())).emitted(collection);
     }
 
     @Test
-    void createCollectionCreatesCollectionAsWorkspaceChild() {
-      var child = valueEmittedBy(store.createCollection(ws));
-      assertThat(child).isNotNull();
-
-      var tx = valueEmittedBy(store.transaction());
-      assertThat(child.currentVersion().transaction()).isEqualTo(tx);
-      var parentNext = ws.nextVersion(tx);
-
-      var id = child.id();
-      assertThat(id).isNotNull();
-
-      var found = valueEmittedBy(store.find(id, COLLECTION));
-      assertThat(found).isEqualTo(child);
-
-      var children = valuesEmittedBy(parentNext.childCollections());
-      assertThat(children).contains(child);
-
-      var childParent = valueEmittedBy(child.parent());
-      assertThat(childParent.left()).contains(parentNext);
-    }
-
-    @Test
-    void createCollectionCreatesCollectionAsCollectionChild() {
-      var parent = valueEmittedBy(store.createCollection(ws));
-
-      var child = valueEmittedBy(store.createCollection(parent));
-      assertThat(child).isNotNull();
-
-      var tx = valueEmittedBy(store.transaction());
-      assertThat(child.currentVersion().transaction()).isEqualTo(tx);
-      var parentNext = parent.nextVersion(tx);
-
-      var id = child.id();
-      assertThat(id).isNotNull();
-
-      var found = valueEmittedBy(store.find(id, COLLECTION));
-      assertThat(found).isEqualTo(child);
-
-      var children = valuesEmittedBy(parentNext.childCollections());
-      assertThat(children).contains(child);
-
-      var childParent = valueEmittedBy(child.parent());
-      assertThat(childParent.right()).contains(parentNext);
-    }
-
-    @Test
-    void deleteCollectionFailsWithChildren() {
-      var parent = valueEmittedBy(store.createCollection(ws));
-      var child = valueEmittedBy(store.createCollection(parent));
-
-      var parentNext = valueEmittedBy(store.find(parent.id(), COLLECTION));
-      var tx = valueEmittedBy(store.transaction());
-
-      var result = store.deleteCollection(parent);
-      var error = errorEmittedBy(result);
-      assertThat(error).isNotNull();
-
-      assertThat(store.findTombstone(parent.id())).wasEmpty();
-      assertThat(store.findTombstone(parent.id(), COLLECTION)).wasEmpty();
-
-      var newTx = valueEmittedBy(store.transaction());
-      assertThat(newTx).isEqualTo(tx);
-
-      var found = valueEmittedBy(store.find(parent.id(), COLLECTION));
-      assertThat(found).isEqualTo(parentNext);
-
-      var children = valuesEmittedBy(parentNext.childCollections());
-      assertThat(children).contains(child);
-
-      var collections = valueEmittedBy(child.parent());
-      assertThat(collections.right()).contains(parentNext);
-    }
-
-    @Test
-    void deleteCollectionRecursiveDeletesChildren() {
-      var parent = valueEmittedBy(store.createCollection(ws));
-      var child = valueEmittedBy(store.createCollection(parent));
-      var grandchild = valueEmittedBy(store.createCollection(child));
-      var tx = valueEmittedBy(store.transaction()).txid();
-
-      var result = store.deleteCollection(parent, true);
-      assertThat(result).emittedValueThat(isDeleted(parent));
-      var newTx = valueEmittedBy(store.transaction());
-      assertThat(newTx.txid()).isEqualTo(tx + 1);
-
-      assertThat(store.find(parent.id(), WORKSPACE)).wasEmpty();
-      assertThat(store.findTombstone(parent.id())).emittedValueThat(isDeleted(parent));
-      assertThat(store.findTombstone(parent.id(), COLLECTION)).emittedValueThat(isDeleted(parent));
-
-      assertThat(store.find(child.id(), COLLECTION)).wasEmpty();
-      assertThat(store.findTombstone(child.id())).emittedValueThat(isDeleted(child));
-      assertThat(store.findTombstone(child.id(), COLLECTION)).emittedValueThat(isDeleted(child));
-
-      assertThat(store.find(grandchild.id(), COLLECTION)).wasEmpty();
-      assertThat(store.findTombstone(grandchild.id())).emittedValueThat(isDeleted(grandchild));
-      assertThat(store.findTombstone(grandchild.id(), COLLECTION)).emittedValueThat(isDeleted(grandchild));
-
-      assertThat(parent.childCollections().test()).observedNothing();
-      assertThat(child.childCollections().test()).observedNothing();
-
-      assertThat(child.parent()).emittedOneError();
-      assertThat(grandchild.parent()).emittedOneError();
+    void findWithTypeOnlyFindsCorrectType() {
+      var collection = valueEmittedBy(store.createCollection(workspace));
+      for (var type : ResourceType.values()) {
+        var actual = store.find(collection.id(), type);
+        if (type == ResourceType.COLLECTION) {
+          @SuppressWarnings("unchecked")
+          var wsActual = (Maybe<Collection>) actual;
+          assertThat(wsActual).emitted(collection);
+        } else {
+          assertThat(actual).wasEmpty();
+        }
+      }
     }
   }
 
-  private Predicate<Resource<?>> isDeleted(Resource<?> r) {
+  private Predicate<Resource<?>> isTombstoneFor(Resource<?> r) {
     return (t) -> t.isLaterVersionOf(r) && t.isDeleted();
   }
 }

@@ -12,6 +12,10 @@ public interface Resource<R extends Resource<R>> {
 
   Option<Version> deletedAt();
 
+  default Option<Transaction> deletedAtTransaction() {
+    return deletedAt().map(Version::transaction);
+  }
+
   boolean isLive();
 
   ResourceType<R> type();

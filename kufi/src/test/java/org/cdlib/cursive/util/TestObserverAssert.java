@@ -63,7 +63,7 @@ public class TestObserverAssert<T> extends AbstractAssert<TestObserverAssert<T>,
   }
 
   @SuppressWarnings("UnusedReturnValue")
-  public TestObserverAssert<T> observed(T expectedValue) {
+  public <T1 extends T> TestObserverAssert<T> observed(T1 expectedValue) {
     if (actual == null) {
       failWithMessage("Expected TestObserver, but found null instead");
     } else {

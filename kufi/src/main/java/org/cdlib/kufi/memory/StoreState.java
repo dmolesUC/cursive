@@ -70,9 +70,10 @@ class StoreState {
     return resources.get(id).filter(Resource::isDeleted);
   }
 
-  <R extends Resource<R>> Traversable<R> findChildrenOfType(UUID id, ResourceType<R> type) {
+  <R extends Resource<R>> Set<R> findChildrenOfType(UUID id, ResourceType<R> type) {
     return findChildren(id)
-      .flatMap(r -> r.as(type));
+      .flatMap(r -> r.as(type))
+      .toSet();
   }
 
   Option<Resource<?>> findParent(Resource<?> child) {
@@ -190,13 +191,11 @@ class StoreState {
   }
 
   private Traversable<Link> linksBySource(UUID id) {
-    return linksBySource.get(id)
-      .getOrElse(HashSet.empty());
+    return linksBySource.getOrElse(id, HashSet.empty());
   }
 
   private Traversable<Link> linksByTarget(UUID id) {
-    return linksByTarget.get(id)
-      .getOrElse(HashSet.empty());
+    return linksByTarget.getOrElse(id, HashSet.empty());
   }
 
   private int countChildren(UUID id) {
@@ -209,8 +208,5 @@ class StoreState {
   private static UUID newId() {
     return generator.get().generate();
   }
-
-  // ------------------------------------------------------------
-  // Helper classes
 
 }

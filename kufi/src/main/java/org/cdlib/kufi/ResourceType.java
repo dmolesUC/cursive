@@ -1,8 +1,6 @@
 package org.cdlib.kufi;
 
-import io.vavr.collection.LinkedHashMap;
-import io.vavr.collection.Map;
-import io.vavr.collection.Seq;
+import io.vavr.collection.*;
 
 import java.util.Objects;
 
@@ -21,6 +19,11 @@ public final class ResourceType<R extends Resource<R>> {
   public static final ResourceType<Workspace> WORKSPACE = new ResourceType<>(Workspace.class);
   public static final ResourceType<Collection> COLLECTION = new ResourceType<>(Collection.class);
 
+  private static final Multimap<ResourceType<?>, ResourceType<?>> allowableChildren = HashMultimap.withSet().of(
+    WORKSPACE, COLLECTION,
+    COLLECTION, COLLECTION
+  );
+
   // ------------------------------------------------------------
   // Fields
 
@@ -35,11 +38,14 @@ public final class ResourceType<R extends Resource<R>> {
   }
 
   // ------------------------------------------------------------
-  // Public methods
+  // Class methods
 
   public static Seq<ResourceType<?>> values() {
     return Registry.values();
   }
+
+  // ------------------------------------------------------------
+  // Instance methods
 
   public R cast(Resource<?> resource) {
     if (!resource.hasType(this)) {
@@ -47,6 +53,17 @@ public final class ResourceType<R extends Resource<R>> {
     }
     return implType.cast(resource);
   }
+
+  public Set<ResourceType<?>> allowableChildren() {
+    return allowableChildren.getOrElse(this, HashSet.empty()).toSet();
+  }
+
+  public Class<R> implType() {
+    return implType;
+  }
+
+  // ------------------------------------------------------------
+  // Object
 
   @Override
   public String toString() {
