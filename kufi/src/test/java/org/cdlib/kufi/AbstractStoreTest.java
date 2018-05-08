@@ -31,6 +31,8 @@ public abstract class AbstractStoreTest<S extends Store> {
   private S store;
 
   // TODO: test dead links
+  // TODO: explicitly test all interface methods (even if that reduplicates some parameterized stuff)
+  // TODO: consider using maps of method references instead of reflection (which might clear up the unused code warnings)
 
   @BeforeEach
   void setUp() {

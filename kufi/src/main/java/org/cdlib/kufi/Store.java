@@ -17,7 +17,7 @@ public interface Store {
 
   Single<Workspace> createWorkspace();
 
-  default Single<Workspace> deleteWorkspace(Workspace ws) { // TODO: replace Completables with tombstones
+  default Single<Workspace> deleteWorkspace(Workspace ws) {
     return deleteWorkspace(ws, false);
   }
 
