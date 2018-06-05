@@ -1,5 +1,12 @@
 apply plugin: 'java-library'
 
+apply plugin: 'jacoco'
+
+jacoco {
+  toolVersion = '0.8.1'
+  applyTo junitPlatformTest
+}
+
 ext {
   rxJavaVersion = '2.1.9'
 }
@@ -8,4 +15,22 @@ dependencies {
   implementation 'com.fasterxml.uuid:java-uuid-generator:3.1.4'
   implementation 'it.unimi.dsi:fastutil:8.1.1'
   api "io.reactivex.rxjava2:rxjava:${rxJavaVersion}"
+}
+
+jacocoTestReport {
+  reports {
+    html.enabled true
+  }
+}
+
+junitPlatformTest {
+  jacoco {
+    destinationFile = file("${buildDir}/jacoco/test.exec")
+  }
+}
+
+task coverage {
+  dependsOn 'test'
+  dependsOn 'jacocoTestReport'
+  tasks.findByName('jacocoTestReport').mustRunAfter('test')
 }
