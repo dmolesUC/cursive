@@ -62,7 +62,7 @@ public final class Version implements Ordered<Version> {
     if (this == o) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
+    if (o == null) {
       return false;
     }
 
