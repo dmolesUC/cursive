@@ -98,24 +98,24 @@ public final class Link {
     if (this == o) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
+    if (o == null) {
       return false;
     }
 
-    var relation = (Link) o;
-    if (!type.equals(relation.type)) {
+    var link = (Link) o;
+    if (!type.equals(link.type)) {
       return false;
     }
-    if (!source.equals(relation.source)) {
+    if (!source.equals(link.source)) {
       return false;
     }
-    if (!target.equals(relation.target)) {
+    if (!target.equals(link.target)) {
       return false;
     }
-    if (!createdAt.equals(relation.createdAt)) {
+    if (!createdAt.equals(link.createdAt)) {
       return false;
     }
-    return deletedAt.equals(relation.deletedAt);
+    return deletedAt.equals(link.deletedAt);
   }
 
   @Override
