@@ -3,15 +3,19 @@ package org.cdlib.kufi;
 import io.reactivex.Single;
 import io.vavr.collection.List;
 import io.vavr.control.Option;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import static io.vavr.control.Option.none;
 import static org.cdlib.cursive.util.RxAssertions.assertThat;
 import static org.cdlib.cursive.util.RxAssertions.valueEmittedBy;
 import static org.cdlib.cursive.util.RxAssertions.valuesEmittedBy;
@@ -19,6 +23,9 @@ import static org.cdlib.kufi.LinkType.CHILD_OF;
 import static org.cdlib.kufi.LinkType.PARENT_OF;
 import static org.cdlib.kufi.ResourceType.COLLECTION;
 import static org.cdlib.kufi.ResourceType.WORKSPACE;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public abstract class AbstractStoreTest<S extends Store> {
 
@@ -57,6 +64,54 @@ public abstract class AbstractStoreTest<S extends Store> {
 
   // ------------------------------------------------------------
   // Tests
+
+  @Nested
+  class Resources {
+    @Test
+    void resourcesAreNotEqualToNull() {
+      var ws = valueEmittedBy(store.createWorkspace());
+      assertThat(ws).isNotEqualTo(null);
+    }
+
+    @Test
+    void resourcesAreEqualToThemselves() {
+      var ws = valueEmittedBy(store.createWorkspace());
+      assertThat(ws).isEqualTo(ws);
+    }
+
+    @Test
+    void resourcesAreEqualToRetrievedCopiesOfThemselves() {
+      var ws0 = valueEmittedBy(store.createWorkspace());
+      var ws1 = valueEmittedBy(store.find(ws0.id(), WORKSPACE));
+      assertThat(ws0).isEqualTo(ws1);
+      assertThat(ws1).isEqualTo(ws0);
+    }
+
+    @Test
+    void resourcesAreNotEqualToDifferentVersionsOfThemselves() {
+      var ws0 = valueEmittedBy(store.createWorkspace());
+      var ws1 = valueEmittedBy(store.createCollection(ws0).flatMap(Collection::parent)).getLeft();
+      assertThat(ws0).isNotEqualTo(ws1);
+      assertThat(ws1).isNotEqualTo(ws0);
+    }
+
+    @Test
+    void differentResourceTypesAreDifferent() {
+      var ws = valueEmittedBy(store.createWorkspace());
+      var col = valueEmittedBy(store.createCollection(ws));
+      assertThat(ws).isNotEqualTo(col);
+      assertThat(col).isNotEqualTo(ws);
+    }
+
+    @Test
+    void differentResourcesAreDifferent() {
+      var ws = valueEmittedBy(store.createWorkspace());
+      var col1 = valueEmittedBy(store.createCollection(ws));
+      var col2 = valueEmittedBy(store.createCollection(ws));
+      assertThat(col1).isNotEqualTo(col2);
+      assertThat(col2).isNotEqualTo(col1);
+    }
+  }
 
   @Nested
   @SuppressWarnings("JUnit5MalformedParameterized")

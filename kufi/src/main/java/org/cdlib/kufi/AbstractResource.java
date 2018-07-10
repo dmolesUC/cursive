@@ -88,13 +88,9 @@ public abstract class AbstractResource<R extends Resource<R>> implements Resourc
     }
 
     var that = (AbstractResource<?>) o;
-    if (!currentVersion.equals(that.currentVersion)) {
-      return false;
-    }
-    if (!type.equals(that.type)) {
-      return false;
-    }
-    return id.equals(that.id);
+    return type.equals(that.type)
+      && id.equals(that.id)
+      && currentVersion.equals(that.currentVersion);
   }
 
   @Override
