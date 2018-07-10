@@ -18,7 +18,10 @@ dependencies {
 }
 
 task coverage {
+  dependsOn 'test'
   dependsOn 'jacocoTestReport'
+  tasks.findByName('jacocoTestReport').mustRunAfter('test')
+
   doLast {
     def index = fileTree(jacoco.reportsDir).find { File d ->
       d.path.endsWith("index.html")
