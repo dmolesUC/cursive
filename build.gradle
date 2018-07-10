@@ -3,16 +3,12 @@ buildscript {
     jcenter()
   }
   dependencies {
-    classpath 'org.junit.platform:junit-platform-gradle-plugin:1.1.0'
+    classpath 'org.jacoco:org.jacoco.core:0.8.1'
   }
 }
 
-task wrapper(type: Wrapper) {
-  gradleVersion = '4.6'
-}
-
 subprojects {
-  apply plugin: 'org.junit.platform.gradle.plugin'
+  apply plugin: 'java'
 
   sourceCompatibility = 10
   targetCompatibility = 10
@@ -32,6 +28,10 @@ subprojects {
     assertJVersion = '3.9.1'
 
     nettyVersion = "4.1.22.Final"
+  }
+
+  test {
+    useJUnitPlatform()
   }
 
   configurations.all {
@@ -70,6 +70,7 @@ subprojects {
     testCompile "org.junit.jupiter:junit-jupiter-params:$junitVersion"
     testRuntime "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
     testCompile "org.junit.vintage:junit-vintage-engine:$junitVersion"
+    testCompile("junit:junit:4.12")
 
     testCompile "org.mockito:mockito-core:$mockitoVersion"
     testCompile "org.assertj:assertj-core:$assertJVersion"

@@ -1,10 +1,10 @@
-apply plugin: 'java-library'
+import java.nio.file.Paths
 
+apply plugin: 'java-library'
 apply plugin: 'jacoco'
 
 jacoco {
   toolVersion = '0.8.1'
-  applyTo junitPlatformTest
 }
 
 ext {
@@ -17,20 +17,12 @@ dependencies {
   api "io.reactivex.rxjava2:rxjava:${rxJavaVersion}"
 }
 
-jacocoTestReport {
-  reports {
-    html.enabled true
-  }
-}
-
-junitPlatformTest {
-  jacoco {
-    destinationFile = file("${buildDir}/jacoco/test.exec")
-  }
-}
-
 task coverage {
-  dependsOn 'test'
   dependsOn 'jacocoTestReport'
-  tasks.findByName('jacocoTestReport').mustRunAfter('test')
+  doLast {
+    def index = fileTree(jacoco.reportsDir).find { File d ->
+      d.path.endsWith("index.html")
+    }.toPath()
+    println("Coverage report: ${Paths.get(System.getProperty("user.dir")).relativize(index)}")
+  }
 }
