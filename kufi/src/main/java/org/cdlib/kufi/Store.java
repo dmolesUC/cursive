@@ -1,6 +1,7 @@
 package org.cdlib.kufi;
 
 import io.reactivex.Maybe;
+import io.reactivex.Observable;
 import io.reactivex.Single;
 
 import java.util.UUID;
@@ -46,4 +47,8 @@ public interface Store {
   <R extends Resource<R>> Maybe<R> find(UUID id, ResourceType<R> type);
 
   <R extends Resource<R>> Maybe<R> findTombstone(UUID id, ResourceType<R> type);
+
+  Observable<Link> linksFrom(UUID id);
+
+  Observable<Link> linksTo(UUID id);
 }

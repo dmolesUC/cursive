@@ -1,6 +1,7 @@
 package org.cdlib.kufi;
 
 import io.reactivex.Single;
+import io.vavr.collection.List;
 import io.vavr.control.Option;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -13,6 +14,9 @@ import java.util.stream.Stream;
 
 import static org.cdlib.cursive.util.RxAssertions.assertThat;
 import static org.cdlib.cursive.util.RxAssertions.valueEmittedBy;
+import static org.cdlib.cursive.util.RxAssertions.valuesEmittedBy;
+import static org.cdlib.kufi.LinkType.CHILD_OF;
+import static org.cdlib.kufi.LinkType.PARENT_OF;
 import static org.cdlib.kufi.ResourceType.COLLECTION;
 import static org.cdlib.kufi.ResourceType.WORKSPACE;
 
@@ -115,6 +119,41 @@ public abstract class AbstractStoreTest<S extends Store> {
       assertThat(parentNext.currentVersion().transaction()).isEqualTo(tx);
 
       assertThat(store.transaction()).emitted(tx);
+
+      var parentLinks = valuesEmittedBy(store.linksFrom(parent.id()));
+      var childLinks = valuesEmittedBy(store.linksFrom(child.id()));
+
+      var expectedParentChildLink = Link.create(parentNext, PARENT_OF, child, tx);
+      var expectedChildParentLink = Link.create(child, CHILD_OF, parentNext, tx);
+
+      assertThat(parentLinks).contains(expectedParentChildLink);
+      assertThat(childLinks).contains(expectedChildParentLink);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.cdlib.kufi.AbstractStoreTest#parentToChildTypes")
+    void parentChildLink(ResourceType<?> parentType, ResourceType<?> childType) {
+      var parent = createParent(parentType);
+      var child = valueEmittedBy(create(parent, childType));
+      var tx = child.currentVersion().transaction();
+      var parentNext = valueEmittedBy(store.find(parent.id(), parentType));
+
+      var parentLinks = valuesEmittedBy(store.linksFrom(parent.id()));
+      var childLinks = valuesEmittedBy(store.linksFrom(child.id()));
+
+      var parentLink = parentLinks.find(l -> l.type() == PARENT_OF).get();
+      assertThat(parentLink.source()).isEqualTo(parentNext);
+      assertThat(parentLink.target()).isEqualTo(child);
+      assertThat(parentLink.isLive()).isTrue();
+      assertThat(parentLink.createdAt()).isEqualTo(tx);
+      assertThat(parentLink.deletedAt()).isEmpty();
+
+      var childLink = childLinks.find(l -> l.type() == CHILD_OF).get();
+      assertThat(childLink.source()).isEqualTo(child);
+      assertThat(childLink.target()).isEqualTo(parentNext);
+      assertThat(childLink.isLive()).isTrue();
+      assertThat(childLink.createdAt()).isEqualTo(tx);
+      assertThat(childLink.deletedAt()).isEmpty();
     }
 
     @ParameterizedTest
@@ -161,6 +200,15 @@ public abstract class AbstractStoreTest<S extends Store> {
 
       var childTombstone = verifyTombstone(child);
       assertThat(childTombstone.deletedAtTransaction()).contains(txNext);
+
+      var parentLinks = valuesEmittedBy(store.linksFrom(parent.id()));
+      var childLinks = valuesEmittedBy(store.linksFrom(child.id()));
+
+      var expectedParentChildLink = Link.create(parentTombstone, PARENT_OF, childTombstone, tx, txNext);
+      var expectedChildParentLink = Link.create(childTombstone, CHILD_OF, parentTombstone, tx, txNext);
+
+      assertThat(parentLinks).contains(expectedParentChildLink);
+      assertThat(childLinks).contains(expectedChildParentLink);
     }
 
     Resource<?> verifyTombstone(Resource<?> r) {

@@ -139,6 +139,14 @@ class StoreState {
     return StoreUpdate.of(r.delete(txNext), deleteRecursive(r, txNext));
   }
 
+  Traversable<Link> linksBySource(UUID id) {
+    return linksBySource.getOrElse(id, HashSet.empty());
+  }
+
+  Traversable<Link> linksByTarget(UUID id) {
+    return linksByTarget.getOrElse(id, HashSet.empty());
+  }
+
   // ------------------------------------------------------------
   // Private instance methods
 
@@ -188,14 +196,6 @@ class StoreState {
     var id = resource.id();
     var type = resource.type();
     return findAs(id, type);
-  }
-
-  private Traversable<Link> linksBySource(UUID id) {
-    return linksBySource.getOrElse(id, HashSet.empty());
-  }
-
-  private Traversable<Link> linksByTarget(UUID id) {
-    return linksByTarget.getOrElse(id, HashSet.empty());
   }
 
   private int countChildren(UUID id) {

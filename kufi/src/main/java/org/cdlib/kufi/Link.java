@@ -1,5 +1,6 @@
 package org.cdlib.kufi;
 
+import io.vavr.collection.List;
 import io.vavr.control.Option;
 
 import java.util.Objects;
@@ -125,5 +126,10 @@ public final class Link {
     result = 31 * result + createdAt.hashCode();
     result = 31 * result + deletedAt.hashCode();
     return result;
+  }
+
+  @Override
+  public String toString() {
+    return List.of(source, type, target, createdAt, deletedAt).mkString("Link(", ", ", ")");
   }
 }

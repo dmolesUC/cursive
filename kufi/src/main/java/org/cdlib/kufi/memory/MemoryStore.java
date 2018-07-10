@@ -106,6 +106,16 @@ public class MemoryStore implements Store {
     }
   }
 
+  @Override
+  public Observable<Link> linksFrom(UUID id) {
+    return Observable.fromIterable(state.linksBySource(id));
+  }
+
+  @Override
+  public Observable<Link> linksTo(UUID id) {
+    return Observable.fromIterable(state.linksByTarget(id));
+  }
+
   // ------------------------------------------------------------
   // Package-private
 
