@@ -16,8 +16,8 @@ public class TimeUtil {
   }
 
   public static ZonedDateTime requireUTC(ZonedDateTime zdt) {
-    var offset = requireNonNull(zdt).getOffset();
-    if (!ZoneOffset.UTC.equals(offset)) {
+    var zone = requireNonNull(zdt).getZone();
+    if (!ZoneOffset.UTC.equals(zone)) {
       throw new IllegalArgumentException("Expected UTC datetime, got " + zdt);
     }
     return zdt;
