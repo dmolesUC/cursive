@@ -16,6 +16,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static io.vavr.control.Option.none;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.cdlib.cursive.util.RxAssertions.assertThat;
 import static org.cdlib.cursive.util.RxAssertions.valueEmittedBy;
 import static org.cdlib.cursive.util.RxAssertions.valuesEmittedBy;
@@ -139,7 +140,6 @@ public abstract class AbstractStoreTest<S extends Store> {
     void findFinds(ResourceType<?> type) {
       var resource = valueEmittedBy(create(type));
       assertThat(store.find(resource.id())).emitted(resource);
-
     }
 
     @ParameterizedTest
@@ -153,6 +153,29 @@ public abstract class AbstractStoreTest<S extends Store> {
         } else {
           assertThat(actual).wasEmpty();
         }
+      }
+    }
+  }
+
+  @Nested
+  @SuppressWarnings("JUnit5MalformedParameterized")
+  class ResourceTypes {
+    @ParameterizedTest
+    @MethodSource("org.cdlib.kufi.AbstractStoreTest#allTypes")
+    void typesCanCastToTheirImplType(ResourceType<?> type) {
+      var resource = valueEmittedBy(create(type));
+      var castResource = type.cast(resource);
+      assertThat(castResource).isInstanceOf(type.implType());
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.cdlib.kufi.AbstractStoreTest#allTypes")
+    void typesCannotCastToWrongImplType(ResourceType<?> type) {
+      var resource = valueEmittedBy(create(type));
+      for (var wrongType: ResourceType.values().filter(t -> !type.equals(t))){
+        assertThatIllegalArgumentException().isThrownBy(() -> {
+          wrongType.cast(resource);
+        });
       }
     }
   }
