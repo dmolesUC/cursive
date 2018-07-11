@@ -25,4 +25,9 @@ public class ObservableAssert<T> extends AbstractAssert<ObservableAssert<T>, Obs
     observer.observedNothing();
     return this;
   }
+
+  public ObservableAssert<T> emitted(T t) {
+    observer.observed(t);
+    return this;
+  }
 }

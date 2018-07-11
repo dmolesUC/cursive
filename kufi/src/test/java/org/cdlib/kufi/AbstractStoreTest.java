@@ -1,9 +1,8 @@
 package org.cdlib.kufi;
 
 import io.reactivex.Single;
-import io.vavr.collection.List;
-import io.vavr.control.Option;
-import org.assertj.core.api.Assertions;
+import io.vavr.collection.Seq;
+import io.vavr.control.Either;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -11,22 +10,14 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.UUID;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
-import static io.vavr.control.Option.none;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
-import static org.cdlib.cursive.util.RxAssertions.assertThat;
-import static org.cdlib.cursive.util.RxAssertions.valueEmittedBy;
-import static org.cdlib.cursive.util.RxAssertions.valuesEmittedBy;
+import static org.cdlib.cursive.util.RxAssertions.*;
 import static org.cdlib.kufi.LinkType.CHILD_OF;
 import static org.cdlib.kufi.LinkType.PARENT_OF;
 import static org.cdlib.kufi.ResourceType.COLLECTION;
 import static org.cdlib.kufi.ResourceType.WORKSPACE;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public abstract class AbstractStoreTest<S extends Store> {
 
@@ -53,14 +44,8 @@ public abstract class AbstractStoreTest<S extends Store> {
 
   /** {@link MethodSource} for {@link AbstractStoreTest.ParentsAndChildren} */
   @SuppressWarnings("unused")
-  private static Stream<Arguments> parentToChildTypes() {
-    return ResourceType.values().flatMap(p -> p.allowableChildren().map(c -> Arguments.of(p, c))).toJavaStream();
-  }
-
-  /** {@link MethodSource} for {@link AbstractStoreTest.CreateAndFind} */
-  @SuppressWarnings("unused")
-  private static Stream<ResourceType<?>> allTypes() {
-    return ResourceType.values().toJavaStream();
+  private static Seq<Arguments> parentToChildTypes() {
+    return ResourceType.values().flatMap(p -> p.allowableChildren().map(c -> Arguments.of(p, c)));
   }
 
   // ------------------------------------------------------------
@@ -68,79 +53,141 @@ public abstract class AbstractStoreTest<S extends Store> {
 
   @Nested
   class Resources {
-    @Test
-    void resourcesAreNotEqualToNull() {
-      var ws = valueEmittedBy(store.createWorkspace());
-      assertThat(ws).isNotEqualTo(null);
+    @ParameterizedTest
+    @MethodSource("org.cdlib.kufi.ResourceType#values")
+    void resourcesAreNotEqualToNull(ResourceType<?> type) {
+      var res = valueEmittedBy(create(type));
+      assertThat(res).isNotEqualTo(null);
     }
 
-    @Test
-    void resourcesAreEqualToThemselves() {
-      var ws = valueEmittedBy(store.createWorkspace());
-      assertThat(ws).isEqualTo(ws);
+    @ParameterizedTest
+    @MethodSource("org.cdlib.kufi.ResourceType#values")
+    void resourcesAreEqualToThemselves(ResourceType<?> type) {
+      var res = valueEmittedBy(create(type));
+      assertThat(res).isEqualTo(res);
     }
 
-    @Test
-    void resourcesAreEqualToRetrievedCopiesOfThemselves() {
-      var ws0 = valueEmittedBy(store.createWorkspace());
-      var ws1 = valueEmittedBy(store.find(ws0.id(), WORKSPACE));
-      assertThat(ws0).isEqualTo(ws1);
-      assertThat(ws1).isEqualTo(ws0);
+    @ParameterizedTest
+    @MethodSource("org.cdlib.kufi.ResourceType#values")
+    void resourcesAreEqualToRetrievedCopiesOfThemselves(ResourceType<?> type) {
+      var res0 = valueEmittedBy(create(type));
+      var res1 = valueEmittedBy(store.find(res0.id()));
+      assertThat(res0).isEqualTo(res1);
+      assertThat(res1).isEqualTo(res0);
     }
 
-    @Test
-    void resourcesAreNotEqualToDifferentVersionsOfThemselves() {
-      var ws0 = valueEmittedBy(store.createWorkspace());
-      var ws1 = valueEmittedBy(store.createCollection(ws0).flatMap(Collection::parent)).getLeft();
-      assertThat(ws0).isNotEqualTo(ws1);
-      assertThat(ws1).isNotEqualTo(ws0);
+    @ParameterizedTest
+    @MethodSource("org.cdlib.kufi.ResourceType#values")
+    void resourcesAreNotEqualToDifferentVersionsOfThemselves(ResourceType<?> type) {
+      var res0 = valueEmittedBy(create(type));
+      var res1 = res0.nextVersion(res0.currentVersion().transaction().next());
+      assertThat(res0).isNotEqualTo(res1);
+      assertThat(res1).isNotEqualTo(res0);
     }
 
-    @Test
-    void differentResourceTypesAreDifferent() {
-      var ws = valueEmittedBy(store.createWorkspace());
-      var col = valueEmittedBy(store.createCollection(ws));
-      assertThat(ws).isNotEqualTo(col);
-      assertThat(col).isNotEqualTo(ws);
+    @ParameterizedTest
+    @MethodSource("org.cdlib.kufi.ResourceType#values")
+    void differentResourceTypesAreDifferent(ResourceType<?> type) {
+      var res0 = valueEmittedBy(create(type));
+      for (var otherType: ResourceType.values().filter(t -> !type.equals(t))) {
+        var res1 = valueEmittedBy(create(otherType));
+        assertThat(res0).isNotEqualTo(res1);
+        assertThat(res1).isNotEqualTo(res0);
+      }
     }
 
-    @Test
-    void differentResourcesAreDifferent() {
-      var ws = valueEmittedBy(store.createWorkspace());
-      var col1 = valueEmittedBy(store.createCollection(ws));
-      var col2 = valueEmittedBy(store.createCollection(ws));
-      assertThat(col1).isNotEqualTo(col2);
-      assertThat(col2).isNotEqualTo(col1);
+    @ParameterizedTest
+    @MethodSource("org.cdlib.kufi.ResourceType#values")
+    void differentResourcesAreDifferent(ResourceType<?> type) {
+      var res0 = valueEmittedBy(create(type));
+      var res1 = valueEmittedBy(create(type));
+      assertThat(res0).isNotEqualTo(res1);
+      assertThat(res1).isNotEqualTo(res0);
     }
 
-    @Test
-    void laterVersionsAreLaterAndEarlierVersionsAreEarlier() {
-      var ws0 = valueEmittedBy(store.createWorkspace());
-      var ws1 = valueEmittedBy(store.createCollection(ws0).flatMap(Collection::parent)).getLeft();
-
-      assertThat(ws0.isEarlierVersionOf(ws1)).isTrue();
-      assertThat(ws1.isLaterVersionOf(ws0)).isTrue();
-
-      assertThat(ws0.isLaterVersionOf(ws1)).isFalse();
-      assertThat(ws1.isEarlierVersionOf(ws0)).isFalse();
+    @ParameterizedTest
+    @MethodSource("org.cdlib.kufi.ResourceType#values")
+    void laterVersionsAreLaterAndEarlierVersionsAreEarlier(ResourceType<?> type) {
+      var res0 = valueEmittedBy(create(type));
+      var res1 = res0.nextVersion(res0.currentVersion().transaction().next());
+      assertThat(res0.isEarlierVersionOf(res1)).isTrue();
+      assertThat(res1.isLaterVersionOf(res0)).isTrue();
+      assertThat(res0.isLaterVersionOf(res1)).isFalse();
+      assertThat(res1.isEarlierVersionOf(res0)).isFalse();
     }
 
-    @Test
-    void unrelatedResourcesAreNotLaterOrEarlierVersions() {
-      var ws0 = valueEmittedBy(store.createWorkspace());
-      var ws1 = valueEmittedBy(store.createWorkspace());
-      assertThat(ws0.isEarlierVersionOf(ws1)).isFalse();
-      assertThat(ws0.isLaterVersionOf(ws1)).isFalse();
-      assertThat(ws1.isEarlierVersionOf(ws0)).isFalse();
-      assertThat(ws1.isLaterVersionOf(ws0)).isFalse();
+    @ParameterizedTest
+    @MethodSource("org.cdlib.kufi.ResourceType#values")
+    void unrelatedResourcesAreNotLaterOrEarlierVersions(ResourceType<?> type) {
+      var res0 = valueEmittedBy(create(type));
+      var res1 = valueEmittedBy(create(type));
+      assertThat(res0.isEarlierVersionOf(res1)).isFalse();
+      assertThat(res0.isLaterVersionOf(res1)).isFalse();
+      assertThat(res1.isEarlierVersionOf(res0)).isFalse();
+      assertThat(res1.isLaterVersionOf(res0)).isFalse();
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.cdlib.kufi.ResourceType#values")
+    void tombstonesAreLaterVersions(ResourceType<?> type) {
+      var resource = valueEmittedBy(create(type));
+      var tombstone = valueEmittedBy(delete(resource));
+      assertThat(resource.isEarlierVersionOf(tombstone)).isTrue();
+      assertThat(tombstone.isLaterVersionOf(resource)).isTrue();
+      assertThat(resource.isLaterVersionOf(tombstone)).isFalse();
+      assertThat(tombstone.isEarlierVersionOf(resource)).isFalse();
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.cdlib.kufi.ResourceType#values")
+    void deletingTombstonesIsHarmless(ResourceType<?> type) {
+      var tombstone0 = valueEmittedBy(create(type).flatMap(AbstractStoreTest.this::delete));
+      var tombstone1 = valueEmittedBy(delete(tombstone0));
+      assertThat(tombstone0).isEqualTo(tombstone1);
+      assertThat(tombstone1).isEqualTo(tombstone0);
     }
   }
 
   @Nested
-  @SuppressWarnings("JUnit5MalformedParameterized")
-  class CreateAndFind {
+  class Workspaces {
+    @Test
+    void childrenAppearInChildrenList() {
+      var ws = valueEmittedBy(store.createWorkspace());
+      var col = valueEmittedBy(store.createCollection(ws));
+      assertThat(ws.childCollections()).emitted(col);
+    }
+  }
+
+  @Nested
+  class Collections {
+    @Test
+    void childrenAppearInChildrenList() {
+      var c1 = valueEmittedBy(store.createWorkspace().flatMap(store::createCollection));
+      var c2 = valueEmittedBy(store.createCollection(c1));
+      assertThat(c1.childCollections()).emitted(c2);
+    }
+
+    @Test
+    void parentFindsParent() {
+      var ws = valueEmittedBy(store.createWorkspace());
+      var col = valueEmittedBy(store.createCollection(ws));
+      assertThat(col.parent().map(Either::getLeft)).emittedValueThat(isLaterVersionOf(ws));
+    }
+
+    @Test
+    void parentIsNotConfusedByChildren() {
+      var ws = valueEmittedBy(store.createWorkspace());
+      var c1 = valueEmittedBy(store.createCollection(ws));
+      var c2 = valueEmittedBy(store.createCollection(c1));
+      assertThat(c1.parent().map(Either::getLeft)).emittedValueThat(isLaterVersionOf(ws));
+      assertThat(c2.parent().map(Either::get)).emittedValueThat(isLaterVersionOf(c1));
+    }
+  }
+
+  @Nested
+  class CRUD {
     @ParameterizedTest
-    @MethodSource("org.cdlib.kufi.AbstractStoreTest#allTypes")
+    @MethodSource("org.cdlib.kufi.ResourceType#values")
     void createCreates(ResourceType<?> type) {
       var tx = valueEmittedBy(store.transaction());
 
@@ -158,14 +205,14 @@ public abstract class AbstractStoreTest<S extends Store> {
     }
 
     @ParameterizedTest
-    @MethodSource("org.cdlib.kufi.AbstractStoreTest#allTypes")
+    @MethodSource("org.cdlib.kufi.ResourceType#values")
     void findFinds(ResourceType<?> type) {
       var resource = valueEmittedBy(create(type));
       assertThat(store.find(resource.id())).emitted(resource);
     }
 
     @ParameterizedTest
-    @MethodSource("org.cdlib.kufi.AbstractStoreTest#allTypes")
+    @MethodSource("org.cdlib.kufi.ResourceType#values")
     void findFindsOnlyCorrectType(ResourceType<?> type) {
       var resource = valueEmittedBy(create(type));
       for (var t1 : ResourceType.values()) {
@@ -177,13 +224,19 @@ public abstract class AbstractStoreTest<S extends Store> {
         }
       }
     }
+
+    @ParameterizedTest
+    @MethodSource("org.cdlib.kufi.ResourceType#values")
+    void deleteCreatesTombstone(ResourceType<?> type) {
+      var res = valueEmittedBy(create(type));
+      assertThat(delete(res)).emittedValueThat(isTombstoneFor(res));
+    }
   }
 
   @Nested
-  @SuppressWarnings("JUnit5MalformedParameterized")
   class ResourceTypes {
     @ParameterizedTest
-    @MethodSource("org.cdlib.kufi.AbstractStoreTest#allTypes")
+    @MethodSource("org.cdlib.kufi.ResourceType#values")
     void typesCanCastToTheirImplType(ResourceType<?> type) {
       var resource = valueEmittedBy(create(type));
       var castResource = type.cast(resource);
@@ -191,7 +244,7 @@ public abstract class AbstractStoreTest<S extends Store> {
     }
 
     @ParameterizedTest
-    @MethodSource("org.cdlib.kufi.AbstractStoreTest#allTypes")
+    @MethodSource("org.cdlib.kufi.ResourceType#values")
     void typesCannotCastToWrongImplType(ResourceType<?> type) {
       var resource = valueEmittedBy(create(type));
       for (var wrongType: ResourceType.values().filter(t -> !type.equals(t))){
@@ -203,7 +256,6 @@ public abstract class AbstractStoreTest<S extends Store> {
   }
 
   @Nested
-  @SuppressWarnings("JUnit5MalformedParameterized")
   class ParentsAndChildren {
     @ParameterizedTest
     @MethodSource("org.cdlib.kufi.AbstractStoreTest#parentToChildTypes")
@@ -228,6 +280,12 @@ public abstract class AbstractStoreTest<S extends Store> {
 
       assertThat(parentLinks).contains(expectedParentChildLink);
       assertThat(childLinks).contains(expectedChildParentLink);
+      
+      var linksToChild = valuesEmittedBy(store.linksTo(child.id()));
+      var linksToParent = valuesEmittedBy(store.linksTo(parent.id()));
+
+      assertThat(linksToChild).contains(expectedParentChildLink);
+      assertThat(linksToParent).contains(expectedChildParentLink);
     }
 
     @ParameterizedTest
@@ -327,6 +385,10 @@ public abstract class AbstractStoreTest<S extends Store> {
     return (t) -> t.isLaterVersionOf(r) && t.isDeleted();
   }
 
+  private Predicate<Resource<?>> isLaterVersionOf(Resource<?> r) {
+    return (r1) -> r1.isLaterVersionOf(r);
+  }
+
   private Resource<?> createParent(ResourceType<?> parentType) {
     var rootWorkspace = valueEmittedBy(store.createWorkspace());
     if (WORKSPACE == parentType) {
@@ -352,12 +414,11 @@ public abstract class AbstractStoreTest<S extends Store> {
     if (childType == WORKSPACE) {
       return store.createWorkspace();
     }
-    var parentType = Option.ofOptional(
-      parentToChildTypes().map(Arguments::get)
-        .filter(a -> a[1] == childType)
-        .map(a -> (ResourceType<?>) a[0])
-        .findFirst()
-    ).get();
+    var parentType = parentToChildTypes()
+      .map(Arguments::get)
+      .filter(a -> a[1] == childType)
+      .map(a -> (ResourceType<?>) a[0])
+      .head();
     var parent = createParent(parentType);
     return create(parent, childType);
   }

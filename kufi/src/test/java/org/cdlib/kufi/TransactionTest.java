@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.cdlib.kufi.util.TimeUtil.utcNow;
 
-class DateTest {
+class TransactionTest {
 
   private static SecureRandom r;
 

@@ -17,7 +17,18 @@ public class MemoryStore implements Store {
   // Instance fields
 
   private final Object mutex = new Object();
-  private volatile StoreState state = new StoreState();
+  private volatile StoreState state;
+
+  // ------------------------------------------------------------
+  // Constructor
+
+  public MemoryStore() {
+    this(new StoreState());
+  }
+
+  MemoryStore(StoreState initialState) {
+    state = initialState;
+  }
 
   // ------------------------------------------------------------
   // Store
@@ -144,10 +155,10 @@ public class MemoryStore implements Store {
     }
   }
 
-  private <R extends Resource<R>> Single<R> delete(R coll, boolean recursive) {
+  private <R extends Resource<R>> Single<R> delete(R res, boolean recursive) {
     synchronized (mutex) {
       try {
-        var result = recursive ? state.deleteRecursive(coll) : state.delete(coll);
+        var result = recursive ? state.deleteRecursive(res) : state.delete(res);
         state = result.stateNext();
         return Single.just(result.resource());
       } catch (Exception e) {

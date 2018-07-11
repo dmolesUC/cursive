@@ -28,6 +28,11 @@ public class MaybeAssert<T> extends AbstractAssert<MaybeAssert<T>, Maybe<T>> {
     return this;
   }
 
+  public MaybeAssert<T> emittedError(Throwable expected) {
+    observer.observedError(expected);
+    return this;
+  }
+
   public MaybeAssert<T> emittedValueThat(Predicate<? super T> predicate) {
     observer.observed(predicate);
     return this;

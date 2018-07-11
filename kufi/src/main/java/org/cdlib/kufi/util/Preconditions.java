@@ -12,14 +12,6 @@ public class Preconditions {
     return value;
   }
 
-  public static void checkArgument(boolean condition, String fmt, Object... args) {
-    require(condition, () -> String.format(fmt, args));
-  }
-
-  public static void checkArgument(boolean condition, String fmt, Supplier... args) {
-    require(condition, () -> String.format(fmt, Array.of(args).map(Supplier::get).toJavaArray()));
-  }
-
   public static void require(boolean condition, Supplier<String> msgSupplier) {
     if (!condition) {
       throw new IllegalArgumentException(msgSupplier.get());

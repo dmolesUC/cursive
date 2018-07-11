@@ -2,6 +2,7 @@ package org.cdlib.kufi.memory;
 
 import org.cdlib.kufi.Resource;
 
+// TODO: can't we just get the new StoreState from the Resource somehow?
 class StoreUpdate<R extends Resource<R>> {
 
   // ------------------------------------------------------------

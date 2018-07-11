@@ -188,14 +188,12 @@ class StoreState {
     return children.foldLeft(stateNext, (storeState, r1) -> storeState.deleteRecursive(r1, txNext));
   }
 
-  private <R extends Resource<R>> R findAs(UUID id, ResourceType<R> type) {
-    return resources.get(id).flatMap(r -> r.as(type)).getOrElseThrow(() -> new ResourceNotFoundException(id, type));
-  }
-
   private Resource<?> current(Resource<?> resource) {
-    var id = resource.id();
-    var type = resource.type();
-    return findAs(id, type);
+    return resources.get(resource.id())
+      .flatMap(r -> r.as(resource.type()))
+      .getOrElseThrow(() ->
+        new ResourceNotFoundException(resource.id(), resource.type())
+      );
   }
 
   private int countChildren(UUID id) {

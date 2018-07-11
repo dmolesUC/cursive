@@ -24,9 +24,9 @@ public interface Resource<R extends Resource<R>> {
 
   <R1 extends Resource<R1>> Option<R1> as(ResourceType<R1> type);
 
-  R delete(Transaction tx);
+  R delete(Transaction tx); // TODO: push this down
 
-  R nextVersion(Transaction tx);
+  R nextVersion(Transaction tx); // TODO: push this down
 
   boolean isDeleted();
 
