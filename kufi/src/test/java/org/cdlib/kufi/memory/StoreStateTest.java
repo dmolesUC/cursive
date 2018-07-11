@@ -24,7 +24,7 @@ class StoreStateTest {
   }
 
   @ParameterizedTest
-  @MethodSource("org.cdlib.kufi.ResourceType#values")
+  @MethodSource("org.cdlib.kufi.ResourceType#values") // TODO: fix test
   @SuppressWarnings("unchecked")
   void deleteFailsForNonexistentResource(ResourceType<?> type) {
     var r = mock(Resource.class);

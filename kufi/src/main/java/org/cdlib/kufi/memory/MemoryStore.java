@@ -9,7 +9,10 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import static io.reactivex.Single.just;
+import static io.vavr.control.Option.none;
+import static io.vavr.control.Option.some;
 import static org.cdlib.kufi.ResourceType.COLLECTION;
+import static org.cdlib.kufi.util.Preconditions.require;
 
 public class MemoryStore implements Store {
 
@@ -138,6 +141,24 @@ public class MemoryStore implements Store {
   Single<? extends Resource<?>> findParentOf(Resource<?> child) {
     return state.findParent(child).map(Single::just)
       .getOrElse(() -> Single.error(new NoSuchElementException("No parent found for resource: " + child)));
+  }
+
+  <R extends Resource<R>> R createNew(ResourceType<R> type, UUID id, Transaction createdAtTx) {
+    return Constructors.creatorFor(type).construct(id, Version.initVersion(createdAtTx), none(), this);
+  }
+
+  <R extends Resource<R>> R nextVersion(Resource<R> resource, Transaction tx) {
+    require(resource.isLive(), () -> "Can't create new version of deleted resource " + resource);
+    return Constructors.creatorFor(resource.type()).construct(resource.id(), resource.currentVersion().next(tx), none(), this);
+  }
+
+  <R extends Resource<R>> R delete(Resource<R> resource, Transaction tx) {
+    if (resource.isLive()) {
+      var type = resource.type();
+      var nextVersion = resource.currentVersion().next(tx);
+      return Constructors.creatorFor(type).construct(resource.id(), nextVersion, some(nextVersion), this);
+    }
+    return resource.self();
   }
 
   // ------------------------------------------------------------

@@ -90,7 +90,7 @@ class StoreState {
   StoreUpdate<Workspace> createWorkspace(MemoryStore store) {
     var id = newId();
     var txNext = tx.next();
-    var ws = MemoryResource.createNew(WORKSPACE, id, txNext, store);
+    var ws = store.createNew(WORKSPACE, id, txNext);
     var lrNext = resources.put(id, ws);
 
     var storeNext = new StoreState(txNext, lrNext, linksBySource, linksByTarget);
@@ -104,8 +104,8 @@ class StoreState {
     var childId = newId();
     var txNext = tx.next();
 
-    var child = MemoryResource.createNew(childType, childId, txNext, store);
-    var parentNext = MemoryResource.nextVersion(parentCurrent, store, txNext);
+    var child = store.createNew(childType, childId, txNext);
+    var parentNext = store.nextVersion(parentCurrent, txNext);
 
     var p2c = Link.create(parentNext, PARENT_OF, child, txNext);
     var c2p = Link.create(child, CHILD_OF, parentNext, txNext);
@@ -136,7 +136,7 @@ class StoreState {
 
   <R extends Resource<R>> StoreUpdate<R> deleteRecursive(R r) {
     var txNext = tx.next();
-    return StoreUpdate.of(MemoryResource.delete(r, ((MemoryResource<R>) r).store, txNext), deleteRecursive(r, txNext));
+    return StoreUpdate.of(getStore(r).delete(r, txNext), deleteRecursive(r, txNext));
   }
 
   Traversable<Link> linksBySource(UUID id) {
@@ -168,15 +168,15 @@ class StoreState {
   private StoreState deleteRecursive(Resource<?> r, Transaction txNext) {
     var current = current(r);
     var id = current.id();
-    var tombstone = MemoryResource.delete(current, ((MemoryResource<?>) current).store, txNext);
+    var tombstone = getStore(current).delete(current, txNext);
 
     var liveBySource = linksBySource(id).filter(Link::isLive);
     var liveByTarget = linksByTarget(id).filter(Link::isLive);
 
     var rsNext = resources.put(id, tombstone);
 
-    var l2dBySource = liveBySource.map(l -> Tuple.of(l, l.deleted(tombstone, MemoryResource.nextVersion(l.target(), ((MemoryResource<?>) l.target()).store, txNext), txNext)));
-    var l2dByTarget = liveByTarget.map(l -> Tuple.of(l, l.deleted(MemoryResource.nextVersion(l.source(), ((MemoryResource<?>) l.source()).store, txNext), tombstone, txNext)));
+    var l2dBySource = liveBySource.map(l -> Tuple.of(l, l.deleted(tombstone, getStore(l.target()).nextVersion(l.target(), txNext), txNext)));
+    var l2dByTarget = liveByTarget.map(l -> Tuple.of(l, l.deleted(getStore(l.source()).nextVersion(l.source(), txNext), tombstone, txNext)));
     var liveToDead = List.of(l2dBySource, l2dByTarget).flatMap(Function.identity());
 
     var lbsNext = liveToDead.foldLeft(linksBySource, (lbs, t) -> lbs.replace(t._1.sourceId(), t._1, t._2));
@@ -198,6 +198,10 @@ class StoreState {
 
   private int countChildren(UUID id) {
     return findChildren(id).size();
+  }
+
+  private static <R extends Resource<R>> MemoryStore getStore(Resource<R> resource) {
+    return ((MemoryResource<R>)resource).store();
   }
 
   // ------------------------------------------------------------

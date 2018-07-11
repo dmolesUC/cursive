@@ -21,7 +21,7 @@ class StoreUpdate<R extends Resource<R>> {
   // ------------------------------------------------------------
   // Constructor
 
-  public StoreUpdate(R resource, StoreState stateNext) {
+  private StoreUpdate(R resource, StoreState stateNext) {
     this.resource = resource;
     this.stateNext = stateNext;
   }
