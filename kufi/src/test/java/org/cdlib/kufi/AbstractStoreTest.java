@@ -112,6 +112,28 @@ public abstract class AbstractStoreTest<S extends Store> {
       assertThat(col1).isNotEqualTo(col2);
       assertThat(col2).isNotEqualTo(col1);
     }
+
+    @Test
+    void laterVersionsAreLaterAndEarlierVersionsAreEarlier() {
+      var ws0 = valueEmittedBy(store.createWorkspace());
+      var ws1 = valueEmittedBy(store.createCollection(ws0).flatMap(Collection::parent)).getLeft();
+
+      assertThat(ws0.isEarlierVersionOf(ws1)).isTrue();
+      assertThat(ws1.isLaterVersionOf(ws0)).isTrue();
+
+      assertThat(ws0.isLaterVersionOf(ws1)).isFalse();
+      assertThat(ws1.isEarlierVersionOf(ws0)).isFalse();
+    }
+
+    @Test
+    void unrelatedResourcesAreNotLaterOrEarlierVersions() {
+      var ws0 = valueEmittedBy(store.createWorkspace());
+      var ws1 = valueEmittedBy(store.createWorkspace());
+      assertThat(ws0.isEarlierVersionOf(ws1)).isFalse();
+      assertThat(ws0.isLaterVersionOf(ws1)).isFalse();
+      assertThat(ws1.isEarlierVersionOf(ws0)).isFalse();
+      assertThat(ws1.isLaterVersionOf(ws0)).isFalse();
+    }
   }
 
   @Nested
