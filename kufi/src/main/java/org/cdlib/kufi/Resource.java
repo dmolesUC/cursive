@@ -24,10 +24,6 @@ public interface Resource<R extends Resource<R>> {
 
   <R1 extends Resource<R1>> Option<R1> as(ResourceType<R1> type);
 
-  R delete(Transaction tx); // TODO: push this down
-
-  R nextVersion(Transaction tx); // TODO: push this down
-
   boolean isDeleted();
 
   default boolean isLaterVersionOf(Resource<?> r) {
@@ -36,5 +32,10 @@ public interface Resource<R extends Resource<R>> {
 
   default boolean isEarlierVersionOf(Resource<?> r) {
     return id().equals(r.id()) && currentVersion().lessThan(r.currentVersion());
+  }
+
+  @SuppressWarnings("unchecked")
+  default R self() {
+    return (R) this;
   }
 }

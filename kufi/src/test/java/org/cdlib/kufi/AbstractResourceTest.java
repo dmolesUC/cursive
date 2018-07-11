@@ -51,15 +51,6 @@ class AbstractResourceTest {
       super(type, id, currentVersion, deletedAt);
     }
 
-    @Override
-    public R delete(Transaction tx) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public R nextVersion(Transaction tx) {
-      throw new UnsupportedOperationException();
-    }
   }
 
 }

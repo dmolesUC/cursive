@@ -30,6 +30,7 @@ public abstract class MemoryResource<R extends Resource<R>> extends AbstractReso
   // ------------------------------------------------------------
   // Class accessors
 
+  // TODO: move to MemoryStore
   static <R extends Resource<R>> R createNew(ResourceType<R> type, UUID id, Transaction createdAtTx, MemoryStore store) {
     return creatorFor(type).construct(id, Version.initVersion(createdAtTx), none(), store);
   }
@@ -37,33 +38,24 @@ public abstract class MemoryResource<R extends Resource<R>> extends AbstractReso
   // ------------------------------------------------------------
   // Resource
 
-  @Override
-  public R nextVersion(Transaction tx) {
-    require(isLive(), () -> "Can't create new version of deleted resource " + this);
-    return creatorFor(type()).construct(id(), currentVersion().next(tx), none(), store);
+  // TODO: move to MemoryStore
+  public static <R extends Resource<R>> R nextVersion(Resource<R> resource, MemoryStore store, Transaction tx) {
+    require(resource.isLive(), () -> "Can't create new version of deleted resource " + resource);
+    return creatorFor(resource.type()).construct(resource.id(), resource.currentVersion().next(tx), none(), store);
   }
 
-  @Override
-  public R delete(Transaction tx) {
-    if (isLive()) {
-      var type = type();
-      var nextVersion = currentVersion().next(tx);
-      return creatorFor(type).construct(id(), nextVersion, some(nextVersion), store);
+  public static <R extends Resource<R>> R delete(Resource<R> resource, MemoryStore store, Transaction tx) {
+    if (resource.isLive()) {
+      var type = resource.type();
+      var nextVersion = resource.currentVersion().next(tx);
+      return creatorFor(type).construct(resource.id(), nextVersion, some(nextVersion), store);
     }
-    return self();
+    return resource.self();
   }
 
   @Override
   public final String toString() {
     return Array.of(id(), currentVersion(), store).mkString(getClass().getSimpleName() + "(", ", ", ")");
-  }
-
-  // ------------------------------------------------------------
-  // Private instance methods
-
-  @SuppressWarnings("unchecked")
-  private R self() {
-    return (R) this;
   }
 
   // ------------------------------------------------------------
