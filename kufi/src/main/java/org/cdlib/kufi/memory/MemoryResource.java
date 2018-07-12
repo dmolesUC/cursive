@@ -2,11 +2,12 @@ package org.cdlib.kufi.memory;
 
 import io.vavr.collection.Array;
 import io.vavr.control.Option;
-import org.cdlib.kufi.*;
+import org.cdlib.kufi.AbstractResource;
+import org.cdlib.kufi.Resource;
+import org.cdlib.kufi.ResourceType;
+import org.cdlib.kufi.Version;
 
 import java.util.UUID;
-
-import static io.vavr.control.Option.some;
 
 abstract class MemoryResource<R extends Resource<R>> extends AbstractResource<R> {
 
