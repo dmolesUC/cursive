@@ -24,9 +24,14 @@ task coverage {
   tasks.findByName('jacocoTestReport').mustRunAfter('test')
 
   doLast {
-    def index = fileTree(jacoco.reportsDir).find { File d ->
-      d.path.endsWith("index.html")
-    }.toPath()
-    println("Coverage report: ${Paths.get(System.getProperty("user.dir")).relativize(index)}")
+    def indexFile = Paths.get(
+        fileTree(jacoco.reportsDir)
+            .collect { d -> d.path }
+            .findAll { p -> p.endsWith("index.html") }
+            .sort { a, b -> a.length() - b.length() }
+            .first()
+    )
+    def workDir = Paths.get(System.getProperty("user.dir"))
+    println("Coverage report: ${workDir.relativize(indexFile)}")
   }
 }
