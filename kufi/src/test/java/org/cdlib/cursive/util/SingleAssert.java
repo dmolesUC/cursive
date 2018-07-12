@@ -33,6 +33,11 @@ public class SingleAssert<T> extends AbstractAssert<SingleAssert<T>, Single<T>> 
     return this;
   }
 
+  public SingleAssert<T> emittedErrorThat(Predicate<? super Throwable> predicate) {
+    observer.observedErrorThat(predicate);
+    return this;
+  }
+
   public SingleAssert<T> emittedErrorOfType(Class<? extends Throwable> expected) {
     observer.observedErrorOfType(expected);
     return this;

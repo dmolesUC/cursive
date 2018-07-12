@@ -1,6 +1,5 @@
 package org.cdlib.kufi.memory;
 
-import io.vavr.control.Option;
 import org.cdlib.kufi.AbstractStoreTest;
 import org.cdlib.kufi.Resource;
 import org.cdlib.kufi.ResourceType;

@@ -1,7 +1,6 @@
 package org.cdlib.kufi.util;
 
 import io.vavr.collection.List;
-import org.assertj.core.api.ThrowableAssert;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;

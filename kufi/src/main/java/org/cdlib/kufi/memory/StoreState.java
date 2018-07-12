@@ -201,7 +201,7 @@ class StoreState {
   }
 
   private static <R extends Resource<R>> MemoryStore getStore(Resource<R> resource) {
-    return ((MemoryResource<R>)resource).store();
+    return ((MemoryResource<R>) resource).store();
   }
 
   // ------------------------------------------------------------

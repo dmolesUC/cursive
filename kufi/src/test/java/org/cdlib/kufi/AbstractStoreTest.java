@@ -18,6 +18,8 @@ import static org.cdlib.kufi.LinkType.CHILD_OF;
 import static org.cdlib.kufi.LinkType.PARENT_OF;
 import static org.cdlib.kufi.ResourceType.COLLECTION;
 import static org.cdlib.kufi.ResourceType.WORKSPACE;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public abstract class AbstractStoreTest<S extends Store> {
 
@@ -32,7 +34,6 @@ public abstract class AbstractStoreTest<S extends Store> {
   private S store;
 
   // TODO: test dead links
-  // TODO: explicitly test all interface methods (even if that reduplicates some parameterized stuff)
 
   @BeforeEach
   void setUp() {
@@ -90,7 +91,7 @@ public abstract class AbstractStoreTest<S extends Store> {
     @MethodSource("org.cdlib.kufi.ResourceType#values")
     void differentResourceTypesAreDifferent(ResourceType<?> type) {
       var res0 = valueEmittedBy(create(type));
-      for (var otherType: ResourceType.values().filter(t -> !type.equals(t))) {
+      for (var otherType : ResourceType.values().filter(t -> !type.equals(t))) {
         var res1 = valueEmittedBy(create(otherType));
         assertThat(res0).isNotEqualTo(res1);
         assertThat(res1).isNotEqualTo(res0);
@@ -233,6 +234,26 @@ public abstract class AbstractStoreTest<S extends Store> {
       var res = valueEmittedBy(create(type));
       assertThat(delete(res)).emittedValueThat(isTombstoneFor(res));
     }
+
+    @ParameterizedTest
+    @MethodSource("org.cdlib.kufi.ResourceType#values")
+    void deleteInvalidTransactionFails(ResourceType<?> type) {
+      var resource = mock(type.implType());
+      var tx = valueEmittedBy(store.transaction());
+      var txNext = tx.next();
+      var version = Version.initVersion(txNext);
+      when(resource.currentVersion()).thenReturn(version);
+      when(resource.hasType(type)).thenReturn(true);
+
+      assertThat(delete(resource)).emittedErrorThat(t -> {
+        var message = t.getMessage();
+        return (t instanceof IllegalArgumentException)
+          && message.contains(version.toString())
+          && message.contains(tx.toString())
+          && message.contains(txNext.toString())
+          ;
+      });
+    }
   }
 
   @Nested
@@ -249,7 +270,7 @@ public abstract class AbstractStoreTest<S extends Store> {
     @MethodSource("org.cdlib.kufi.ResourceType#values")
     void typesCannotCastToWrongImplType(ResourceType<?> type) {
       var resource = valueEmittedBy(create(type));
-      for (var wrongType: ResourceType.values().filter(t -> !type.equals(t))){
+      for (var wrongType : ResourceType.values().filter(t -> !type.equals(t))) {
         assertThatIllegalArgumentException().isThrownBy(() -> {
           wrongType.cast(resource);
         });
@@ -259,6 +280,27 @@ public abstract class AbstractStoreTest<S extends Store> {
 
   @Nested
   class ParentsAndChildren {
+
+    @ParameterizedTest
+    @MethodSource("org.cdlib.kufi.AbstractStoreTest#parentToChildTypes")
+    void createInvalidParentTransactionFails(ResourceType<?> parentType, ResourceType<?> childType) {
+      var parent = mock(parentType.implType());
+      var tx = valueEmittedBy(store.transaction());
+      var txNext = tx.next();
+      var version = Version.initVersion(txNext);
+      when(parent.currentVersion()).thenReturn(version);
+      when(parent.hasType(parentType)).thenReturn(true);
+
+      assertThat(create(parent, childType)).emittedErrorThat(t -> {
+        var message = t.getMessage();
+        return (t instanceof IllegalArgumentException)
+          && message.contains(version.toString())
+          && message.contains(tx.toString())
+          && message.contains(txNext.toString())
+          ;
+      });
+    }
+
     @ParameterizedTest
     @MethodSource("org.cdlib.kufi.AbstractStoreTest#parentToChildTypes")
     void createChild(ResourceType<?> parentType, ResourceType<?> childType) {
@@ -282,7 +324,7 @@ public abstract class AbstractStoreTest<S extends Store> {
 
       assertThat(parentLinks).contains(expectedParentChildLink);
       assertThat(childLinks).contains(expectedChildParentLink);
-      
+
       var linksToChild = valuesEmittedBy(store.linksTo(child.id()));
       var linksToParent = valuesEmittedBy(store.linksTo(parent.id()));
 

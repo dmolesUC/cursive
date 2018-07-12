@@ -1,7 +1,6 @@
 package org.cdlib.kufi;
 
 import io.vavr.collection.List;
-import io.vavr.control.Option;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -31,7 +30,7 @@ class LinkTest {
   void toStringIncludesDetails() {
     var str = link.toString();
     var fields = List.of(source, link.type(), target, link.createdAt(), link.deletedAt()).map(Object::toString);
-    for (var field: fields) {
+    for (var field : fields) {
       assertThat(str).contains(field);
     }
   }

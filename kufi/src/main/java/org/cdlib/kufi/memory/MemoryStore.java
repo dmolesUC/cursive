@@ -167,6 +167,7 @@ public class MemoryStore implements Store {
   private <P extends Resource<P>, C extends Resource<C>> Single<C> create(P parent, ResourceType<C> childType) {
     synchronized (mutex) {
       try {
+        requireValidTransaction(parent);
         var result = state.createChild(this, parent, childType);
         state = result.stateNext();
         return just(result.resource());
@@ -179,6 +180,7 @@ public class MemoryStore implements Store {
   private <R extends Resource<R>> Single<R> delete(R res, boolean recursive) {
     synchronized (mutex) {
       try {
+        requireValidTransaction(res);
         var result = recursive ? state.deleteRecursive(res) : state.delete(res);
         state = result.stateNext();
         return Single.just(result.resource());
@@ -186,5 +188,12 @@ public class MemoryStore implements Store {
         return Single.error(e);
       }
     }
+  }
+
+  private void requireValidTransaction(Resource<?> resource) {
+    var version = resource.currentVersion();
+    var resourceTx = version.transaction();
+    var currentTx = state.transaction();
+    require(resourceTx.lessThanOrEqualTo(currentTx), () -> String.format("Invalid transaction: resource %s version %s transaction %s must be <= %s", resource, version, resourceTx, currentTx));
   }
 }

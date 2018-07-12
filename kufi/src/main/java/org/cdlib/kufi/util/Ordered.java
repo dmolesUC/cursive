@@ -5,9 +5,16 @@ public interface Ordered<T> extends Comparable<T> {
     return compareTo(other) < 0;
   }
 
+  default boolean lessThanOrEqualTo(T other) {
+    return compareTo(other) <= 0;
+  }
+
   default boolean greaterThan(T other) {
     return compareTo(other) > 0;
   }
 
+  default boolean greaterThanOrEqualTo(T other) {
+    return compareTo(other) >= 0;
+  }
 }
 

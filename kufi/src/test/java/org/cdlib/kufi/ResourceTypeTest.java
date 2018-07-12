@@ -10,14 +10,14 @@ class ResourceTypeTest {
   class Equals {
     @Test
     void typesAreEqualToThemselves() {
-      for (var rt: ResourceType.values()) {
+      for (var rt : ResourceType.values()) {
         assertThat(rt).isEqualTo(rt);
       }
     }
 
     @Test
     void typesAreNotEqualToNull() {
-      for (var rt: ResourceType.values()) {
+      for (var rt : ResourceType.values()) {
         assertThat(rt).isNotEqualTo(null);
       }
     }

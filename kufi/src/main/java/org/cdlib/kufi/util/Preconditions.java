@@ -1,7 +1,5 @@
 package org.cdlib.kufi.util;
 
-import io.vavr.collection.Array;
-
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 

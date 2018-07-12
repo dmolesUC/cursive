@@ -1,8 +1,10 @@
 package org.cdlib.kufi.memory;
 
-import org.cdlib.kufi.*;
+import org.cdlib.kufi.ResourceNotFoundException;
+import org.cdlib.kufi.ResourceType;
+import org.cdlib.kufi.Transaction;
+import org.cdlib.kufi.Version;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -10,8 +12,6 @@ import java.util.UUID;
 
 import static io.vavr.control.Option.none;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class StoreStateTest {
 
@@ -26,7 +26,8 @@ class StoreStateTest {
   @MethodSource("org.cdlib.kufi.ResourceType#values") // TODO: fix test
   @SuppressWarnings("unchecked")
   void deleteFailsForNonexistentResource(ResourceType<?> type) {
-    var r = new MemoryResource(type, UUID.randomUUID(), Version.initVersion(Transaction.initTransaction()), none(), new MemoryStore(state)) {};
+    var r = new MemoryResource(type, UUID.randomUUID(), Version.initVersion(Transaction.initTransaction()), none(), new MemoryStore(state)) {
+    };
     assertThatExceptionOfType(ResourceNotFoundException.class)
       .isThrownBy(() -> state.deleteRecursive(r))
       .withMessageContaining(r.id().toString())

@@ -4,7 +4,6 @@ import io.reactivex.observers.TestObserver;
 import io.vavr.collection.Array;
 import io.vavr.collection.List;
 import io.vavr.collection.Traversable;
-import io.vavr.control.Option;
 import org.assertj.core.api.AbstractAssert;
 
 import java.util.function.Predicate;
@@ -184,6 +183,22 @@ public class TestObserverAssert<T> extends AbstractAssert<TestObserverAssert<T>,
     }
     return this;
   }
+
+  public TestObserverAssert<T> observedErrorThat(Predicate<? super Throwable> predicate) {
+    if (actual == null) {
+      failWithMessage("Expected TestObserver, but found null instead");
+    } else {
+      var errors = List.ofAll(actual.errors());
+      if (errors.find(predicate).isEmpty()) {
+        failWithMessage("Expected error matching predicate <%s>, got <%s>",
+          predicate,
+          format(errors.map(this::formatException))
+        );
+      }
+    }
+    return this;
+  }
+
 
   public TestObserverAssert<T> observedNoErrors() {
     if (actual == null) {
