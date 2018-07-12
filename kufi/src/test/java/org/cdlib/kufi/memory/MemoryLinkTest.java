@@ -1,6 +1,8 @@
-package org.cdlib.kufi;
+package org.cdlib.kufi.memory;
 
 import io.vavr.collection.List;
+import org.cdlib.kufi.LinkType;
+import org.cdlib.kufi.Transaction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -11,19 +13,19 @@ import static org.cdlib.kufi.LinkType.PARENT_OF;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class LinkTest {
+class MemoryLinkTest {
 
-  private Resource<?> source;
-  private Resource<?> target;
+  private MemoryResource<?> source;
+  private MemoryResource<?> target;
   private Transaction tx;
-  private Link link;
+  private MemoryLink link;
 
   @BeforeEach
   void setUp() {
-    source = mock(Resource.class);
-    target = mock(Resource.class);
+    source = mock(MemoryResource.class);
+    target = mock(MemoryResource.class);
     tx = Transaction.initTransaction();
-    link = Link.create(source, PARENT_OF, target, tx);
+    link = MemoryLink.create(source, PARENT_OF, target, tx);
   }
 
   @Test
@@ -39,9 +41,9 @@ class LinkTest {
   class Deleted {
     @Test
     void requiresLaterSource() {
-      Resource<?> badSource = mock(Resource.class);
+      MemoryResource<?> badSource = mock(MemoryResource.class);
       when(badSource.isLaterVersionOf(source)).thenReturn(false);
-      Resource<?> goodTarget = mock(Resource.class);
+      MemoryResource<?> goodTarget = mock(MemoryResource.class);
       when(goodTarget.isLaterVersionOf(target)).thenReturn(true);
 
       assertThatIllegalArgumentException().isThrownBy(() -> link.deleted(badSource, goodTarget, tx.next()))
@@ -50,9 +52,9 @@ class LinkTest {
 
     @Test
     void requiresLaterTarget() {
-      Resource<?> goodSource = mock(Resource.class);
+      MemoryResource<?> goodSource = mock(MemoryResource.class);
       when(goodSource.isLaterVersionOf(source)).thenReturn(true);
-      Resource<?> badTarget = mock(Resource.class);
+      MemoryResource<?> badTarget = mock(MemoryResource.class);
       when(badTarget.isLaterVersionOf(target)).thenReturn(false);
 
       assertThatIllegalArgumentException().isThrownBy(() -> link.deleted(goodSource, badTarget, tx.next()))
@@ -70,7 +72,7 @@ class LinkTest {
 
     @Test
     void linkEqualToEqualLink() {
-      var link2 = Link.create(source, PARENT_OF, target, tx);
+      var link2 = MemoryLink.create(source, PARENT_OF, target, tx);
       assertThat(link).isEqualTo(link2);
       assertThat(link.hashCode()).isEqualTo(link2.hashCode());
     }
@@ -82,23 +84,33 @@ class LinkTest {
 
     @Test
     void linkWithDifferentSourceIsNotEqual() {
-      var link2 = Link.create(mock(Resource.class), link.type(), link.target(), link.createdAt());
+      var link2 = MemoryLink.create(mock(MemoryResource.class), link.type(), link.target(), link.createdAt());
       assertThat(link).isNotEqualTo(link2);
       assertThat(link2).isNotEqualTo(link);
     }
 
     @Test
     void linkWithDifferentTargetIsNotEqual() {
-      var link2 = Link.create(link.source(), link.type(), mock(Resource.class), link.createdAt());
+      var link2 = MemoryLink.create(link.source(), link.type(), mock(MemoryResource.class), link.createdAt());
       assertThat(link).isNotEqualTo(link2);
       assertThat(link2).isNotEqualTo(link);
     }
 
     @Test
+    void linkWithDifferentTypeIsNotEqual() {
+      for (var otherType : LinkType.allTypes().filter(l -> l != link.type())) {
+        var link2 = MemoryLink.create(link.source(), otherType, link.target(), link.createdAt());
+        assertThat(link).isNotEqualTo(link2);
+        assertThat(link2).isNotEqualTo(link);
+      }
+    }
+
+    @Test
     void linkWithDifferentTxIsNotEqual() {
-      var link2 = Link.create(link.source(), link.type(), link.target(), link.createdAt().next());
+      var link2 = MemoryLink.create(link.source(), link.type(), link.target(), link.createdAt().next());
       assertThat(link).isNotEqualTo(link2);
       assertThat(link2).isNotEqualTo(link);
     }
+
   }
 }

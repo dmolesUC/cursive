@@ -8,6 +8,6 @@ import java.util.UUID;
 
 @FunctionalInterface
 interface ResourceConstructor<C extends Resource<C>> {
-  C construct(UUID id, Version currentVersion, Option<Version> deletedAt, MemoryStore store);
+  MemoryResource<C> construct(UUID id, Version currentVersion, Option<Version> deletedAt, MemoryStore store);
 }
 

@@ -49,6 +49,10 @@ class TransactionTest {
       var tx1 = new Transaction(tx0.txid(), timestamp);
       assertThat(tx0).isEqualByComparingTo(tx1);
       assertThat(tx1).isEqualByComparingTo(tx0);
+      assertThat(tx0.lessThanOrEqualTo(tx1)).isTrue();
+      assertThat(tx0.greaterThanOrEqualTo(tx1)).isTrue();
+      assertThat(tx1.lessThanOrEqualTo(tx0)).isTrue();
+      assertThat(tx1.greaterThanOrEqualTo(tx0)).isTrue();
     }
 
     @Test
@@ -57,6 +61,14 @@ class TransactionTest {
       var tx1 = new Transaction(1 + tx0.txid(), tx0.timestamp());
       assertThat(tx0).isLessThan(tx1);
       assertThat(tx1).isGreaterThan(tx0);
+      assertThat(tx0.lessThan(tx1)).isTrue();
+      assertThat(tx0.greaterThan(tx1)).isFalse();
+      assertThat(tx1.lessThan(tx0)).isFalse();
+      assertThat(tx1.greaterThan(tx0)).isTrue();
+      assertThat(tx0.lessThanOrEqualTo(tx1)).isTrue();
+      assertThat(tx0.greaterThanOrEqualTo(tx1)).isFalse();
+      assertThat(tx1.lessThanOrEqualTo(tx0)).isFalse();
+      assertThat(tx1.greaterThanOrEqualTo(tx0)).isTrue();
     }
 
     @Test
@@ -65,6 +77,14 @@ class TransactionTest {
       var tx1 = new Transaction(tx0.txid(), timestamp.plus(1, ChronoUnit.NANOS));
       assertThat(tx0).isLessThan(tx1);
       assertThat(tx1).isGreaterThan(tx0);
+      assertThat(tx0.lessThan(tx1)).isTrue();
+      assertThat(tx0.greaterThan(tx1)).isFalse();
+      assertThat(tx1.lessThan(tx0)).isFalse();
+      assertThat(tx1.greaterThan(tx0)).isTrue();
+      assertThat(tx0.lessThanOrEqualTo(tx1)).isTrue();
+      assertThat(tx0.greaterThanOrEqualTo(tx1)).isFalse();
+      assertThat(tx1.lessThanOrEqualTo(tx0)).isFalse();
+      assertThat(tx1.greaterThanOrEqualTo(tx0)).isTrue();
     }
   }
 

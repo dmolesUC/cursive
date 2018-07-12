@@ -47,7 +47,7 @@ public class MemoryStore implements Store {
       try {
         var result = state.createWorkspace(this);
         state = result.stateNext();
-        return just(result.resource());
+        return just(result.resource().self());
       } catch (Exception e) {
         return Single.error(e);
       }
@@ -143,22 +143,22 @@ public class MemoryStore implements Store {
       .getOrElse(() -> Single.error(new NoSuchElementException("No parent found for resource: " + child)));
   }
 
-  <R extends Resource<R>> R createNew(ResourceType<R> type, UUID id, Transaction createdAtTx) {
-    return Constructors.creatorFor(type).construct(id, Version.initVersion(createdAtTx), none(), this);
+  <R extends Resource<R>> MemoryResource<R> createNew(ResourceType<R> type, UUID id, Transaction createdAtTx) {
+    return MemoryResource.creatorFor(type).construct(id, Version.initVersion(createdAtTx), none(), this);
   }
 
-  <R extends Resource<R>> R nextVersion(Resource<R> resource, Transaction tx) {
+  <R extends Resource<R>> MemoryResource<R> nextVersion(MemoryResource<R> resource, Transaction tx) {
     require(resource.isLive(), () -> "Can't create new version of deleted resource " + resource);
-    return Constructors.creatorFor(resource.type()).construct(resource.id(), resource.currentVersion().next(tx), none(), this);
+    return MemoryResource.creatorFor(resource.type()).construct(resource.id(), resource.currentVersion().next(tx), none(), this);
   }
 
-  <R extends Resource<R>> R delete(Resource<R> resource, Transaction tx) {
+  <R extends Resource<R>> MemoryResource<R> delete(MemoryResource<R> resource, Transaction tx) {
     if (resource.isLive()) {
       var type = resource.type();
       var nextVersion = resource.currentVersion().next(tx);
-      return Constructors.creatorFor(type).construct(resource.id(), nextVersion, some(nextVersion), this);
+      return MemoryResource.creatorFor(type).construct(resource.id(), nextVersion, some(nextVersion), this);
     }
-    return resource.self();
+    return resource;
   }
 
   // ------------------------------------------------------------
@@ -167,10 +167,9 @@ public class MemoryStore implements Store {
   private <P extends Resource<P>, C extends Resource<C>> Single<C> create(P parent, ResourceType<C> childType) {
     synchronized (mutex) {
       try {
-        requireValidTransaction(parent);
-        var result = state.createChild(this, parent, childType);
+        var result = state.createChild(this, internalize(parent), childType);
         state = result.stateNext();
-        return just(result.resource());
+        return just(result.resource().self());
       } catch (Exception e) {
         return Single.error(e);
       }
@@ -180,20 +179,25 @@ public class MemoryStore implements Store {
   private <R extends Resource<R>> Single<R> delete(R res, boolean recursive) {
     synchronized (mutex) {
       try {
-        requireValidTransaction(res);
-        var result = recursive ? state.deleteRecursive(res) : state.delete(res);
+        var r = internalize(res);
+        var result = state.delete(r, recursive);
         state = result.stateNext();
-        return Single.just(result.resource());
+        return Single.just(result.resource().self());
       } catch (Exception e) {
         return Single.error(e);
       }
     }
   }
 
-  private void requireValidTransaction(Resource<?> resource) {
+  private <R extends Resource<R>> MemoryResource<R> internalize(Resource<R> resource) {
     var version = resource.currentVersion();
     var resourceTx = version.transaction();
     var currentTx = state.transaction();
     require(resourceTx.lessThanOrEqualTo(currentTx), () -> String.format("Invalid transaction: resource %s version %s transaction %s must be <= %s", resource, version, resourceTx, currentTx));
+    if (resource instanceof MemoryResource) {
+      return (MemoryResource<R>) resource;
+    }
+    var type = resource.type();
+    return MemoryResource.creatorFor(type).construct(resource.id(), resource.currentVersion(), resource.deletedAt(), this);
   }
 }

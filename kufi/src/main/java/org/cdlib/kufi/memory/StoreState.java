@@ -33,10 +33,10 @@ class StoreState {
 
   private final Transaction tx;
 
-  private final Map<UUID, Resource<?>> resources;
+  private final Map<UUID, MemoryResource<?>> resources;
 
-  private final Multimap<UUID, Link> linksBySource;
-  private final Multimap<UUID, Link> linksByTarget;
+  private final Multimap<UUID, MemoryLink> linksBySource;
+  private final Multimap<UUID, MemoryLink> linksByTarget;
 
   // ------------------------------------------------------------
   // Constructors
@@ -45,7 +45,7 @@ class StoreState {
     this(initTransaction(), HashMap.empty(), HashMultimap.withSet().empty(), HashMultimap.withSet().empty());
   }
 
-  private StoreState(Transaction tx, Map<UUID, Resource<?>> resources, Multimap<UUID, Link> linksBySource, Multimap<UUID, Link> linksByTarget) {
+  private StoreState(Transaction tx, Map<UUID, MemoryResource<?>> resources, Multimap<UUID, MemoryLink> linksBySource, Multimap<UUID, MemoryLink> linksByTarget) {
     this.tx = tx;
     this.resources = resources;
     this.linksBySource = linksBySource;
@@ -62,11 +62,11 @@ class StoreState {
   // ------------------------------
   // Finders
 
-  Option<Resource<?>> find(UUID id) {
+  Option<MemoryResource<?>> find(UUID id) {
     return resources.get(id).filter(Resource::isLive);
   }
 
-  Option<Resource<?>> findTombstone(UUID id) {
+  Option<MemoryResource<?>> findTombstone(UUID id) {
     return resources.get(id).filter(Resource::isDeleted);
   }
 
@@ -97,7 +97,7 @@ class StoreState {
     return StoreUpdate.of(ws, storeNext);
   }
 
-  <P extends Resource<P>, C extends Resource<C>> StoreUpdate<C> createChild(MemoryStore store, P parent, ResourceType<C> childType) {
+  <P extends Resource<P>, C extends Resource<C>> StoreUpdate<C> createChild(MemoryStore store, MemoryResource<P> parent, ResourceType<C> childType) {
     var parentId = parent.id();
     var parentCurrent = current(parent);
 
@@ -107,8 +107,8 @@ class StoreState {
     var child = store.createNew(childType, childId, txNext);
     var parentNext = store.nextVersion(parentCurrent, txNext);
 
-    var p2c = Link.create(parentNext, PARENT_OF, child, txNext);
-    var c2p = Link.create(child, CHILD_OF, parentNext, txNext);
+    var p2c = MemoryLink.create(parentNext, PARENT_OF, child, txNext);
+    var c2p = MemoryLink.create(child, CHILD_OF, parentNext, txNext);
 
     var lrNext = resources
       .put(parentId, parentNext)
@@ -126,35 +126,33 @@ class StoreState {
     return StoreUpdate.of(child, stateNext);
   }
 
-  <R extends Resource<R>> StoreUpdate<R> delete(R r) {
-    var childCount = countChildren(r.id());
-    if (childCount > 0) {
-      throw new IllegalStateException("Can't delete " + r + "; " + childCount + " children");
+  <R extends Resource<R>> StoreUpdate<R> delete(MemoryResource<R> r, boolean recursive) {
+    if (!recursive) {
+      var childCount = countChildren(r.id());
+      if (childCount > 0) {
+        throw new IllegalStateException("Can't delete " + r + "; " + childCount + " children");
+      }
     }
-    return deleteRecursive(r);
-  }
-
-  <R extends Resource<R>> StoreUpdate<R> deleteRecursive(R r) {
     var txNext = tx.next();
-    return StoreUpdate.of(getStore(r).delete(r, txNext), deleteRecursive(r, txNext));
+    return StoreUpdate.of(r.store().delete(r, txNext), deleteRecursive(r, txNext));
   }
 
-  Traversable<Link> linksBySource(UUID id) {
+  Traversable<MemoryLink> linksBySource(UUID id) {
     return linksBySource.getOrElse(id, HashSet.empty());
   }
 
-  Traversable<Link> linksByTarget(UUID id) {
+  Traversable<MemoryLink> linksByTarget(UUID id) {
     return linksByTarget.getOrElse(id, HashSet.empty());
   }
 
   // ------------------------------------------------------------
   // Private instance methods
 
-  private Traversable<Resource<?>> findChildren(UUID id) {
+  private Traversable<MemoryResource<?>> findChildren(UUID id) {
     return linksBySource(id)
       .filter(l -> l.type() == PARENT_OF)
       .filter(Link::isLive)
-      .map(Link::target);
+      .map(MemoryLink::target);
   }
 
   /**
@@ -165,18 +163,18 @@ class StoreState {
    * @param txNext The final transaction.
    * @return The final state.
    */
-  private StoreState deleteRecursive(Resource<?> r, Transaction txNext) {
+  private StoreState deleteRecursive(MemoryResource<?> r, Transaction txNext) {
     var current = current(r);
     var id = current.id();
-    var tombstone = getStore(current).delete(current, txNext);
+    var tombstone = current.store().delete(current, txNext);
 
     var liveBySource = linksBySource(id).filter(Link::isLive);
     var liveByTarget = linksByTarget(id).filter(Link::isLive);
 
     var rsNext = resources.put(id, tombstone);
 
-    var l2dBySource = liveBySource.map(l -> Tuple.of(l, l.deleted(tombstone, getStore(l.target()).nextVersion(l.target(), txNext), txNext)));
-    var l2dByTarget = liveByTarget.map(l -> Tuple.of(l, l.deleted(getStore(l.source()).nextVersion(l.source(), txNext), tombstone, txNext)));
+    var l2dBySource = liveBySource.map(l -> Tuple.of(l, l.deleted(tombstone, l.target().store().nextVersion(l.target(), txNext), txNext)));
+    var l2dByTarget = liveByTarget.map(l -> Tuple.of(l, l.deleted(l.source().store().nextVersion(l.source(), txNext), tombstone, txNext)));
     var liveToDead = List.of(l2dBySource, l2dByTarget).flatMap(Function.identity());
 
     var lbsNext = liveToDead.foldLeft(linksBySource, (lbs, t) -> lbs.replace(t._1.sourceId(), t._1, t._2));
@@ -184,13 +182,12 @@ class StoreState {
 
     var stateNext = new StoreState(txNext, rsNext, lbsNext, lbtNext);
 
-    var children = liveBySource.filter(l -> l.type() == PARENT_OF).map(Link::target);
+    var children = liveBySource.filter(l -> l.type() == PARENT_OF).map(MemoryLink::target);
     return children.foldLeft(stateNext, (storeState, r1) -> storeState.deleteRecursive(r1, txNext));
   }
 
-  private Resource<?> current(Resource<?> resource) {
-    return resources.get(resource.id())
-      .flatMap(r -> r.as(resource.type()))
+  private MemoryResource<?> current(MemoryResource<?> resource) {
+    return resources.get(resource.id()).filter(r -> r.hasType(resource.type()))
       .getOrElseThrow(() ->
         new ResourceNotFoundException(resource.id(), resource.type())
       );
@@ -198,10 +195,6 @@ class StoreState {
 
   private int countChildren(UUID id) {
     return findChildren(id).size();
-  }
-
-  private static <R extends Resource<R>> MemoryStore getStore(Resource<R> resource) {
-    return ((MemoryResource<R>) resource).store();
   }
 
   // ------------------------------------------------------------

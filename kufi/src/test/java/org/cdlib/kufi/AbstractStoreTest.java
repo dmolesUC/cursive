@@ -77,16 +77,6 @@ public abstract class AbstractStoreTest<S extends Store> {
       assertThat(res1).isEqualTo(res0);
     }
 
-// TODO: replace this test
-//    @ParameterizedTest
-//    @MethodSource("org.cdlib.kufi.ResourceType#values")
-//    void resourcesAreNotEqualToDifferentVersionsOfThemselves(ResourceType<?> type) {
-//      var res0 = valueEmittedBy(create(type));
-//      var res1 = res0.nextVersion(res0.currentVersion().transaction().next());
-//      assertThat(res0).isNotEqualTo(res1);
-//      assertThat(res1).isNotEqualTo(res0);
-//    }
-
     @ParameterizedTest
     @MethodSource("org.cdlib.kufi.ResourceType#values")
     void differentResourceTypesAreDifferent(ResourceType<?> type) {
@@ -106,18 +96,6 @@ public abstract class AbstractStoreTest<S extends Store> {
       assertThat(res0).isNotEqualTo(res1);
       assertThat(res1).isNotEqualTo(res0);
     }
-
-// TODO: replace this test
-//    @ParameterizedTest
-//    @MethodSource("org.cdlib.kufi.ResourceType#values")
-//    void laterVersionsAreLaterAndEarlierVersionsAreEarlier(ResourceType<?> type) {
-//      var res0 = valueEmittedBy(create(type));
-//      var res1 = res0.nextVersion(res0.currentVersion().transaction().next());
-//      assertThat(res0.isEarlierVersionOf(res1)).isTrue();
-//      assertThat(res1.isLaterVersionOf(res0)).isTrue();
-//      assertThat(res0.isLaterVersionOf(res1)).isFalse();
-//      assertThat(res1.isEarlierVersionOf(res0)).isFalse();
-//    }
 
     @ParameterizedTest
     @MethodSource("org.cdlib.kufi.ResourceType#values")
@@ -149,6 +127,16 @@ public abstract class AbstractStoreTest<S extends Store> {
       assertThat(tombstone0).isEqualTo(tombstone1);
       assertThat(tombstone1).isEqualTo(tombstone0);
     }
+
+    @ParameterizedTest
+    @MethodSource("org.cdlib.kufi.ResourceType#values")
+    @SuppressWarnings("unchecked")
+    void deleteAcceptsResourceObjectsNotCreatedByStore(ResourceType<?> type) {
+      var actual = valueEmittedBy(create(type));
+      var equivalent = mockEquivalentResource(actual);
+      assertThat(delete(equivalent)).emittedValueThat(isTombstoneFor(actual));
+    }
+
   }
 
   @Nested
@@ -271,9 +259,7 @@ public abstract class AbstractStoreTest<S extends Store> {
     void typesCannotCastToWrongImplType(ResourceType<?> type) {
       var resource = valueEmittedBy(create(type));
       for (var wrongType : ResourceType.values().filter(t -> !type.equals(t))) {
-        assertThatIllegalArgumentException().isThrownBy(() -> {
-          wrongType.cast(resource);
-        });
+        assertThatIllegalArgumentException().isThrownBy(() -> wrongType.cast(resource));
       }
     }
   }
@@ -319,17 +305,36 @@ public abstract class AbstractStoreTest<S extends Store> {
       var parentLinks = valuesEmittedBy(store.linksFrom(parent.id()));
       var childLinks = valuesEmittedBy(store.linksFrom(child.id()));
 
-      var expectedParentChildLink = Link.create(parentNext, PARENT_OF, child, tx);
-      var expectedChildParentLink = Link.create(child, CHILD_OF, parentNext, tx);
+      assertThat(parentLinks)
+        .filteredOn(l -> l.type() == PARENT_OF)
+        .filteredOn(l -> l.source().equals(parentNext))
+        .filteredOn(l -> l.target().equals(child))
+        .filteredOn(l -> l.createdAt().equals(tx))
+        .isNotEmpty();
 
-      assertThat(parentLinks).contains(expectedParentChildLink);
-      assertThat(childLinks).contains(expectedChildParentLink);
+      assertThat(childLinks)
+        .filteredOn(l -> l.type() == CHILD_OF)
+        .filteredOn(l -> l.source().equals(child))
+        .filteredOn(l -> l.target().equals(parentNext))
+        .filteredOn(l -> l.createdAt().equals(tx))
+        .isNotEmpty();
 
       var linksToChild = valuesEmittedBy(store.linksTo(child.id()));
       var linksToParent = valuesEmittedBy(store.linksTo(parent.id()));
 
-      assertThat(linksToChild).contains(expectedParentChildLink);
-      assertThat(linksToParent).contains(expectedChildParentLink);
+      assertThat(linksToChild)
+        .filteredOn(l -> l.type() == PARENT_OF)
+        .filteredOn(l -> l.source().equals(parentNext))
+        .filteredOn(l -> l.target().equals(child))
+        .filteredOn(l -> l.createdAt().equals(tx))
+        .isNotEmpty();
+
+      assertThat(linksToParent)
+        .filteredOn(l -> l.type() == CHILD_OF)
+        .filteredOn(l -> l.source().equals(child))
+        .filteredOn(l -> l.target().equals(parentNext))
+        .filteredOn(l -> l.createdAt().equals(tx))
+        .isNotEmpty();
     }
 
     @ParameterizedTest
@@ -337,6 +342,34 @@ public abstract class AbstractStoreTest<S extends Store> {
     void parentChildLink(ResourceType<?> parentType, ResourceType<?> childType) {
       var parent = createParent(parentType);
       var child = valueEmittedBy(create(parent, childType));
+      var tx = child.currentVersion().transaction();
+      var parentNext = valueEmittedBy(store.find(parent.id(), parentType));
+
+      var parentLinks = valuesEmittedBy(store.linksFrom(parent.id()));
+      var childLinks = valuesEmittedBy(store.linksFrom(child.id()));
+
+      var parentLink = parentLinks.find(l -> l.type() == PARENT_OF).get();
+      assertThat(parentLink.source()).isEqualTo(parentNext);
+      assertThat(parentLink.target()).isEqualTo(child);
+      assertThat(parentLink.isLive()).isTrue();
+      assertThat(parentLink.createdAt()).isEqualTo(tx);
+      assertThat(parentLink.deletedAt()).isEmpty();
+
+      var childLink = childLinks.find(l -> l.type() == CHILD_OF).get();
+      assertThat(childLink.source()).isEqualTo(child);
+      assertThat(childLink.target()).isEqualTo(parentNext);
+      assertThat(childLink.isLive()).isTrue();
+      assertThat(childLink.createdAt()).isEqualTo(tx);
+      assertThat(childLink.deletedAt()).isEmpty();
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.cdlib.kufi.AbstractStoreTest#parentToChildTypes")
+    @SuppressWarnings("unchecked")
+    void createAcceptsResourceObjectsNotCreatedByStore(ResourceType<?> parentType, ResourceType<?> childType) {
+      var parent = createParent(parentType);
+      var equivalent = mockEquivalentResource(parent);
+      var child = valueEmittedBy(create(equivalent, childType));
       var tx = child.currentVersion().transaction();
       var parentNext = valueEmittedBy(store.find(parent.id(), parentType));
 
@@ -406,11 +439,21 @@ public abstract class AbstractStoreTest<S extends Store> {
       var parentLinks = valuesEmittedBy(store.linksFrom(parent.id()));
       var childLinks = valuesEmittedBy(store.linksFrom(child.id()));
 
-      var expectedParentChildLink = Link.create(parentTombstone, PARENT_OF, childTombstone, tx, txNext);
-      var expectedChildParentLink = Link.create(childTombstone, CHILD_OF, parentTombstone, tx, txNext);
+      assertThat(parentLinks)
+        .filteredOn(l -> l.type() == PARENT_OF)
+        .filteredOn(l -> l.source().equals(parentTombstone))
+        .filteredOn(l -> l.target().equals(childTombstone))
+        .filteredOn(l -> l.createdAt().equals(tx))
+        .filteredOn(l -> l.deletedAt().contains(txNext))
+        .isNotEmpty();
 
-      assertThat(parentLinks).contains(expectedParentChildLink);
-      assertThat(childLinks).contains(expectedChildParentLink);
+      assertThat(childLinks)
+        .filteredOn(l -> l.type() == CHILD_OF)
+        .filteredOn(l -> l.source().equals(childTombstone))
+        .filteredOn(l -> l.target().equals(parentTombstone))
+        .filteredOn(l -> l.createdAt().equals(tx))
+        .filteredOn(l -> l.deletedAt().contains(txNext))
+        .isNotEmpty();
     }
 
     Resource<?> verifyTombstone(Resource<?> r) {
@@ -486,4 +529,17 @@ public abstract class AbstractStoreTest<S extends Store> {
     }
     throw new IllegalArgumentException("Can't delete " + r.type());
   }
+
+  @SuppressWarnings("unchecked")
+  private static Resource<?> mockEquivalentResource(Resource<?> actual) {
+    var type = actual.type();
+    var mock = mock(type.implType());
+    when(mock.type()).thenReturn((ResourceType) type);
+    when(mock.hasType(type)).thenReturn(true);
+    when(mock.id()).thenReturn(actual.id());
+    when(mock.currentVersion()).thenReturn(actual.currentVersion());
+    when(mock.deletedAt()).thenReturn(actual.deletedAt());
+    return mock;
+  }
+
 }

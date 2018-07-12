@@ -1,15 +1,23 @@
 package org.cdlib.kufi.memory;
 
+import io.vavr.Lazy;
 import io.vavr.collection.Array;
+import io.vavr.collection.HashMap;
+import io.vavr.collection.Map;
 import io.vavr.control.Option;
-import org.cdlib.kufi.AbstractResource;
-import org.cdlib.kufi.Resource;
-import org.cdlib.kufi.ResourceType;
-import org.cdlib.kufi.Version;
+import org.cdlib.kufi.*;
 
 import java.util.UUID;
 
 abstract class MemoryResource<R extends Resource<R>> extends AbstractResource<R> {
+
+  // ------------------------------------------------------------
+  // Class fields
+
+  private static final Lazy<Map<ResourceType<?>, ResourceConstructor<?>>> creators = Lazy.of(() -> HashMap.of(
+    ResourceType.WORKSPACE, (ResourceConstructor<Workspace>) MemoryWorkspace::new,
+    ResourceType.COLLECTION, (ResourceConstructor<Collection>) MemoryCollection::new
+  ));
 
   // ------------------------------------------------------------
   // Instance fields
@@ -37,5 +45,10 @@ abstract class MemoryResource<R extends Resource<R>> extends AbstractResource<R>
 
   MemoryStore store() {
     return store;
+  }
+
+  @SuppressWarnings("unchecked")
+  static <R extends Resource<R>> ResourceConstructor<R> creatorFor(ResourceType<R> type) {
+    return creators.get().get(type).map(b -> (ResourceConstructor<R>) b).get();
   }
 }
